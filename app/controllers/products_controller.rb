@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: [ :show, :edit, :update, :destroy ]
   def index
-    @products = current_account.products.order(created_at: :desc)
+    @products = current_account.products.order(created_at: :asc)
   end
 
   def show
