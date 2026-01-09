@@ -5,7 +5,13 @@ class ApplicationController < ActionController::Base
   before_action :require_account
   before_action :authenticate_user!
 
+  helper_method :current_account
+
   private
+
+  def current_account
+    @current_account ||= current_user&.account
+  end
 
   def require_account
     return unless user_signed_in?
