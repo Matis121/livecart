@@ -1,0 +1,94 @@
+<aside class="w-56 bg-base-100 min-h-screen flex flex-col">
+  <!-- Logo -->
+  <div class="px-5 py-6">
+    <a href="<%= root_path %>" class="flex items-center gap-2">
+      <span class="text-lg font-semibold tracking-tight">Livecart</span>
+    </a>
+  </div>
+  <!-- Navigation -->
+  <nav class="flex-1 px-3">
+    <ul class="space-y-1">
+      <li>
+        <%= link_to root_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(root_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+          <%= lucide_icon('layout-dashboard', class: 'w-4 h-4') %>
+          <span>Dashboard</span>
+        <% end %>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('message-circle', class: 'w-4 h-4') %>
+          <span>Chat</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('package', class: 'w-4 h-4') %>
+          <span>Produkty</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('shopping-bag', class: 'w-4 h-4') %>
+          <span>Zamówienia</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('users', class: 'w-4 h-4') %>
+          <span>Klienci</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('radio', class: 'w-4 h-4') %>
+          <span>Transmisje</span>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('blocks', class: 'w-4 h-4') %>
+          <span>Integracje</span>
+        </a>
+      </li>
+    </ul>
+    <div class="my-4 mx-3 border-t border-base-200"></div>
+    <ul class="space-y-1">
+      <li>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+          <%= lucide_icon('settings', class: 'w-4 h-4') %>
+          <span>Ustawienia</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- User section -->
+  <% if user_signed_in? %>
+    <div class="p-3 mt-auto">
+      <div class="dropdown dropdown-top w-full">
+        <div tabindex="0" role="button" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-base-200/50 transition-colors cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+            <span class="text-xs font-medium text-base-content/70"><%= current_user.email[0].upcase %></span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate"><%= current_user.account&.company_name || 'Mój sklep' %></p>
+          </div>
+          <%= lucide_icon('chevrons-up-down', class: 'w-4 h-4 text-base-content/40') %>
+        </div>
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-lg z-[1] w-full p-1 shadow-lg border border-base-200 mb-1">
+          <li>
+            <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-md" do %>
+              <%= lucide_icon('user', class: 'w-4 h-4') %>
+              Profil
+            <% end %>
+          </li>
+          <li>
+            <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-md text-error w-full text-left" do %>
+              <%= lucide_icon('log-out', class: 'w-4 h-4') %>
+              Wyloguj się
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+</aside>

@@ -20,30 +20,9 @@
   <body class="bg-base-200 min-h-screen">
     <div class="flex">
       <!-- Sidebar -->
-      <aside class="w-64 bg-base-100 min-h-screen p-4 border-r border-base-300 flex flex-col">
-        <div class="text-xl font-bold text-primary mb-8 px-2">
-          🛒 Livecart
-        </div>
-        <nav class="flex-1 space-y-1">
-          <%= link_to root_path, class: "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-base-200 transition-colors #{'bg-base-200 text-primary' if current_page?(root_path)}" do %>
-            <i class="fas fa-home w-5"></i>
-            <span>Dashboard</span>
-          <% end %>
-          <!-- Dodaj więcej linków tutaj -->
-        </nav>
-        <!-- User section -->
-        <div class="border-t border-base-300 pt-4 mt-4">
-          <% if user_signed_in? %>
-            <div class="px-3 py-2 text-sm text-base-content/60 mb-2">
-              <%= current_user.email %>
-            </div>
-            <%= button_to destroy_user_session_path, method: :delete, class: "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-error/10 hover:text-error transition-colors text-left" do %>
-              <i class="fas fa-sign-out-alt w-5"></i>
-              <span>Wyloguj się</span>
-            <% end %>
-          <% end %>
-        </div>
-      </aside>
+      <% if user_signed_in? %>
+        <%= render "layouts/sidebar" %>
+      <% end %>
       <!-- Main content -->
       <main class="flex-1 p-8">
         <% if notice %>
