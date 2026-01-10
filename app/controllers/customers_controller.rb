@@ -1,0 +1,45 @@
+class CustomersController < ApplicationController
+  before_action :set_customer, only: [ :edit, :update, :destroy ]
+  def index
+    @customers = current_account.customers.order(created_at: :asc)
+  end
+
+  def edit
+  end
+
+  def new
+    @customer = Customer.new
+  end
+
+  def create
+    @customer = current_account.customers.build(customer_params)
+    if @customer.save
+      redirect_to customers_path, notice: "Klient został utworzony"
+    else
+      render :new
+    end
+  end
+
+  def update
+    if @customer.update(customer_params)
+      redirect_to customers_path, notice: "Klient został zaktualizowany"
+    else
+      render :edit
+    end
+  end
+
+  def destroy
+    @customer.destroy
+    redirect_to customers_path, notice: "Klient został usunięty"
+  end
+
+  private
+
+  def set_customer
+    @customer = current_account.customers.find(params[:id])
+  end
+
+  def customer_params
+    params.require(:customer).permit(:first_name, :last_name, :platform_user_id, :platform, :platform_username, :profile_data)
+  end
+end

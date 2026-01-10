@@ -1,0 +1,11 @@
+<%= form_with model: @customer do |f| %>
+  <div class="form-control w-full">
+    <%= f.label :first_name, "Imię", class: "label" %>
+    <%= f.text_field :first_name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Jan" %>
+  </div>
+  <div class="form-control w-full">
+    <%= f.label :last_name, "Nazwisko", class: "label" %>
+    <%= f.text_field :last_name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Kowalski" %>
+  </div>
+  <%= f.submit "Zapisz", class: "btn btn-primary" %>
+<% end %>

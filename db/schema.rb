@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_09_225505) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_09_225505) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "customers", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "platform_user_id"
+    t.string "platform"
+    t.string "platform_username"
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.json "profile_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_customers_on_account_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "name"
@@ -79,6 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_09_225505) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "customers", "accounts"
   add_foreign_key "products", "accounts"
   add_foreign_key "users", "accounts"
 end

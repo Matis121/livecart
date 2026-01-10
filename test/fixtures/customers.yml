@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  platform_user_id: MyString
+  platform: MyString
+  platform_username: MyString
+  first_name: MyString
+  last_name: MyString
+  profile_data: 
+
+two:
+  account: two
+  platform_user_id: MyString
+  platform: MyString
+  platform_username: MyString
+  first_name: MyString
+  last_name: MyString
+  profile_data: 

@@ -33,10 +33,10 @@
         </a>
       </li>
       <li>
-        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+        <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
           <%= lucide_icon('users', class: 'w-4 h-4') %>
           <span>Klienci</span>
-        </a>
+        <% end %>
       </li>
       <li>
         <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">

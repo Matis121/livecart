@@ -11,5 +11,6 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   resources :onboarding_accounts, only: [ :new, :create ]
   resources :products, controller: "products"
+  resources :customers, controller: "customers"
   root "dashboard#index"
 end
