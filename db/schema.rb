@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_11_214128) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "billing_addresses", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.boolean "needs_invoice"
+    t.string "company_name"
+    t.string "nip"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address_line1"
+    t.string "address_line2"
+    t.string "city"
+    t.string "postal_code"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_billing_addresses_on_order_id"
+  end
+
   create_table "customers", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "platform_user_id"
@@ -60,6 +77,40 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_customers_on_account_id"
+  end
+
+  create_table "order_items", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "product_id"
+    t.string "name", null: false
+    t.string "ean", null: false
+    t.string "sku", null: false
+    t.decimal "unit_price", null: false
+    t.integer "quantity", null: false
+    t.decimal "total_price", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+    t.index ["product_id"], name: "index_order_items_on_product_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "customer_id"
+    t.string "order_number", null: false
+    t.string "order_token", null: false
+    t.string "status", null: false
+    t.string "email"
+    t.string "phone"
+    t.decimal "total_amount", null: false
+    t.decimal "shipping_cost", default: "0.0", null: false
+    t.string "currency", default: "PLN", null: false
+    t.string "shipping_method"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_orders_on_account_id"
+    t.index ["customer_id"], name: "index_orders_on_customer_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -74,6 +125,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_products_on_account_id"
+  end
+
+  create_table "shipping_addresses", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address_line1"
+    t.string "address_line2"
+    t.string "city"
+    t.string "postal_code"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_shipping_addresses_on_order_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -92,7 +157,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_10_222922) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "billing_addresses", "orders"
   add_foreign_key "customers", "accounts"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "products"
+  add_foreign_key "orders", "accounts"
+  add_foreign_key "orders", "customers"
   add_foreign_key "products", "accounts"
+  add_foreign_key "shipping_addresses", "orders"
   add_foreign_key "users", "accounts"
 end

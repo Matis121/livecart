@@ -12,5 +12,6 @@ Rails.application.routes.draw do
   resources :onboarding_accounts, only: [ :new, :create ]
   resources :products, controller: "products"
   resources :customers, controller: "customers"
+  resources :orders, controller: "orders"
   root "dashboard#index"
 end

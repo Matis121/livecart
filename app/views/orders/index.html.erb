@@ -1,0 +1,66 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold">Zamówienia</h1>
+  <%= link_to "Nowe zamówienie", new_order_path, class: "btn btn-primary" %>
+</div>
+<div class="container mx-auto px-4 py-8">
+  <div class="overflow-x-auto">
+    <table class="table table-zebra">
+      <thead>
+        <tr>
+          <th>Numer zamówienia</th>
+          <th>Klient</th>
+          <th>Status</th>
+          <th>Suma</th>
+          <th>Data utworzenia</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td>
+                <%= link_to order.order_number, order_path(order), class: "link link-primary font-semibold" %>
+              </td>
+              <td>
+                <div>
+                  <div class="font-medium"><%= order.customer&.name || "Brak danych" %></div>
+                  <div class="text-sm opacity-60"><%= order.email %></div>
+                </div>
+              </td>
+              <td>
+                <% status_class = case order.status
+                  when "sent" then "badge-info"
+                  when "processing" then "badge-warning"
+                  when "completed" then "badge-success"
+                  when "paid" then "badge-success"
+                  when "cancelled" then "badge-error"
+                  else "badge-ghost"
+                  end
+                %>
+                <span class="badge <%= status_class %>">
+                  <%= {
+                    "sent" => "Wysłane",
+                    "processing" => "W trakcie",
+                    "completed" => "Zrealizowane",
+                    "paid" => "Opłacone",
+                    "cancelled" => "Anulowane"
+                  }[order.status] || order.status %>
+                </span>
+              </td>
+              <td class="font-semibold">
+                <%= number_to_currency(order.total_amount + order.shipping_cost, unit: order.currency, format: "%n %u") %>
+              </td>
+              <td><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
+              <td>
+                <div class="flex gap-2">
+                  <%= link_to "Szczegóły", order_path(order), class: "btn btn-sm btn-ghost" %>
+                  <%= link_to "Edytuj", edit_order_path(order), class: "btn btn-sm btn-primary" %>
+                  <%= button_to "Usuń", order_path(order), method: :delete, class: "btn btn-sm btn-error", data: { turbo_confirm: "Na pewno usunąć zamówienie #{order.order_number}?" } %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

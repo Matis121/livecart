@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  customer: one
+  stream: one
+  order_number: MyString
+  order_token: MyString
+  status: MyString
+  email: MyString
+  phone: MyString
+  total_amount: 9.99
+  shipping_cost: 9.99
+  shipping_method: MyString
+  comment: MyText
+
+two:
+  account: two
+  customer: two
+  stream: two
+  order_number: MyString
+  order_token: MyString
+  status: MyString
+  email: MyString
+  phone: MyString
+  total_amount: 9.99
+  shipping_cost: 9.99
+  shipping_method: MyString
+  comment: MyText
