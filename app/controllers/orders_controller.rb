@@ -26,6 +26,12 @@ class OrdersController < ApplicationController
     end
   end
 
+  def destroy
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    @order.destroy
+    redirect_to orders_path, notice: "Zamówienie zostało usunięte"
+  end
+
   private
 
   def order_params
