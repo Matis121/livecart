@@ -12,6 +12,23 @@ Rails.application.routes.draw do
   resources :onboarding_accounts, only: [ :new, :create ]
   resources :products, controller: "products"
   resources :customers, controller: "customers"
-  resources :orders, controller: "orders"
+  resources :orders, controller: "orders" do
+    resources :order_items, only: [ :new, :create, :edit, :update, :destroy ] do
+      post :quick_add, on: :collection
+    end
+    resource :shipping_address, only: [ :edit, :update ] do
+      patch :copy_from_billing
+    end
+    resource :billing_address, only: [ :edit, :update ] do
+      patch :copy_from_shipping
+    end
+    get :edit_customer, on: :member
+    get :edit_contact_info, on: :member
+    patch :update_contact_info, on: :member
+    get :edit_payment, on: :member
+    patch :update_payment, on: :member
+    get :edit_shipping_payment_methods, on: :member
+    patch :update_shipping_payment_methods, on: :member
+  end
   root "dashboard#index"
 end

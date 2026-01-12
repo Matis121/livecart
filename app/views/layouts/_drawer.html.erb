@@ -1,0 +1,21 @@
+<div class="drawer lg:drawer-open">
+  <input id="main-drawer" type="checkbox" class="drawer-toggle" />
+  
+  <!-- Main content -->
+  <div class="drawer-content flex flex-col">
+    <!-- Navbar with hamburger for mobile -->
+    <%= render "layouts/navbar" %>
+    
+    <!-- Page content -->
+    <main class="flex-1">
+      <%= render "layouts/flash_messages" %>
+      <%= yield %>
+    </main>
+  </div>
+  
+  <!-- Sidebar -->
+  <div class="drawer-side z-40">
+    <label for="main-drawer" class="drawer-overlay"></label>
+    <%= render "layouts/sidebar" %>
+  </div>
+</div>

@@ -1,0 +1,237 @@
+<%= turbo_frame_tag "new_order_item" do %>
+  <div class="mb-4 pt-4 border-t" data-controller="order-item-form">
+    <!-- Mode Selector -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+      <h3 class="font-semibold text-sm sm:text-base">Dodaj produkt do zamówienia</h3>
+      <div class="btn-group w-full sm:w-auto">
+        <button type="button" 
+                class="btn btn-sm btn-active flex-1 sm:flex-initial" 
+                data-action="click->order-item-form#showFromStock">
+          <%= lucide_icon("package", class: "w-4 h-4") %>
+          <span class="hidden xs:inline">Z magazynu</span>
+          <span class="xs:hidden">Magazyn</span>
+        </button>
+        <button type="button" 
+                class="btn btn-sm flex-1 sm:flex-initial" 
+                data-action="click->order-item-form#showManual">
+          <%= lucide_icon("pencil", class: "w-4 h-4") %>
+          Ręcznie
+        </button>
+      </div>
+    </div>
+
+      <!-- FROM STOCK MODE - Quick Add -->
+      <div data-order-item-form-target="fromStock">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Wybierz produkty z magazynu</span>
+          </label>
+          
+          <!-- Custom Dropdown with Search -->
+          <div class="dropdown w-full" data-order-item-form-target="dropdown">
+            <div class="relative">
+              <input 
+                type="text" 
+                placeholder="Wpisz minimum 2 znaki aby wyszukać produkt..." 
+                class="input input-bordered w-full"
+                data-action="input->order-item-form#filterProducts focus->order-item-form#handleFocus"
+                data-order-item-form-target="searchInput"
+                autocomplete="off">
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <%= lucide_icon("search", class: "w-5 h-5 opacity-50") %>
+              </div>
+            </div>
+            
+            <div class="dropdown-content z-10 mt-2 w-full bg-base-100 rounded-lg shadow-2xl border border-base-300 hidden"
+                 data-order-item-form-target="dropdownMenu">
+              <div class="max-h-[400px] overflow-y-auto">
+                <div class="p-2" data-order-item-form-target="productsList">
+                  <% @products.each do |product| %>
+                    <button 
+                      type="button"
+                      class="product-item flex gap-3 items-center p-3 hover:bg-base-200 active:bg-base-300 w-full text-left rounded-lg transition-colors"
+                      data-action="click->order-item-form#addToCart"
+                      data-search-text="<%= "#{product.name} #{product.sku} #{product.ean}".downcase %>"
+                      data-product-id="<%= product.id %>"
+                      data-product-name="<%= product.name %>"
+                      data-product-sku="<%= product.sku %>"
+                      data-product-ean="<%= product.ean %>"
+                      data-product-price="<%= product.gross_price %>"
+                      data-product-currency="<%= product.currency %>"
+                      data-product-image="<%= product.images.attached? ? url_for(product.images.first) : '' %>">
+                      <!-- Zdjęcie -->
+                      <div class="avatar flex-shrink-0">
+                        <div class="w-12 h-12 rounded">
+                          <% if product.images.attached? %>
+                            <%= image_tag product.images.first, alt: product.name, class: "object-cover w-full h-full" %>
+                          <% else %>
+                            <div class="w-full h-full bg-base-200 flex items-center justify-center">
+                              <%= lucide_icon("image", class: "w-6 h-6 opacity-30") %>
+                            </div>
+                          <% end %>
+                        </div>
+                      </div>
+                      
+                      <!-- Informacje -->
+                      <div class="flex-1 min-w-0">
+                        <div class="font-medium truncate"><%= product.name %></div>
+                        <div class="text-xs opacity-60 flex gap-3 mt-0.5">
+                          <span>SKU: <span class="font-mono"><%= product.sku || "-" %></span></span>
+                          <span>EAN: <span class="font-mono"><%= product.ean || "-" %></span></span>
+                        </div>
+                      </div>
+                      
+                      <!-- Cena -->
+                      <div class="flex-shrink-0 text-right">
+                        <div class="font-bold text-primary">
+                          <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
+                        </div>
+                        <div class="text-xs opacity-60">
+                          <%= product.quantity %> szt.
+                        </div>
+                      </div>
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+              
+              <div data-order-item-form-target="minChars" class="hidden p-8 text-center text-base-content/60">
+                <%= lucide_icon("type", class: "w-12 h-12 mx-auto opacity-30 mb-2") %>
+                <p>Wpisz minimum 2 znaki aby wyszukać produkt</p>
+              </div>
+              
+              <div data-order-item-form-target="noResults" class="hidden p-8 text-center text-base-content/60">
+                <%= lucide_icon("search-x", class: "w-12 h-12 mx-auto opacity-30 mb-2") %>
+                <p>Nie znaleziono produktów</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart - Lista produktów do dodania -->
+        <div data-order-item-form-target="cartContainer" class="hidden mt-4">
+          <div class="bg-base-200 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-3">
+              <h4 class="font-semibold">Produkty do dodania (<span data-order-item-form-target="cartCount">0</span>)</h4>
+            </div>
+            
+            <div class="space-y-2" data-order-item-form-target="cartItems">
+              <!-- Cart items will be inserted here by JavaScript -->
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div class="flex justify-end gap-2">
+              <%= form_with url: quick_add_order_order_items_path(@order), 
+                  method: :post,
+                  data: { 
+                    action: "submit->order-item-form#submitCart"
+                  } do |f| %>
+                <input type="hidden" name="cart_items" data-order-item-form-target="cartData">
+                <%= link_to "Anuluj", order_path(@order), data: { turbo_frame: "_top" }, class: "btn btn-ghost" %>
+                <%= button_tag type: "submit", class: "btn btn-primary" do %>
+                  <%= lucide_icon("plus", class: "w-4 h-4") %>
+                  Dodaj wszystkie do zamówienia
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANUAL MODE - Full Form -->
+      <div data-order-item-form-target="manual" class="hidden">
+        
+        <%= form_with model: [@order, @order_item], class: "space-y-4", data: { turbo_frame: "_top" } do |f| %>
+          <!-- Nazwa produktu - pełna szerokość -->
+          <div class="form-control">
+            <%= f.label :name, "Nazwa produktu", class: "label font-semibold" %>
+            <%= f.text_field :name, 
+                class: "input input-bordered w-full", 
+                placeholder: "Wprowadź nazwę produktu", 
+                required: true,
+                data: { order_item_form_target: "name" } 
+            %>
+          </div>
+
+          <!-- SKU i EAN w jednej linii -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="form-control">
+              <%= f.label :sku, "SKU (opcjonalnie)", class: "label" %>
+              <%= f.text_field :sku, 
+                  class: "input input-bordered w-full", 
+                  placeholder: "SKU-123",
+                  data: { order_item_form_target: "sku" }
+              %>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :ean, "EAN (opcjonalnie)", class: "label" %>
+              <%= f.text_field :ean, 
+                  class: "input input-bordered w-full", 
+                  placeholder: "1234567890123",
+                  data: { order_item_form_target: "ean" }
+              %>
+            </div>
+          </div>
+
+          <!-- Cena, ilość i suma w jednej linii -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="form-control">
+              <%= f.label :unit_price, "Cena jedn.", class: "label font-semibold" %>
+              <%= f.number_field :unit_price, 
+                  step: 0.01, 
+                  class: "input input-bordered w-full", 
+                  placeholder: "0.00", 
+                  required: true,
+                  data: { 
+                    order_item_form_target: "unitPrice",
+                    action: "input->order-item-form#calculateTotal"
+                  }
+              %>
+              <label class="label">
+                <span class="label-text-alt"><%= @order.currency %></span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :quantity, "Ilość", class: "label font-semibold" %>
+              <%= f.number_field :quantity, 
+                  class: "input input-bordered w-full text-center", 
+                  placeholder: "1", 
+                  required: true, 
+                  min: 1, 
+                  value: 1,
+                  data: { 
+                    order_item_form_target: "quantity",
+                    action: "input->order-item-form#calculateTotal"
+                  }
+              %>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :total_price, "Suma", class: "label font-semibold" %>
+              <%= f.number_field :total_price, 
+                  step: 0.01, 
+                  class: "input input-bordered w-full font-semibold bg-base-200", 
+                  placeholder: "0.00", 
+                  required: true,
+                  readonly: true,
+                  data: { order_item_form_target: "totalPrice" }
+              %>
+              <label class="label">
+                <span class="label-text-alt"><%= @order.currency %> (obliczane automatycznie)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="divider my-2"></div>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-2">
+            <%= link_to "Anuluj", order_path(@order), data: { turbo_frame: "_top" }, class: "btn btn-ghost w-full sm:w-auto" %>
+            <%= f.submit "Dodaj produkt", class: "btn btn-primary w-full sm:w-auto" %>
+          </div>
+        <% end %>
+      </div>
+  </div>
+<% end %>

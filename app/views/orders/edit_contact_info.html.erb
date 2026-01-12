@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "contact_info_section" do %>
+    <h3 class="font-semibold text-base mb-4">Edytuj dane kontaktowe</h3>
+    
+    <%= form_with model: @order, url: update_contact_info_order_path(@order), method: :patch, data: { turbo_frame: "contact_info_section" } do |f| %>
+      <div class="space-y-4">
+        <!-- Email -->
+        <div class="form-control">
+          <%= f.label :email, "Email", class: "label" %>
+          <%= f.email_field :email, class: "input input-bordered w-full", placeholder: "np. jan@example.com" %>
+        </div>
+
+        <!-- Telefon -->
+        <div class="form-control">
+          <%= f.label :phone, "Telefon", class: "label" %>
+          <%= f.text_field :phone, class: "input input-bordered w-full", placeholder: "np. +48 123 456 789" %>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-2 justify-end">
+          <%= link_to "Anuluj", order_path(@order), 
+              class: "btn btn-ghost w-full sm:w-auto" %>
+          <%= f.submit "Zapisz", class: "btn btn-primary w-full sm:w-auto" %>
+        </div>
+      </div>
+    <% end %>
+<% end %>

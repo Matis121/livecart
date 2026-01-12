@@ -1,21 +1,93 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold">Zamówienia</h1>
-  <%= link_to "Nowe zamówienie", new_order_path, class: "btn btn-primary" %>
-</div>
-<div class="container mx-auto px-4 py-8">
-  <div class="overflow-x-auto">
-    <table class="table table-zebra">
-      <thead>
-        <tr>
-          <th>Numer zamówienia</th>
-          <th>Klient</th>
-          <th>Status</th>
-          <th>Suma</th>
-          <th>Data utworzenia</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold">Zamówienia</h1>
+    <%= link_to "Nowe zamówienie", new_order_path, class: "btn btn-primary w-full sm:w-auto" %>
+  </div>
+
+  <% if @orders.any? %>
+    <!-- Widok kartek na mobile -->
+    <div class="md:hidden space-y-3">
+      <% @orders.each do |order| %>
+        <div class="card bg-base-100 shadow-sm border border-base-300">
+          <div class="card-body p-4">
+            <!-- Header z numerem, statusem i menu -->
+            <div class="flex justify-between items-start mb-3">
+              <div class="flex-1 min-w-0">
+                <%= link_to order_path(order), class: "link link-primary font-semibold text-lg block" do %>
+                  <%= order.order_number %>
+                <% end %>
+                <% status_class = case order.status
+                  when "sent" then "badge-info"
+                  when "processing" then "badge-warning"
+                  when "completed" then "badge-success"
+                  when "paid" then "badge-success"
+                  when "cancelled" then "badge-error"
+                  else "badge-ghost"
+                  end
+                %>
+                <span class="badge <%= status_class %> badge-sm mt-1">
+                  <%= {
+                    "sent" => "Wysłane",
+                    "processing" => "W trakcie",
+                    "completed" => "Zrealizowane",
+                    "paid" => "Opłacone",
+                    "cancelled" => "Anulowane"
+                  }[order.status] || order.status %>
+                </span>
+              </div>
+              
+              <!-- Dropdown menu -->
+              <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-sm btn-square">
+                  <%= lucide_icon "more-vertical", class: "w-4 h-4" %>
+                </label>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-40 border border-base-300">
+                  <li>
+                    <%= button_to order_path(order), method: :delete, class: "text-error", data: { turbo_confirm: "Na pewno usunąć zamówienie #{order.order_number}?" } do %>
+                      <%= lucide_icon "trash-2", class: "w-4 h-4" %>
+                      Usuń
+                    <% end %>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <!-- Klient -->
+            <div class="mb-3">
+              <div class="font-medium text-sm"><%= order.customer&.name || "Brak danych" %></div>
+              <div class="text-xs opacity-60"><%= order.email %></div>
+            </div>
+            
+            <!-- Suma i data -->
+            <div class="flex justify-between items-center text-sm">
+              <div>
+                <span class="opacity-60">Suma:</span>
+                <span class="font-semibold ml-1"><%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %></span>
+              </div>
+              <div class="text-xs opacity-60">
+                <%= order.created_at.strftime("%d.%m.%Y") %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Widok tabeli na desktop -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Numer zamówienia</th>
+            <th>Klient</th>
+            <th>Status</th>
+            <th>Suma</th>
+            <th>Data utworzenia</th>
+            <th>Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
           <% @orders.each do |order| %>
             <tr>
               <td>
@@ -48,19 +120,40 @@
                 </span>
               </td>
               <td class="font-semibold">
-                <%= number_to_currency(order.total_amount + order.shipping_cost, unit: order.currency, format: "%n %u") %>
+                <%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %>
               </td>
               <td><%= order.created_at.strftime("%d.%m.%Y %H:%M") %></td>
               <td>
-                <div class="flex gap-2">
-                  <%= link_to "Szczegóły", order_path(order), class: "btn btn-sm btn-ghost" %>
-                  <%= link_to "Edytuj", edit_order_path(order), class: "btn btn-sm btn-primary" %>
-                  <%= button_to "Usuń", order_path(order), method: :delete, class: "btn btn-sm btn-error", data: { turbo_confirm: "Na pewno usunąć zamówienie #{order.order_number}?" } %>
+                <div class="dropdown dropdown-end">
+                  <label tabindex="0" class="btn btn-sm btn-ghost">
+                    <%= lucide_icon "more-vertical", class: "w-4 h-4" %>
+                  </label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
+                    <li>
+                      <%= button_to order_path(order), method: :delete, class: "btn btn-ghost btn-error btn-xs justify-start", data: { turbo_confirm: "Na pewno usunąć zamówienie #{order.order_number}?" } do %>
+                        <%= lucide_icon "trash", class: "w-4 h-4" %>
+                        Usuń
+                      <% end %>
+                    </li>
+                  </ul>
                 </div>
               </td>
             </tr>
           <% end %>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <!-- Pusty stan -->
+    <div class="text-center py-12">
+      <div class="flex flex-col items-center gap-4">
+        <%= lucide_icon("shopping-bag", class: "w-16 h-16 opacity-30") %>
+        <div>
+          <h3 class="text-lg font-semibold mb-1">Brak zamówień</h3>
+          <p class="text-sm opacity-60 mb-4">Utwórz pierwsze zamówienie</p>
+          <%= link_to "Nowe zamówienie", new_order_path, class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

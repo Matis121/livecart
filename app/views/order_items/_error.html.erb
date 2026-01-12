@@ -1,0 +1,11 @@
+<div class="alert alert-error">
+  <%= lucide_icon("circle-x", class: "stroke-current shrink-0 h-6 w-6") %>
+  <div>
+    <h3 class="font-bold">Błąd podczas dodawania produktu</h3>
+    <ul class="list-disc list-inside">
+      <% errors.each do |error| %>
+        <li><%= error %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>

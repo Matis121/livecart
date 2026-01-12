@@ -1,0 +1,80 @@
+<%= turbo_frame_tag "order_items" do %>
+  <% if order.order_items.any? %>
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="w-20">Zdjęcie</th>
+            <th>Produkt</th>
+            <th class="text-right">Cena jedn.</th>
+            <th class="text-center">Ilość</th>
+            <th class="text-right">Suma</th>
+            <th class="text-center w-24">Akcje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% order.order_items.each do |item| %>
+            <%= turbo_frame_tag "order_item_frame_#{item.id}" do %>
+              <tr id="order_item_<%= item.id %>">
+                <td>
+                  <div class="avatar">
+                    <div class="w-16 h-16 rounded">
+                      <% if item.product.present? && item.product.images.attached? %>
+                        <%= image_tag item.product.images.first, alt: item.name, class: "object-cover w-full h-full" %>
+                      <% else %>
+                        <div class="w-full h-full bg-base-200 flex items-center justify-center">
+                          <%= lucide_icon("image", class: "w-8 h-8 opacity-30") %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <div class="font-medium"><%= item.name %></div>
+                    <div class="text-xs opacity-60 mt-1 flex gap-3">
+                      <% if item.sku.present? %>
+                        <span>SKU: <span class="font-mono"><%= item.sku %></span></span>
+                      <% end %>
+                      <% if item.ean.present? %>
+                        <span>EAN: <span class="font-mono"><%= item.ean %></span></span>
+                      <% end %>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-right"><%= number_to_currency(item.unit_price, unit: order.currency, format: "%n %u") %></td>
+                <td class="text-center">
+                  <span class="badge badge-ghost"><%= item.quantity %></span>
+                </td>
+                <td class="text-right font-semibold"><%= number_to_currency(item.total_price, unit: order.currency, format: "%n %u") %></td>
+                <td>
+                  <div class="flex gap-1 justify-center">
+                    <%= link_to edit_order_order_item_path(order, item), 
+                        data: { turbo_frame: "order_item_frame_#{item.id}" },
+                        class: "btn btn-ghost btn-xs" do %>
+                      <%= lucide_icon("pencil", class: "w-4 h-4") %>
+                    <% end %>
+                    <%= button_to order_order_item_path(order, item), 
+                        method: :delete,
+                        data: { turbo_confirm: "Czy na pewno usunąć ten produkt?" },
+                        class: "btn btn-ghost btn-xs text-error" do %>
+                      <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <!-- Pusty stan -->
+    <div class="text-center py-8 text-base-content/60">
+      <div class="flex flex-col items-center gap-2">
+        <%= lucide_icon("shopping-cart", class: "w-12 h-12 opacity-30") %>
+        <span>Brak produktów w zamówieniu</span>
+      </div>
+    </div>
+  <% end %>
+<% end %>

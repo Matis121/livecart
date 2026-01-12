@@ -1,0 +1,41 @@
+<turbo-frame id="shipping_address_section">
+  <div class="flex justify-between items-start mb-3">
+    <h3 class="font-semibold text-base">Adres dostawy</h3>
+    <%= link_to edit_order_shipping_address_path(order), 
+        data: { turbo_frame: "shipping_address_modal" }, 
+        class: "btn btn-ghost btn-sm btn-square" do %>
+      <%= lucide_icon "pencil", class: "w-4 h-4" %>
+    <% end %>
+  </div>
+  <% if shipping_address&.first_name.present? || shipping_address&.address_line1.present? %>
+    <div class="text-sm space-y-1 mb-3">
+      <% if shipping_address.first_name.present? || shipping_address.last_name.present? %>
+        <div class="font-medium"><%= [shipping_address.first_name, shipping_address.last_name].compact.join(" ") %></div>
+      <% end %>
+      <% if shipping_address.address_line1.present? %>
+        <div><%= shipping_address.address_line1 %></div>
+      <% end %>
+      <% if shipping_address.address_line2.present? %>
+        <div><%= shipping_address.address_line2 %></div>
+      <% end %>
+      <% if shipping_address.postal_code.present? || shipping_address.city.present? %>
+        <div><%= [shipping_address.postal_code, shipping_address.city].compact.join(" ") %></div>
+      <% end %>
+      <% if shipping_address.country.present? %>
+        <div><%= shipping_address.country %></div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-base-content/50 mb-3">Brak adresu</p>
+  <% end %>
+  
+  <%= button_to copy_from_billing_order_shipping_address_path(order), 
+      method: :patch,
+      class: "btn btn-ghost btn-xs gap-1",
+      data: { 
+        turbo_confirm: "Czy na pewno chcesz skopiować dane z adresu faktury? Obecne dane zostaną nadpisane." 
+      } do %>
+    <%= lucide_icon "copy", class: "w-3 h-3" %>
+    Skopiuj z faktury
+  <% end %>
+</turbo-frame>

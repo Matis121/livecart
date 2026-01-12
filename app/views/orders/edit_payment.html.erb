@@ -1,0 +1,28 @@
+<%= turbo_frame_tag "payment_section" do %>
+  <div>
+    <h3 class="font-semibold text-base mb-4">Edytuj płatność</h3>
+    
+    <%= form_with model: @order, url: update_payment_order_path(@order), method: :patch, data: { turbo_frame: "payment_section" } do |f| %>
+      <div class="space-y-4">
+        <!-- Zapłacono -->
+        <div class="form-control">
+          <%= f.label :paid_amount, "Zapłacono", class: "label" %>
+          <div class="join">
+            <%= f.number_field :paid_amount, step: 0.01, class: "input input-bordered join-item flex-1", placeholder: "0.00" %>
+            <span class="btn btn-ghost join-item no-animation"><%= @order.currency %></span>
+          </div>
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">Suma zamówienia: <%= number_to_currency(@order.total_amount, unit: @order.currency, format: "%n %u") %></span>
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex flex-col sm:flex-row gap-2 justify-end">
+          <%= link_to "Anuluj", order_path(@order), 
+              class: "btn btn-ghost w-full sm:w-auto" %>
+          <%= f.submit "Zapisz", class: "btn btn-primary w-full sm:w-auto" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,79 @@
+<%= turbo_frame_tag "order_item_frame_#{@order_item.id}" do %>
+  <tr>
+    <td colspan="6" class="p-0 bg-base-200">
+      <div class="p-6" data-controller="order-item-form">
+        <%= form_with model: [@order, @order_item], class: "space-y-4" do |f| %>
+          <!-- Nazwa produktu - pełna szerokość -->
+          <div class="form-control">
+            <%= f.label :name, "Nazwa produktu", class: "label font-semibold" %>
+            <%= f.text_field :name, class: "input input-bordered w-full", required: true %>
+          </div>
+
+          <!-- SKU i EAN w jednej linii -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="form-control">
+              <%= f.label :sku, "SKU (opcjonalnie)", class: "label" %>
+              <%= f.text_field :sku, class: "input input-bordered w-full" %>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :ean, "EAN (opcjonalnie)", class: "label" %>
+              <%= f.text_field :ean, class: "input input-bordered w-full" %>
+            </div>
+          </div>
+
+          <!-- Cena, ilość i suma w jednej linii -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="form-control">
+              <%= f.label :unit_price, "Cena jednostkowa", class: "label font-semibold" %>
+              <%= f.number_field :unit_price, 
+                  step: 0.01, 
+                  class: "input input-bordered w-full", 
+                  required: true,
+                  data: {
+                    order_item_form_target: "unitPrice",
+                    action: "input->order-item-form#calculateTotal"
+                  } %>
+              <label class="label">
+                <span class="label-text-alt"><%= @order.currency %></span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :quantity, "Ilość", class: "label font-semibold" %>
+              <%= f.number_field :quantity, 
+                  class: "input input-bordered w-full text-center", 
+                  required: true, 
+                  min: 1,
+                  data: {
+                    order_item_form_target: "quantity",
+                    action: "input->order-item-form#calculateTotal"
+                  } %>
+            </div>
+
+            <div class="form-control">
+              <%= f.label :total_price, "Suma", class: "label font-semibold" %>
+              <%= f.number_field :total_price, 
+                  step: 0.01, 
+                  class: "input input-bordered w-full font-semibold bg-base-200", 
+                  required: true,
+                  readonly: true,
+                  value: (@order_item.unit_price.to_f * @order_item.quantity.to_i).round(2),
+                  data: { order_item_form_target: "totalPrice" } %>
+              <label class="label">
+                <span class="label-text-alt"><%= @order.currency %> (obliczane automatycznie)</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="divider my-2"></div>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-2">
+            <%= link_to "Anuluj", order_path(@order), class: "btn btn-ghost w-full sm:w-auto", data: { turbo_frame: "_top" } %>
+            <%= f.submit "Zapisz zmiany", class: "btn btn-primary w-full sm:w-auto" %>
+          </div>
+        <% end %>
+      </div>
+    </td>
+  </tr>
+<% end %>
