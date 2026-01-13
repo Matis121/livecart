@@ -9,6 +9,7 @@ class ProductsController < ApplicationController
 
   def new
     @product = Product.new
+    @product.build_product_stock
   end
 
   def create
@@ -37,6 +38,7 @@ class ProductsController < ApplicationController
   end
 
   def edit
+    @product.build_product_stock unless @product.product_stock
   end
 
   def destroy
@@ -51,6 +53,6 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:name, :sku, :ean, :gross_price, :tax_rate, :quantity, :currency, images: [])
+    params.require(:product).permit(:name, :sku, :ean, :gross_price, :tax_rate, :quantity, :currency, images: [], product_stock_attributes: [ :id, :quantity ])
   end
 end

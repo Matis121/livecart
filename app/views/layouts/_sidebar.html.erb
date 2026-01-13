@@ -27,6 +27,12 @@
         <% end %>
       </li>
       <li>
+        <%= link_to product_reservations_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
+          <%= lucide_icon('calendar-check', class: 'w-4 h-4') %>
+          <span>Rezerwacje</span>
+        <% end %>
+      </li>
+      <li>
         <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
           <%= lucide_icon('shopping-bag', class: 'w-4 h-4') %>
           <span>Zamówienia</span>
