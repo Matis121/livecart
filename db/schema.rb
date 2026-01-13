@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_11_233236) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_13_224943) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,42 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_11_233236) do
     t.index ["customer_id"], name: "index_orders_on_customer_id"
   end
 
+  create_table "product_reservations", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "order_item_id", null: false
+    t.integer "quantity", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_product_reservations_on_order_id"
+    t.index ["order_item_id"], name: "index_product_reservations_on_order_item_id"
+    t.index ["product_id"], name: "index_product_reservations_on_product_id"
+  end
+
+  create_table "product_stock_movements", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "order_item_id", null: false
+    t.integer "quantity_change", null: false
+    t.integer "quantity_before", null: false
+    t.integer "quantity_after", null: false
+    t.string "movement_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_item_id"], name: "index_product_stock_movements_on_order_item_id"
+    t.index ["product_id"], name: "index_product_stock_movements_on_product_id"
+  end
+
+  create_table "product_stocks", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.integer "quantity", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.boolean "sync_enabled", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_stocks_on_product_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "name"
@@ -165,6 +201,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_11_233236) do
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "accounts"
   add_foreign_key "orders", "customers"
+  add_foreign_key "product_reservations", "order_items"
+  add_foreign_key "product_reservations", "orders"
+  add_foreign_key "product_reservations", "products"
+  add_foreign_key "product_stock_movements", "order_items"
+  add_foreign_key "product_stock_movements", "products"
+  add_foreign_key "product_stocks", "products"
   add_foreign_key "products", "accounts"
   add_foreign_key "shipping_addresses", "orders"
   add_foreign_key "users", "accounts"

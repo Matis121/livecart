@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  order: one
+  order_item: one
+  quantity: 1
+  status: MyString
+  reservation_type: MyString
+
+two:
+  product: two
+  order: two
+  order_item: two
+  quantity: 1
+  status: MyString
+  reservation_type: MyString

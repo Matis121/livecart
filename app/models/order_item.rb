@@ -1,6 +1,7 @@
 class OrderItem < ApplicationRecord
   belongs_to :order
   belongs_to :product, optional: true
+  has_one :product_reservation, dependent: :destroy
 
   validates :name, presence: true
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -14,6 +15,11 @@ class OrderItem < ApplicationRecord
   after_save :recalculate_order_total
   after_destroy :recalculate_order_total
 
+  # Rezerwacje (TYLKO dla draft orders)
+  after_create :create_reservation, if: :should_reserve?
+  after_update :update_reservation_quantity, if: :quantity_changed_and_draft?
+
+
   private
 
   def calculate_total_price
@@ -25,5 +31,44 @@ class OrderItem < ApplicationRecord
 
     items_total = order.order_items.reload.sum(:total_price)
     order.update_column(:total_amount, items_total + (order.shipping_cost || 0))
+  end
+
+  # === WARUNKI ===
+
+  def should_reserve?
+    product.present? && order.draft?
+  end
+
+  def quantity_changed_and_draft?
+    saved_change_to_quantity? && product.present? && order.draft?
+  end
+
+
+  # === REZERWACJE ===
+
+  def create_reservation
+    ProductReservation.create!(
+      product: product,
+      order: order,
+      order_item: self,
+      quantity: quantity,
+      status: "pending"
+    )
+  rescue StandardError => e
+    errors.add(:base, "Nie można zarezerwować: #{e.message}")
+    raise ActiveRecord::Rollback
+  end
+
+  def update_reservation_quantity
+    return unless product_reservation&.pending?
+
+    product_reservation.update!(quantity: quantity)
+  rescue StandardError => e
+    errors.add(:base, "Nie można zaktualizować rezerwacji: #{e.message}")
+    raise ActiveRecord::Rollback
+  end
+
+  def cancel_reservation_if_exists
+    product_reservation&.cancel! if product_reservation&.pending?
   end
 end

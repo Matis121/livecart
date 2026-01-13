@@ -38,10 +38,12 @@
             <%= f.select :currency, [["PLN", "PLN"], ["EUR", "EUR"], ["USD", "USD"]], {}, class: "select select-bordered w-full focus:select-primary" %>
           </div>
         </div>
-        <div class="form-control w-full max-w-xs">
-          <%= f.label :quantity, "Stan magazynowy", class: "label" %>
-          <%= f.number_field :quantity, class: "input input-bordered w-full focus:input-primary", min: 0, placeholder: "0" %>
-        </div>
+        <%= f.fields_for :product_stock do |stock_fields| %>
+          <div class="form-control w-full max-w-xs">
+            <%= stock_fields.label :quantity, "Stan magazynowy", class: "label" %>
+            <%= stock_fields.number_field :quantity, class: "input input-bordered w-full focus:input-primary", min: 0, placeholder: "0" %>
+          </div>
+        <% end %>
       </div>
     </section>
     <%# ===== SEKCJA: ZDJĘCIA ===== %>

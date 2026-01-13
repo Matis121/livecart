@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  quantity: 1
+  last_synced_at: 2026-01-13 13:30:46
+  sync_enabled: false
+
+two:
+  product: two
+  quantity: 1
+  last_synced_at: 2026-01-13 13:30:46
+  sync_enabled: false
