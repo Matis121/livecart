@@ -27,7 +27,7 @@
                 </td>
                 <td>
                   <% if reservation.customer %>
-                    <%= reservation.customer.email %>
+                    <%= reservation.customer.first_name %> <%= reservation.customer.last_name %>
                   <% else %>
                     <span class="text-gray-400">Brak danych</span>
                   <% end %>

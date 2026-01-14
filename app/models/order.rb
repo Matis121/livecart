@@ -18,6 +18,18 @@ class Order < ApplicationRecord
     returned: 8
   }, suffix: :status
 
+  STATUS_NAMES = {
+    draft: "Szkic",
+    offer_sent: "Oferta wysłana",
+    payment_processing: "Płatność w trakcie",
+    paid: "Opłacone",
+    in_fulfillment: "W realizacji",
+    shipped: "Wysłane",
+    delivered: "Dostarczone",
+    cancelled: "Anulowane",
+    returned: "Zwrócone"
+  }.freeze
+
   validates :order_number, presence: true, uniqueness: true
   validates :order_token, presence: true, uniqueness: true
   validates :status, presence: true
@@ -35,6 +47,10 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
   # Gospodarka magazynowa
   after_update :finalize_order_stock, if: :paid_status?
   after_update :cancel_order_reservations, if: :cancelled_status?
+
+  def status_name
+    STATUS_NAMES[status.to_sym] || status
+  end
 
   def to_param
     order_number
