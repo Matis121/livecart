@@ -98,7 +98,7 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
         )
 
         # 2. Oznacz rezerwację jako fulfilled
-        reservation.complete!
+        reservation.completed!
       end
     end
   end

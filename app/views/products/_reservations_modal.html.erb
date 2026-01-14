@@ -4,7 +4,6 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
     <h3 class="font-bold text-lg mb-4">Rezerwacje - <%= product.name %></h3>
-    
     <% reservations = product.product_reservations.order(created_at: :desc) %>
     <% if reservations.any? %>
       <div class="overflow-x-auto">
@@ -34,13 +33,7 @@
                 </td>
                 <td><%= reservation.quantity %></td>
                 <td>
-                  <% if reservation.pending? %>
-                    <span class="badge badge-warning">Oczekująca</span>
-                  <% elsif reservation.completed? %>
-                    <span class="badge badge-success">Zrealizowana</span>
-                  <% elsif reservation.cancelled? %>
-                    <span class="badge badge-error">Anulowana</span>
-                  <% end %>
+                  <span class="badge badge-<%= reservation.status_badge_class %>"><%= reservation.status_name %></span>
                 </td>
               </tr>
             <% end %>

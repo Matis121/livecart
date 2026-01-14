@@ -9,6 +9,10 @@ class Product < ApplicationRecord
 
   accepts_nested_attributes_for :product_stock
 
+
+  delegate :quantity, :available_quantity, :reserved_quantity,
+           to: :product_stock, prefix: false, allow_nil: true
+
   validates :name, presence: true
   validates :gross_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :tax_rate, inclusion: { in: [ 0, 5, 8, 23 ] }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_14_100348) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_14_225142) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -120,9 +120,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_14_100348) do
     t.bigint "order_id", null: false
     t.bigint "order_item_id", null: false
     t.integer "quantity", null: false
-    t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
     t.index ["order_id"], name: "index_product_reservations_on_order_id"
     t.index ["order_item_id"], name: "index_product_reservations_on_order_item_id"
     t.index ["product_id"], name: "index_product_reservations_on_product_id"
@@ -134,9 +134,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_14_100348) do
     t.integer "quantity_change", null: false
     t.integer "quantity_before", null: false
     t.integer "quantity_after", null: false
-    t.string "movement_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "movement_type", null: false
     t.index ["order_item_id"], name: "index_product_stock_movements_on_order_item_id"
     t.index ["product_id"], name: "index_product_stock_movements_on_product_id"
   end

@@ -4,7 +4,6 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
     <h3 class="font-bold text-lg mb-4">Historia magazynowa - <%= product.name %></h3>
-    
     <% stock_movements = product.product_stock_movements.order(created_at: :desc) %>
     <% if stock_movements.any? %>
       <div class="overflow-x-auto">
@@ -24,10 +23,10 @@
               <tr>
                 <td><%= movement.created_at.strftime("%d.%m.%Y %H:%M") %></td>
                 <td>
-                  <% if movement.movement_type == "restock" %>
-                    <span class="badge badge-success">Przyjęcie</span>
-                  <% elsif movement.movement_type == "sale" %>
-                    <span class="badge badge-info">Sprzedaż</span>
+                  <% if movement.restock? %>
+                    <span class="badge badge-success"><%= movement.movement_type_name %></span>
+                  <% elsif movement.sale? %>
+                    <span class="badge badge-info"><%= movement.movement_type_name %></span>
                   <% end %>
                 </td>
                 <td>
@@ -37,7 +36,6 @@
                     <span class="text-gray-400">-</span>
                   <% end %>
                 </td>
-      
                 <td><%= movement.quantity_before %></td>
                 <td>
                   <% if movement.increase? %>

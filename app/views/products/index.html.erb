@@ -2,7 +2,6 @@
   <h1 class="text-3xl font-bold">Produkty</h1>
   <%= link_to "Nowy produkt", new_product_path, class: "btn btn-primary" %>
 </div>
-
 <div class="container mx-auto px-4 py-8">
   <div class="overflow-x-auto">
     <table class="table table-zebra">
@@ -36,9 +35,9 @@
             <td>
               <div class="flex items-center gap-2">
                 <div>
-                  <%= product.product_stock&.available_quantity || 0 %>
+                  <%= product.available_quantity %>
                 </div>
-                <% reserved = product.product_stock&.reserved_quantity || 0 %>
+                <% reserved = product.reserved_quantity %>
                 <% if reserved > 0 %>
                   <div class="text-sm text-gray-500">
                     +(<%= reserved %>)
@@ -48,7 +47,6 @@
             </td>
             <td>
               <div class="flex items-center gap-2">
-                
                 <div class="dropdown dropdown-end">
                   <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
                     <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
@@ -82,7 +80,6 @@
     </table>
   </div>
 </div>
-
 <!-- Modale dla wszystkich produktów -->
 <% @products.each do |product| %>
   <%= render "products/reservations_modal", product: product %>
