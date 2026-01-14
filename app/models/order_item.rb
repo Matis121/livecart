@@ -36,11 +36,11 @@ class OrderItem < ApplicationRecord
   # === WARUNKI ===
 
   def should_reserve?
-    product.present? && order.draft?
+    product.present? && order.draft_status?
   end
 
   def quantity_changed_and_draft?
-    saved_change_to_quantity? && product.present? && order.draft?
+    saved_change_to_quantity? && product.present? && order.draft_status?
   end
 
 

@@ -6,9 +6,21 @@ class Order < ApplicationRecord
   has_one :billing_address, dependent: :destroy
   has_many :product_reservations, dependent: :destroy
 
+  enum :status, {
+    draft: 0,
+    offer_sent: 1,
+    payment_processing: 2,
+    paid: 3,
+    in_fulfillment: 4,
+    shipped: 5,
+    delivered: 6,
+    cancelled: 7,
+    returned: 8
+  }, suffix: :status
+
   validates :order_number, presence: true, uniqueness: true
   validates :order_token, presence: true, uniqueness: true
-  validates :status, presence: true, inclusion: { in: [  "draft", "sent", "processing", "completed", "paid", "cancelled" ] }
+  validates :status, presence: true
   validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :shipping_cost, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :paid_amount, numericality: { greater_than_or_equal_to: 0 }
@@ -21,25 +33,22 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
 
 
   # Gospodarka magazynowa
-  after_update :finalize_order_stock, if: :status_changed_to_paid?
-  after_update :cancel_order_reservations, if: :status_changed_to_cancelled?
+  after_update :finalize_order_stock, if: :paid_status?
+  after_update :cancel_order_reservations, if: :cancelled_status?
 
   def to_param
     order_number
   end
 
-  def paid?
+  def order_paid?
     return false if total_amount.zero?
     (paid_amount || 0) == total_amount
   end
 
-  def draft?
-    status == "draft"
-  end
 
   def payment_badge_class
     return "badge-neutral" if total_amount.zero?
-    paid? ? "badge-success" : "badge-error"
+    order_paid? ? "badge-success" : "badge-error"
   end
 
   private
@@ -56,21 +65,15 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
     update_column(:total_amount, items_total + shipping_cost)
   end
 
-  # === CALLBACKS - MAGAZYN ===
-
-  def status_changed_to_paid?
-    saved_change_to_status? && status == "paid"
-  end
-
-  def status_changed_to_cancelled?
-    saved_change_to_status? && status == "cancelled"
-  end
-
   # Finalizacja zamówienia (paid)
   def finalize_order_stock
     transaction do
       order_items.includes(:product, :product_reservation).each do |item|
         next unless item.product
+
+        # Sprawdź czy rezerwacja istnieje i jest pending
+        reservation = item.product_reservation
+        next unless reservation&.pending?
 
         # 1. Zmniejsz fizyczny stan
         item.product.product_stock.decrease_for_order!(
@@ -79,7 +82,7 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
         )
 
         # 2. Oznacz rezerwację jako fulfilled
-        item.product_reservation&.complete!
+        reservation.complete!
       end
     end
   end

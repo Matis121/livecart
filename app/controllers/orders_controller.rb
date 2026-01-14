@@ -3,7 +3,7 @@ class OrdersController < ApplicationController
     @order = current_account.orders.build
     @order.order_number = generate_order_number
     @order.order_token = SecureRandom.urlsafe_base64(16)
-    @order.status = "draft"
+    @order.status = :draft
     @order.total_amount = 0
     @order.shipping_cost = 0
     @order.currency = "PLN"
@@ -110,11 +110,20 @@ class OrdersController < ApplicationController
     if @order.update(order_params)
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "customer_section",
-            partial: "orders/customer_section",
-            locals: { order: @order }
-          )
+          # Sprawdź czy aktualizowano status czy klienta
+          if params[:order][:status].present?
+            render turbo_stream: turbo_stream.replace(
+              "order_status",
+              partial: "orders/status_dropdown",
+              locals: { order: @order }
+            )
+          else
+            render turbo_stream: turbo_stream.replace(
+              "customer_section",
+              partial: "orders/customer_section",
+              locals: { order: @order }
+            )
+          end
         end
         format.html { redirect_to @order, notice: "Zamówienie zostało zaktualizowane" }
       end

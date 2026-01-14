@@ -7,25 +7,9 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
       <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-xl sm:text-2xl font-bold"><%= @order.order_number %></h1>
-            <% status_class = case @order.status
-              when "sent" then "badge-info"
-              when "processing" then "badge-warning"
-              when "completed" then "badge-success"
-              when "paid" then "badge-success"
-              when "cancelled" then "badge-error"
-              else "badge-ghost"
-              end
-            %>
-        <span class="badge <%= status_class %>">
-          <%= {
-            "draft" => "Szkic",
-            "sent" => "Wysłane",
-            "processing" => "W trakcie",
-            "completed" => "Zrealizowane",
-            "paid" => "Opłacone",
-            "cancelled" => "Anulowane"
-          }[@order.status] || @order.status %>
-        </span>
+        <%= turbo_frame_tag "order_status" do %>
+          <%= render "orders/status_dropdown", order: @order %>
+        <% end %>
       </div>
       <%= button_to "Usuń", order_path(@order), method: :delete, class: "btn btn-sm btn-ghost text-error w-full sm:w-auto", data: { turbo_confirm: "Na pewno usunąć to zamówienie?" } %>
     </div>
