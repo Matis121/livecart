@@ -37,7 +37,7 @@
                 <div>
                   <%= product.available_quantity %>
                 </div>
-                <% reserved = product.reserved_quantity %>
+                <% reserved = product.reserved_quantity || 0 %>
                 <% if reserved > 0 %>
                   <div class="text-sm text-gray-500">
                     +(<%= reserved %>)

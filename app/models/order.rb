@@ -5,6 +5,7 @@ class Order < ApplicationRecord
   has_one :shipping_address, dependent: :destroy
   has_one :billing_address, dependent: :destroy
   has_many :product_reservations, dependent: :destroy
+  has_many :order_status_histories, dependent: :destroy
 
   enum :status, {
     draft: 0,
@@ -38,8 +39,9 @@ class Order < ApplicationRecord
   validates :paid_amount, numericality: { greater_than_or_equal_to: 0 }
   validates :currency, presence: true, inclusion: { in: [ "PLN", "EUR", "USD" ] }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
-validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
+  validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
 
+  # Adresy
   after_initialize :build_blank_addresses
   after_update :recalculate_total_if_shipping_changed, if: :saved_change_to_shipping_cost?
 
@@ -47,6 +49,10 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
   # Gospodarka magazynowa
   after_update :finalize_order_stock, if: :paid_status?
   after_update :cancel_order_reservations, if: :cancelled_status?
+
+  # Historia statusów
+  after_create :log_status_change
+  after_update :log_status_change, if: :saved_change_to_status?
 
   def status_name
     STATUS_NAMES[status.to_sym] || status
@@ -106,5 +112,11 @@ validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
   # Anulowanie zamówienia
   def cancel_order_reservations
     product_reservations.pending.each(&:cancel!)
+  end
+
+  def log_status_change
+    order_status_histories.create!(
+      status: status
+    )
   end
 end

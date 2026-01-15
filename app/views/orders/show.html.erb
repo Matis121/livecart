@@ -7,8 +7,13 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
       <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-xl sm:text-2xl font-bold"><%= @order.order_number %></h1>
-        <%= turbo_frame_tag "order_status" do %>
-          <%= render "orders/status_dropdown", order: @order %>
+        <%= render "orders/status_dropdown", order: @order %>
+        <!-- Przycisk dla historii -->
+        <%= link_to status_history_order_path(@order), 
+            data: { turbo_frame: "status_history_modal" },
+            class: "btn btn-sm btn-ghost" do %>
+          <%= lucide_icon('history', class: 'w-4 h-4') %>
+          Historia
         <% end %>
       </div>
       <%= button_to "Usuń", order_path(@order), method: :delete, class: "btn btn-sm btn-ghost text-error w-full sm:w-auto", data: { turbo_confirm: "Na pewno usunąć to zamówienie?" } %>
@@ -100,4 +105,5 @@
   <!-- Modals -->
   <%= turbo_frame_tag "shipping_address_modal", target: "_top" %>
   <%= turbo_frame_tag "billing_address_modal", target: "_top" %>
+  <%= turbo_frame_tag "status_history_modal", target: "_top" %>
 </div>

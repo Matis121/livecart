@@ -30,10 +30,14 @@ class OrdersController < ApplicationController
   def edit_customer
     @order = current_account.orders.find_by!(order_number: params[:id])
     @customers = current_account.customers.order(:first_name, :last_name)
+
+    redirect_to @order unless turbo_frame_request?
   end
 
   def edit_contact_info
     @order = current_account.orders.find_by!(order_number: params[:id])
+
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update_contact_info
@@ -56,6 +60,8 @@ class OrdersController < ApplicationController
 
   def edit_payment
     @order = current_account.orders.find_by!(order_number: params[:id])
+
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update_payment
@@ -78,6 +84,8 @@ class OrdersController < ApplicationController
 
   def edit_shipping_payment_methods
     @order = current_account.orders.find_by!(order_number: params[:id])
+
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update_shipping_payment_methods
@@ -103,6 +111,24 @@ class OrdersController < ApplicationController
     else
       render :edit_shipping_payment_methods, status: :unprocessable_entity
     end
+  end
+
+  def update_status
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    if @order.update(status: params[:order][:status])
+        render turbo_stream: turbo_stream.replace(
+          "order_status",
+          partial: "orders/status_dropdown",
+          locals: { order: @order }
+        )
+    end
+  end
+
+  def status_history
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    @status_history = @order.order_status_histories.chronological
+
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update

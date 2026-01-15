@@ -3,6 +3,7 @@ class ShippingAddressesController < ApplicationController
   before_action :set_shipping_address
 
   def edit
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update
@@ -27,7 +28,7 @@ class ShippingAddressesController < ApplicationController
 
   def copy_from_billing
     billing_address = @order.billing_address
-    
+
     if billing_address.present?
       @shipping_address.update(billing_address_values(billing_address))
       respond_to do |format|

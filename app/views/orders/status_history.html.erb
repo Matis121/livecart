@@ -1,0 +1,44 @@
+<%= turbo_frame_tag "status_history_modal" do %>
+  <dialog id="status_history_modal" class="modal modal-open">
+    <div class="modal-box max-w-2xl max-h-[90vh]">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onclick="document.getElementById('status_history_modal').innerHTML = ''">
+        ✕
+      </button>
+      <h3 class="font-bold text-lg mb-4">Historia statusów - <%= @order.order_number %></h3>
+      
+      <% if @status_history.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra table-sm">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @status_history.each do |history| %>
+                <tr>
+                  <td><%= history.created_at.strftime("%d.%m.%Y %H:%M:%S") %></td>
+                  <td>
+                    <span class="badge badge-primary badge-sm">
+                      <%= history.status_name %>
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="alert alert-info">
+          <%= lucide_icon('info', class: 'w-4 h-4') %>
+          <span>Brak historii zmian statusów dla tego zamówienia</span>
+        </div>
+      <% end %>
+    </div>
+    <div class="modal-backdrop" 
+         onclick="document.getElementById('status_history_modal').innerHTML = ''">
+    </div>
+  </dialog>
+<% end %>

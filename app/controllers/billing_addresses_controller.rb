@@ -3,6 +3,7 @@ class BillingAddressesController < ApplicationController
   before_action :set_billing_address
 
   def edit
+    redirect_to @order unless turbo_frame_request?
   end
 
   def update

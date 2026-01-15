@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "billing_address_modal" do %>
   <dialog class="modal modal-open">
-    <div class="modal-box max-w-2xl">
+    <div class="modal-box max-w-2xl max-h-[90vh]">
       <h3 class="font-bold text-lg mb-4">Dane do faktury</h3>
       
       <%= form_with model: @billing_address, url: order_billing_address_path(@order), class: "space-y-4" do |f| %>

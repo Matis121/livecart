@@ -1,26 +1,28 @@
-<%= form_with model: order, url: order_path(order), method: :patch, class: "inline-block" do |f| %>
-  <% status_options = [
-    ["Szkic", "draft"],
-    ["Oferta wysłana", "offer_sent"],
-    ["Płatność w trakcie", "payment_processing"],
-    ["Opłacone", "paid"],
-    ["W realizacji", "in_fulfillment"],
-    ["Wysłane", "shipped"],
-    ["Dostarczone", "delivered"],
-    ["Anulowane", "cancelled"],
-    ["Zwrócone", "returned"]
-  ] %>
-  <% status_class = case order.status
-    when "shipped", "delivered" then "select-info"
-    when "payment_processing", "in_fulfillment" then "select-warning"
-    when "paid" then "select-success"
-    when "cancelled", "returned" then "select-error"
-    else ""
-    end
-  %>
-  <%= f.select :status, 
-      options_for_select(status_options, order.status),
-      {},
-      class: "select select-bordered select-sm #{status_class}",
-      onchange: "this.form.requestSubmit()" %>
+<%= turbo_frame_tag "order_status" do %>
+  <%= form_with model: order, url: update_status_order_path(order), method: :patch, class: "inline-block" do |f| %>
+    <% status_options = [
+      ["Szkic", "draft"],
+      ["Oferta wysłana", "offer_sent"],
+      ["Płatność w trakcie", "payment_processing"],
+      ["Opłacone", "paid"],
+      ["W realizacji", "in_fulfillment"],
+      ["Wysłane", "shipped"],
+      ["Dostarczone", "delivered"],
+      ["Anulowane", "cancelled"],
+      ["Zwrócone", "returned"]
+    ] %>
+    <% status_class = case order.status
+      when "shipped", "delivered" then "select-info"
+      when "payment_processing", "in_fulfillment" then "select-warning"
+      when "paid" then "select-success"
+      when "cancelled", "returned" then "select-error"
+      else ""
+      end
+    %>
+    <%= f.select :status, 
+        options_for_select(status_options, order.status),
+        {},
+        class: "select select-bordered select-sm #{status_class}",
+        onchange: "this.form.requestSubmit()" %>
+  <% end %>
 <% end %>
