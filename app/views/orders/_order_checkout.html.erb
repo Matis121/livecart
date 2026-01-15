@@ -1,0 +1,61 @@
+<%= turbo_frame_tag "order_checkout" do %>
+  <div class="card bg-base-100 shadow-sm border border-base-300">
+    <div class="card-body p-4">
+      <div class="flex items-center gap-2 mb-4">
+        <%= lucide_icon "shopping-cart", class: "w-5 h-5 text-primary" %>
+        <h3 class="font-semibold text-lg">Koszyk</h3>
+      </div>
+      
+      <% if order.checkout.present? && order.checkout.active? %>
+        <div class="space-y-4">
+          <!-- Status -->
+          <div class="flex items-center gap-2">
+            <%= checkout_status_badge(order.checkout) %>
+            <%= checkout_expiry_info(order.checkout) %>
+          </div>
+          
+          <!-- Link -->
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-base-content/70 uppercase tracking-wide">Link do koszyka</label>
+            <div class="flex gap-2 items-center p-3 bg-base-200 rounded-lg group hover:bg-base-300 transition-colors">
+              <div class="flex-1 overflow-hidden">
+                <a href="<%= order.checkout.public_url %>" 
+                   target="_blank"
+                   class="text-sm font-mono text-primary hover:underline break-all">
+                  <%= order.checkout.public_url %>
+                </a>
+              </div>
+              <button type="button"
+                      onclick="navigator.clipboard.writeText('<%= order.checkout.public_url %>'); this.classList.add('btn-success'); setTimeout(() => this.classList.remove('btn-success'), 2000)"
+                      class="btn btn-ghost btn-sm btn-square flex-shrink-0"
+                      title="Kopiuj link">
+                <%= lucide_icon "copy", class: "w-4 h-4" %>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Akcje -->
+          <div class="flex gap-2 justify-end">
+            <%= link_to cancel_checkout_order_path(order), 
+                        method: :delete, 
+                        class: "btn btn-ghost btn-sm gap-2 text-error hover:bg-error/10",
+                        data: { turbo_confirm: "Czy na pewno chcesz anulować koszyk?" },
+                        title: "Anuluj koszyk" do %>
+              <%= lucide_icon "x", class: "w-4 h-4" %>
+              Anuluj
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <p class="text-sm text-base-content/60 mb-4">Wygeneruj link do koszyka dla klienta</p>
+          <%= link_to activate_checkout_order_path(order), 
+                      class: "btn btn-primary btn-sm gap-2" do %>
+            <%= lucide_icon "link", class: "w-4 h-4" %>
+            Wygeneruj link do koszyka
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

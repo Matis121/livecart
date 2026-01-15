@@ -5,7 +5,6 @@ one:
   customer: one
   stream: one
   order_number: MyString
-  order_token: MyString
   status: MyString
   email: MyString
   phone: MyString
@@ -19,7 +18,6 @@ two:
   customer: two
   stream: two
   order_number: MyString
-  order_token: MyString
   status: MyString
   email: MyString
   phone: MyString

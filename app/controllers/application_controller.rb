@@ -5,12 +5,16 @@ class ApplicationController < ActionController::Base
   before_action :require_account
   before_action :authenticate_user!
 
-  helper_method :current_account
+  helper_method :current_account, :onboarding_complete?
 
   private
 
   def current_account
     @current_account ||= current_user&.account
+  end
+
+  def onboarding_complete?
+    current_account.present?
   end
 
   def require_account

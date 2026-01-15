@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_15_122707) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_15_214401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,6 +66,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_122707) do
     t.index ["order_id"], name: "index_billing_addresses_on_order_id"
   end
 
+  create_table "checkouts", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "token", null: false
+    t.datetime "expires_at"
+    t.datetime "completed_at"
+    t.integer "activation_hours", default: 24, null: false
+    t.integer "views_count", default: 0, null: false
+    t.datetime "last_viewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "active", default: false, null: false
+    t.index ["expires_at"], name: "index_checkouts_on_expires_at"
+    t.index ["order_id"], name: "index_checkouts_on_order_id"
+    t.index ["token"], name: "index_checkouts_on_token", unique: true
+  end
+
   create_table "customers", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "platform_user_id"
@@ -107,7 +123,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_122707) do
     t.bigint "account_id", null: false
     t.bigint "customer_id"
     t.string "order_number", null: false
-    t.string "order_token", null: false
     t.string "email"
     t.string "phone"
     t.decimal "total_amount", null: false
@@ -205,6 +220,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_122707) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "billing_addresses", "orders"
+  add_foreign_key "checkouts", "orders"
   add_foreign_key "customers", "accounts"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"

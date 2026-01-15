@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
   devise_for :users
-
-
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
@@ -33,7 +31,13 @@ Rails.application.routes.draw do
       patch :update_shipping_payment_methods
       patch :update_status
       get :status_history
+      get :activate_checkout
+      get :cancel_checkout
     end
   end
+
   root "dashboard#index"
+
+  # Checkout
+  resources :checkouts, only: [ :show, :update ]
 end

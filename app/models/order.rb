@@ -6,6 +6,10 @@ class Order < ApplicationRecord
   has_one :billing_address, dependent: :destroy
   has_many :product_reservations, dependent: :destroy
   has_many :order_status_histories, dependent: :destroy
+  has_one :checkout, dependent: :destroy
+
+  accepts_nested_attributes_for :shipping_address
+  accepts_nested_attributes_for :billing_address
 
   enum :status, {
     draft: 0,
@@ -32,7 +36,6 @@ class Order < ApplicationRecord
   }.freeze
 
   validates :order_number, presence: true, uniqueness: true
-  validates :order_token, presence: true, uniqueness: true
   validates :status, presence: true
   validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :shipping_cost, presence: true, numericality: { greater_than_or_equal_to: 0 }

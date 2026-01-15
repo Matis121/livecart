@@ -2,7 +2,6 @@ class OrdersController < ApplicationController
   def new
     @order = current_account.orders.build
     @order.order_number = generate_order_number
-    @order.order_token = SecureRandom.urlsafe_base64(16)
     @order.status = :draft
     @order.total_amount = 0
     @order.shipping_cost = 0
@@ -162,6 +161,26 @@ class OrdersController < ApplicationController
     @order = current_account.orders.find_by!(order_number: params[:id])
     @order.destroy
     redirect_to orders_path, notice: "Zamówienie zostało usunięte"
+  end
+
+  def activate_checkout
+    @order = current_account.orders.find_by!(order_number: params[:id])
+
+    checkout = @order.checkout || @order.create_checkout!
+    checkout.activate!
+
+    redirect_to @order, notice: "Koszyk aktywowany. Link skopiuj poniżej."
+  rescue => e
+    redirect_to @order, alert: "Błąd: #{e.message}"
+  end
+
+  def cancel_checkout
+    @order = current_account.orders.find_by!(order_number: params[:id])
+
+    checkout = @order.checkout
+    checkout.cancel! if checkout.present?
+
+    redirect_to @order, notice: "Koszyk anulowany"
   end
 
   private
