@@ -16,7 +16,6 @@
           
           <!-- Link -->
           <div class="space-y-2">
-            <label class="text-xs font-medium text-base-content/70 uppercase tracking-wide">Link do koszyka</label>
             <div class="flex gap-2 items-center p-3 bg-base-200 rounded-lg group hover:bg-base-300 transition-colors">
               <div class="flex-1 overflow-hidden">
                 <a href="<%= order.checkout.public_url %>" 
@@ -35,6 +34,7 @@
           </div>
           
           <!-- Akcje -->
+          <% unless order.checkout.completed? %>
           <div class="flex gap-2 justify-end">
             <%= link_to cancel_checkout_order_path(order), 
                         method: :delete, 
@@ -45,6 +45,7 @@
               Anuluj
             <% end %>
           </div>
+          <% end %>
         </div>
       <% else %>
         <div class="text-center py-4">

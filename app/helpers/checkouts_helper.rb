@@ -18,10 +18,10 @@ module CheckoutsHelper
       end
     end
   end
-  
+
   def checkout_expiry_info(checkout)
     return nil unless checkout.expires_at.present?
-    
+
     content_tag :span, class: "text-xs text-base-content/60" do
       "Wygasa: #{checkout.expires_at.strftime('%d.%m.%Y %H:%M')}"
     end

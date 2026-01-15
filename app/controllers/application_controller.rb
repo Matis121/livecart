@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   before_action :require_account
   before_action :authenticate_user!
 
-  helper_method :current_account, :onboarding_complete?
+  helper_method :current_account, :onboarding_complete?, :public_checkout_page?
 
   private
 
@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
 
   def onboarding_complete?
     current_account.present?
+  end
+
+  def public_checkout_page?
+    controller_name == "checkouts"
   end
 
   def require_account

@@ -18,7 +18,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="bg-base-200 min-h-screen">
-    <% if user_signed_in? && onboarding_complete? %>
+    <% if user_signed_in? && onboarding_complete? && !public_checkout_page? %>
       <%= render "layouts/drawer" %>
     <% else %>
       <main>

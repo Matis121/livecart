@@ -4,7 +4,6 @@
     <div class="text-sm mb-2">
       <%= link_to "← Zamówienia", orders_path, class: "link" %>
     </div>
-    <%= render "orders/order_checkout", order: @order %>
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
       <div class="flex flex-wrap items-center gap-3">
         <h1 class="text-xl sm:text-2xl font-bold"><%= @order.order_number %></h1>
@@ -26,6 +25,12 @@
       <span>Aktualizacja: <%= @order.updated_at.strftime("%d.%m.%Y %H:%M") %></span>
     </div>
   </div>
+
+  <!-- Koszyk -->
+  <div class="mb-6">
+    <%= render "orders/order_checkout", order: @order %>
+  </div>
+
 
   <!-- Układ dwukolumnowy -->
   <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
