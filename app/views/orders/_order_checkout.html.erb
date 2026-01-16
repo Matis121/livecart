@@ -6,7 +6,7 @@
         <h3 class="font-semibold text-lg">Koszyk</h3>
       </div>
       
-      <% if order.checkout.present? && order.checkout.active? %>
+      <% if order.checkout.present? && order.checkout.active? || order.checkout&.completed? %>
         <div class="space-y-4">
           <!-- Status -->
           <div class="flex items-center gap-2">

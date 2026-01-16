@@ -1,20 +1,36 @@
 class CheckoutsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :show, :update ]
+  skip_before_action :authenticate_user!, only: [ :show, :update, :not_found ]
 
-  before_action :find_checkout
-  before_action :set_order
-  before_action :validate_availability
+  before_action :find_checkout, except: [ :not_found ]
+  before_action :set_order, except: [ :not_found ]
+  before_action :validate_availability, except: [ :not_found ]
 
   def show
+    # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
+    if @checkout.completed?
+      if session[:show_success_for_checkout] == @checkout.id
+        # Pokaż stronę sukcesu i wyczyść flagę
+        session.delete(:show_success_for_checkout)
+      else
+        # Nie ma flagi - to ponowna wizyta, przekieruj
+        redirect_to not_found_checkouts_path
+      end
+    end
   end
 
   def update
     if update_order_data
       @checkout.complete!
+      # Ustaw flagę, że można pokazać stronę sukcesu
+      session[:show_success_for_checkout] = @checkout.id
       redirect_to checkout_path(@checkout.token)
     else
       render :show, status: :unprocessable_entity
     end
+  end
+
+  def not_found
+    # Renderuje widok not_found.html.erb
   end
 
   private
@@ -26,14 +42,15 @@ class CheckoutsController < ApplicationController
   def find_checkout
     @checkout = Checkout.find_by!(token: params[:id])
   rescue ActiveRecord::RecordNotFound
-    render plain: "Link do realizacji zamówienia jest nieprawidłowy lub wygasł", status: :not_found
+    redirect_to not_found_checkouts_path
   end
 
   def validate_availability
-    return if @checkout.completed?
-
-    unless @checkout.available?
-      redirect_to root_path, alert: "Link do realizacji zamówienia jest nieprawidłowy lub wygasł"
+    # Jeśli checkout NIE jest zakończony, sprawdź czy jest dostępny
+    unless @checkout.completed?
+      unless @checkout.available?
+        redirect_to not_found_checkouts_path
+      end
     end
   end
 

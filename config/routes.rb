@@ -39,5 +39,9 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # Checkout
-  resources :checkouts, only: [ :show, :update ]
+  resources :checkouts, only: [ :show, :update ] do
+    collection do
+      get :not_found
+    end
+  end
 end
