@@ -1,0 +1,47 @@
+<div class="bg-base-100 rounded-lg shadow-sm">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="font-semibold">Numer zamówienia</th>
+        <th class="font-semibold">Klient</th>
+        <th class="font-semibold">Status</th>
+        <th class="font-semibold">Wartość</th>
+        <th class="font-semibold">Sposób płatności</th>
+        <th class="font-semibold">Sposób wysyłki</th>
+        <th class="text-end font-semibold">Data utworzenia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td>
+            <%= link_to order.order_number, order_path(order), class: "text-primary font-semibold hover:underline" %>
+          </td>
+          <td>
+            <div>
+              <div class="font-medium"><%= order.customer&.name || "Brak danych" %></div>
+              <div class="text-sm opacity-60"><%= order.email %></div>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-ghost">
+              <%= order.status_name %>
+            </span>
+          </td>
+          <td class="font-semibold">
+            <%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %>
+          </td>
+          <td>
+            <%= order.payment_method.presence || "—" %>
+          </td>
+          <td class="font-semibold">
+            <%= order.shipping_method.presence || "—" %>
+          </td>
+          <td class="text-end">
+            <%= order.created_at.strftime("%d.%m.%Y %H:%M") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

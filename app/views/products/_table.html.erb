@@ -1,0 +1,75 @@
+  
+<div class="bg-base-100 rounded-lg shadow-sm">
+  <table class="table table-zebra">
+    <thead>
+      <tr>
+        <th>Zdjęcie</th>
+        <th>Nazwa</th>
+        <th>SKU</th>
+        <th>EAN</th>
+        <th>Cena brutto</th>
+        <th>VAT</th>
+        <th>Ilość</th>
+        <th class="text-end">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <tr>
+          <td>
+            <% if product.images.attached? %>
+              <%= image_tag product.images.first, class: "w-14 h-14 object-cover rounded" %>
+            <% else %>
+              <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
+            <% end %>
+          </td>
+          <td><%= link_to product.name, edit_product_path(product), class: "link link-primary" %></td>
+          <td><%= product.sku %></td>
+          <td><%= product.ean %></td>
+          <td><%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %></td>
+          <td><%= product.tax_rate %>%</td>
+          <td>
+            <div class="flex items-center gap-2">
+              <div>
+                <%= product.available_quantity %>
+              </div>
+              <% reserved = product.reserved_quantity || 0 %>
+              <% if reserved > 0 %>
+                <div class="text-sm text-gray-500">
+                  +(<%= reserved %>)
+                </div>
+              <% end %>
+            </div>
+          </td>
+          <td class="text-end">
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
+              </div>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                <li>
+                  <a onclick="reservations_modal_<%= product.id %>.showModal()">
+                    <%= lucide_icon('calendar-check', class: 'w-4 h-4') %>
+                    Rezerwacje
+                  </a>
+                </li>
+                <li>
+                  <a onclick="history_modal_<%= product.id %>.showModal()">
+                    <%= lucide_icon('history', class: 'w-4 h-4') %>
+                    Historia produktu
+                  </a>
+                </li>
+                <li>
+                  <%= link_to product_path(product), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć ten produkt?" } do %>
+                    <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
+                    Usuń
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
