@@ -41,7 +41,7 @@
         <%= f.fields_for :product_stock do |stock_fields| %>
           <div class="form-control w-full max-w-xs">
             <%= stock_fields.label :quantity, "Stan magazynowy", class: "label" %>
-            <%= stock_fields.number_field :quantity, class: "input input-bordered w-full focus:input-primary", min: 0, placeholder: "0" %>
+            <%= stock_fields.number_field :quantity, class: "input input-bordered w-full focus:input-primary", placeholder: "0" %>
           </div>
         <% end %>
       </div>

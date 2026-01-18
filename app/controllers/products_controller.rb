@@ -39,6 +39,7 @@ class ProductsController < ApplicationController
 
   def edit
     @product.build_product_stock unless @product.product_stock
+    @product.product_stock.quantity = @product.product_stock.quantity - @product.product_stock.reserved_quantity
   end
 
   def destroy
