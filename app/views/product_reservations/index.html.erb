@@ -1,80 +1,11 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold">Rezerwacje produktów</h1>
-  <p class="text-sm text-base-content/70 mt-2">Lista wszystkich oczekujących rezerwacji</p>
-</div>
-
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold">Rezerwacje</h1>
+  </div>
   <% if @product_reservations.any? %>
-    <div class="overflow-x-auto">
-      <table class="table table-zebra">
-        <thead>
-          <tr>
-            <th>Data utworzenia</th>
-            <th>Produkt</th>
-            <th>Ilość</th>
-            <th>Zamówienie</th>
-            <th>Klient</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @product_reservations.each do |reservation| %>
-            <tr>
-              <td>
-                <div class="text-sm">
-                  <%= l(reservation.created_at, format: :short) %>
-                </div>
-              </td>
-              <td>
-                <div class="flex items-center gap-3">
-                  <% if reservation.product.images.attached? %>
-                    <%= image_tag reservation.product.images.first, class: "w-10 h-10 object-cover rounded" %>
-                  <% else %>
-                    <span class="text-gray-400"><%= lucide_icon('image', class: 'w-10 h-10') %></span>
-                  <% end %>
-                  <div>
-                    <div class="flex flex-col"><%= link_to reservation.product.name, edit_product_path(reservation.product), class: "link link-primary font-medium" %><div class="text-xs text-gray-500">sku: <%= reservation.product.sku %> ean: <%= reservation.product.ean %></div></div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="badge badge-primary"><%= reservation.quantity %></span>
-              </td>
-              <td>
-                <% if reservation.order %>
-                  <%= link_to "##{reservation.order.order_number}", order_path(reservation.order), class: "link link-primary" %>
-                <% else %>
-                  <span class="text-gray-400">-</span>
-                <% end %>
-              </td>
-              <td>
-                <% if reservation.customer %>
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
-                      <span class="text-xs font-medium"><%= reservation.customer.first_name&.first&.upcase %></span>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium">
-                        <%= reservation.customer.first_name %> <%= reservation.customer.last_name %>
-                      </div>
-                    </div>
-                  </div>
-                <% else %>
-                  <span class="text-gray-400">-</span>
-                <% end %>
-              </td>
-              <td>
-                <span class="badge badge-warning">Oczekuje</span>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    <%= render "product_reservations/table" %>
   <% else %>
-    <div class="alert">
-      <%= lucide_icon('info', class: 'w-6 h-6') %>
-      <span>Brak oczekujących rezerwacji</span>
-    </div>
+    <%= render "product_reservations/empty_state" %>
   <% end %>
 </div>

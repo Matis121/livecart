@@ -1,31 +1,34 @@
-  
 <div class="bg-base-100 rounded-lg shadow-sm">
-  <table class="table table-zebra">
+  <table class="table">
     <thead>
       <tr>
-        <th>Zdjęcie</th>
-        <th>Nazwa</th>
-        <th>SKU</th>
-        <th>EAN</th>
-        <th>Cena brutto</th>
-        <th>VAT</th>
-        <th>Ilość</th>
-        <th class="text-end">Akcje</th>
+        <th class="font-semibold">ID</th>
+        <th class="font-semibold">Produkt</th>
+        <th class="font-semibold w-40">Cena brutto</th>
+        <th class="font-semibold w-40">VAT</th>
+        <th class="font-semibold w-40">Ilość</th>
+        <th class="text-end font-semibold">Akcje</th>
       </tr>
     </thead>
     <tbody>
       <% @products.each do |product| %>
         <tr>
+          <td><%= product.id %></td>
           <td>
-            <% if product.images.attached? %>
-              <%= image_tag product.images.first, class: "w-14 h-14 object-cover rounded" %>
-            <% else %>
-              <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
-            <% end %>
+            <div class="flex items-center gap-3">
+              <div>
+                <% if product.images.attached? %>
+                  <%= image_tag product.images.first, class: "w-14 h-14 object-cover rounded" %>
+                <% else %>
+                  <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
+                <% end %>
+              </div>
+              <div>
+                <div class="font-medium"><%= link_to product.name, edit_product_path(product), class: "hover:underline" %></div>
+                <div class="text-sm opacity-60"><% if product.sku.present? %>SKU: <%= product.sku %><% end %> <% if product.ean.present? %> <span class="mx-1">&bull;</span> EAN: <%= product.ean %> <% end %></div>
+              </div>
+            </div>
           </td>
-          <td><%= link_to product.name, edit_product_path(product), class: "link link-primary" %></td>
-          <td><%= product.sku %></td>
-          <td><%= product.ean %></td>
           <td><%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %></td>
           <td><%= product.tax_rate %>%</td>
           <td>
@@ -48,6 +51,12 @@
               </div>
               <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                 <li>
+                  <%= link_to edit_product_path(product) do %>
+                    <%= lucide_icon('edit', class: 'w-4 h-4') %>
+                    Edytuj
+                  <% end %>
+                </li>
+                <li>
                   <a onclick="reservations_modal_<%= product.id %>.showModal()">
                     <%= lucide_icon('calendar-check', class: 'w-4 h-4') %>
                     Rezerwacje
@@ -60,7 +69,7 @@
                   </a>
                 </li>
                 <li>
-                  <%= link_to product_path(product), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć ten produkt?" } do %>
+                  <%= link_to product_path(product), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć ten produkt?" }, class: "text-error" do %>
                     <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
                     Usuń
                   <% end %>

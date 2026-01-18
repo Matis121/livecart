@@ -1,0 +1,46 @@
+<div class="bg-base-100 rounded-lg shadow-sm">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="font-semibold">ID</th>
+        <th class="font-semibold">Platforma</th>
+        <th class="font-semibold">Imię</th>
+        <th class="font-semibold">Nazwisko</th>
+        <th class="text-end font-semibold">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @customers.each do |customer| %>
+        <tr>
+          <td><%= customer.id %></td>
+          <td>
+            ---
+          </td>
+          <td><%= customer.first_name %></td>
+          <td><%= customer.last_name %></td>
+          <td class="text-end">
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
+              </div>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                <li>
+                  <%= link_to edit_customer_path(customer) do %>
+                    <%= lucide_icon('edit', class: 'w-4 h-4') %>
+                    Edytuj
+                  <% end %>
+                </li>
+                <li>
+                  <%= link_to customer_path(customer), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć?" }, class: "text-error" do %>
+                    <%= lucide_icon('trash', class: 'w-4 h-4') %>
+                    Usuń
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

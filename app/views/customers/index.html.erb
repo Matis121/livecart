@@ -1,29 +1,12 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold">Klienci</h1>
-  <%= link_to "Nowy klient", new_customer_path, class: "btn btn-primary" %>
-</div>
-<div class="container mx-auto px-4 py-8">
-  <div class="overflow-x-auto">
-    <table class="table table-zebra">
-      <thead>
-        <tr>
-          <th>Imię</th>
-          <th>Nazwisko</th>
-          <th>Akcje</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @customers.each do |customer| %>
-          <tr>
-            <td><%= customer.first_name %></td>
-            <td><%= customer.last_name %></td>
-            <td class="flex gap-2">
-              <%= link_to "Edytuj", edit_customer_path(customer), class: "btn btn-sm btn-primary" %>
-              <%= button_to "Usuń", customer_path(customer), method: :delete, class: "btn btn-sm btn-error", data: { turbo_confirm: "Na pewno usunąć?" } %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold">Klienci</h1>
+    <%= link_to "Nowy klient", new_customer_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
+  <% if @customers.any? %>
+    <%= render "customers/table" %>
+  <% else %>
+    <%= render "customers/empty_state" %>
+  <% end %>
 </div>
