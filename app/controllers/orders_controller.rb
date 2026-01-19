@@ -15,7 +15,9 @@ class OrdersController < ApplicationController
   end
 
   def index
-    @orders = current_account.orders.order(created_at: :desc)
+    @all_orders = current_account.orders
+    @orders = @all_orders.order(created_at: :desc)
+    @orders = @orders.where(status: params[:status]) if params[:status].present?
   end
 
   def show

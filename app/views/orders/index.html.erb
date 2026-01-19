@@ -4,8 +4,13 @@
     <h1 class="text-2xl sm:text-3xl font-bold">Zamówienia</h1>
     <%= link_to "Nowe zamówienie", new_order_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
-  <% if @orders.any? %>
-    <%= render "orders/orders_table" %>
+  <% if @all_orders.any? %>
+    <div class="flex gap-4">
+      <%= render "orders/orders_sidebar" %>
+      <div class="flex-1 min-w-0">
+        <%= render "orders/orders_table" %>
+      </div>
+    </div>
   <% else %>
     <%= render "orders/empty_state" %>
   <% end %>

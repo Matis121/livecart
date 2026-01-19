@@ -1,0 +1,22 @@
+<div class="w-48">
+  <div class="bg-base-100 rounded-lg p-3 shadow-sm">
+    <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-3">Status</div>
+    <ul class="space-y-1">
+      <li>
+        <%= link_to orders_path, class: "flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-base-200 #{'bg-base-200 font-medium' if params[:status].blank?}" do %>
+          Wszystkie
+          <span class="ml-auto text-xs text-base-content/50"><%= @all_orders.count %></span>
+        <% end %>
+      </li>
+      <% Order::STATUS_NAMES.each do |key, name| %>
+        <% count = @all_orders.where(status: key).count %>
+        <li>
+          <%= link_to orders_path(status: key), class: "flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-base-200 #{'bg-base-200 font-medium' if params[:status] == key.to_s}" do %>
+            <%= name %>
+            <span class="ml-auto text-xs text-base-content/50"><%= count %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

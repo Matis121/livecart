@@ -2,76 +2,81 @@
   <table class="table">
     <thead>
       <tr>
-        <th class="font-semibold">Numer</th>
-        <th class="font-semibold w-38">Klient</th>
-        <th class="font-semibold w-80">Produkty</th>
-        <th class="font-semibold">Status</th>
-        <th class="font-semibold">Wartość</th>
-        <th class="font-semibold">Dane zamówienia</th>
-        <th class="text-end font-semibold">Data utworzenia</th>
+        <th class="font-semibold w-25 min-w-25">Numer</th>
+        <th class="font-semibold min-w-28 w-28">Klient</th>
+        <th class="font-semibold min-w-80 w-80">Produkty</th>
+        <th class="font-semibold min-w-34 w-34">Status</th>
+        <th class="font-semibold min-w-36 w-36">Dane zamówienia</th>
+        <th class="text-end font-semibold w-32 min-w-32">Data</th>
       </tr>
     </thead>
     <tbody>
-      <% @orders.each do |order| %>
-        <tr>
-          <td>
-            <%= link_to order.order_number, order_path(order), class: "text-primary font-semibold hover:underline" %>
-          </td>
-          <td>
-            <div>
-              <div class="font-medium"><%= order.customer&.name || "Brak danych" %></div>
-            </div>
-          </td>
-          <td>
-            <div class="flex flex-col gap-2">
-              <% order.order_items.limit(3).each do |item| %>
-                <div class="flex items-center gap-2">
-                  <% if item.product&.images&.attached? %>
-                    <%= image_tag item.product.images.first, class: "w-12 h-12 object-cover rounded flex-shrink-0" %>
-                  <% else %>
-                    <div class="w-12 h-12 bg-base-200 rounded flex items-center justify-center flex-shrink-0">
-                      <%= lucide_icon('package', class: 'w-6 h-6 text-base-content/30') %>
-                    </div>
-                  <% end %>
-                  <div class="min-w-0">
-                    <div class="text-sm font-medium truncate"><%= item.name %></div>
-                    <div class="text-xs text-base-content/50">
-                      <% if item.product&.sku.present? || item.product&.ean.present? %>
-                        <%= [item.product&.sku, item.product&.ean].compact.join(" · ") %>
-                      <% else %>
-                        × <%= item.quantity %>
-                      <% end %>
+      <% if @orders.any? %>
+        <% @orders.each do |order| %>
+          <tr>
+            <td class="align-top">
+              <%= link_to order.order_number, order_path(order), class: "text-primary font-semibold hover:underline" %>
+            </td>
+            <td class="align-top">
+              <div>
+                <div><%= order.customer&.name || "Brak danych" %></div>
+              </div>
+            </td>
+            <td class="align-top">
+              <div class="flex flex-col gap-2">
+                <% order.order_items.limit(3).each do |item| %>
+                  <div class="flex items-center gap-2">
+                    <% if item.product&.images&.attached? %>
+                      <%= image_tag item.product.images.first, class: "w-12 h-12 object-cover rounded flex-shrink-0" %>
+                    <% else %>
+                      <div class="w-12 h-12 bg-base-200 rounded flex items-center justify-center flex-shrink-0">
+                        <%= lucide_icon('package', class: 'w-6 h-6 text-base-content/30') %>
+                      </div>
+                    <% end %>
+                    <div class="min-w-0">
+                      <div class="w-64 text-sm truncate"><%= item.name %></div>
+                      <div class="text-xs text-base-content/50">
+                        <% if item.product&.sku.present? || item.product&.ean.present? %>
+                          <%= [item.product&.sku, item.product&.ean].compact.join(" · ") %>
+                        <% else %>
+                          × <%= item.quantity %>
+                        <% end %>
+                      </div>
                     </div>
                   </div>
+                <% end %>
+                <% if order.order_items.count > 3 %>
+                  <div class="text-xs text-base-content/50">+ <%= order.order_items.count - 3 %> więcej</div>
+                <% end %>
+              </div>
+            </td>
+            <td class="align-top">
+              <%= order_status_badge(order) %>
+            </td>
+            <td class="align-top">
+              <div class="flex flex-col gap-1.5">
+                <div class="text-base mb-2">
+                  <%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %>
                 </div>
-              <% end %>
-              <% if order.order_items.count > 3 %>
-                <div class="text-xs text-base-content/50">+ <%= order.order_items.count - 3 %> więcej</div>
-              <% end %>
-            </div>
-          </td>
-          <td>
-            <span class="badge badge-ghost">
-              <%= order.status_name %>
-            </span>
-          </td>
-          <td class="font-semibold">
-            <%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %>
-          </td>
-          <td>
-            <div class="flex flex-col gap-1.5">
-              <div class="flex items-center gap-1.5 text-sm text-base-content/60">
-                <%= lucide_icon('credit-card', class: 'w-3.5 h-3.5') %>
-                <%= order.payment_method.presence || lucide_icon('minus', class: 'w-3.5 h-3.5 opacity-50') %>
+                <div class="flex items-center gap-1.5 text-sm text-base-content/60">
+                  <%= lucide_icon('credit-card', class: 'w-3.5 h-3.5') %>
+                  <%= order.payment_method.presence || lucide_icon('minus', class: 'w-3.5 h-3.5 opacity-50') %>
+                </div>
+                <div class="flex items-center gap-1.5 text-sm text-base-content/60">
+                  <%= lucide_icon('truck', class: 'w-3.5 h-3.5') %>
+                  <%= order.shipping_method.presence || lucide_icon('minus', class: 'w-3.5 h-3.5 opacity-50') %>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5 text-sm text-base-content/60">
-                <%= lucide_icon('truck', class: 'w-3.5 h-3.5') %>
-                <%= order.shipping_method.presence || lucide_icon('minus', class: 'w-3.5 h-3.5 opacity-50') %>
-              </div>
-            </div>
-          </td>
-          <td class="text-end">
-            <%= order.created_at.strftime("%d.%m.%Y %H:%M") %>
+            </td>
+            <td class="text-end align-top text-base-content/60 text-xs">
+              <%= order.created_at.strftime("%d.%m.%Y %H:%M") %>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="7" class="text-center py-8">
+            <%= render "orders/orders_empty_state" %>
           </td>
         </tr>
       <% end %>
