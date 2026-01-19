@@ -8,4 +8,8 @@ class ShippingAddress < ApplicationRecord
   validates :city, presence: true, unless: -> { order&.draft_status? }
   validates :postal_code, presence: true, unless: -> { order&.draft_status? }
   validates :country, presence: true, unless: -> { order&.draft_status? }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[first_name last_name address_line1 city postal_code]
+  end
 end

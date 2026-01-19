@@ -1,4 +1,7 @@
 class OrdersController < ApplicationController
+  PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
+  DEFAULT_PER_PAGE = 10
+
   def new
     @order = current_account.orders.build
     @order.order_number = generate_order_number
@@ -16,8 +19,26 @@ class OrdersController < ApplicationController
 
   def index
     @all_orders = current_account.orders
-    @orders = @all_orders.order(created_at: :desc)
-    @orders = @orders.where(status: params[:status]) if params[:status].present?
+    @q = @all_orders.ransack(params[:q])
+    orders = @q.result.order(created_at: :desc)
+    orders = orders.where(status: params[:status]) if params[:status].present?
+
+    # Pobierz per_page: najpierw z params, potem z cookies, na końcu default
+    per_page = if params[:per_page].present?
+      params[:per_page].to_i
+    elsif cookies[:orders_per_page].present?
+      cookies[:orders_per_page].to_i
+    else
+      DEFAULT_PER_PAGE
+    end
+
+    per_page = DEFAULT_PER_PAGE unless PER_PAGE_OPTIONS.include?(per_page)
+
+    # Zapisz do cookies (na 1 rok)
+    cookies[:orders_per_page] = { value: per_page, expires: 1.year.from_now }
+
+    @per_page_options = PER_PAGE_OPTIONS
+    @pagy, @orders = pagy(orders, limit: per_page)
   end
 
   def show

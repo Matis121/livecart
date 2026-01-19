@@ -1,0 +1,52 @@
+<div class="flex items-center justify-between gap-4 mb-3">
+  <%= search_form_for @q, url: orders_path, method: :get, html: { class: "flex-1 max-w-sm" } do |f| %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <div class="relative">
+      <%= lucide_icon('search', class: 'w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40') %>
+      <%= f.search_field :order_number_or_customer_first_name_or_customer_last_name_or_email_or_shipping_address_first_name_or_shipping_address_last_name_cont,
+                  placeholder: "Szukaj...",
+                  class: "input input-sm input-bordered w-full pl-4 pr-8 bg-base-100 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
+                  data: { action: "input->search#submit" } %>
+      <% if params.dig(:q, :order_number_or_customer_first_name_or_customer_last_name_or_email_or_shipping_address_first_name_or_shipping_address_last_name_cont).present? %>
+        <%= link_to orders_path(status: params[:status]), class: "absolute right-2 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content" do %>
+          <%= lucide_icon('x', class: 'w-6 h-6') %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="flex items-center gap-3 text-sm text-base-content/60">
+    <!-- Per page selector -->
+    <div class="flex items-center gap-2">
+      <select
+                onchange="window.location.href = this.value"
+                class="select select-sm select-bordered bg-base-100 min-h-0 h-8 pr-8"
+              >
+        <% @per_page_options.each do |option| %>
+          <option
+                    value="<%= orders_path(request.params.merge(per_page: option, page: 1)) %>"
+                    <%= 'selected' if @pagy.limit == option %>
+                  >
+            <%= option %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+    <div class="flex items-center gap-1">
+      <% if @pagy.page > 1 %>
+        <%= link_to orders_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
+      <% end %>
+      <span class="px-2 tabular-nums"><%= @pagy.page %> / <%= @pagy.pages %></span>
+      <% if @pagy.page < @pagy.pages %>
+        <%= link_to orders_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
+      <% end %>
+    </div>
+  </div>
+</div>

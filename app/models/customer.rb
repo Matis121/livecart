@@ -7,4 +7,9 @@ class Customer < ApplicationRecord
   def name
     "#{first_name} #{last_name}"
   end
+
+  # Ransack - dozwolone atrybuty do wyszukiwania
+  def self.ransackable_attributes(auth_object = nil)
+    %w[first_name last_name email phone]
+  end
 end

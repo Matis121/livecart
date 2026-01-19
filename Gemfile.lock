@@ -207,6 +207,9 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
+    pagy (43.2.6)
+      json
+      yaml
     parallel (1.27.0)
     parser (3.3.10.0)
       ast (~> 2.4.1)
@@ -274,6 +277,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
+    ransack (4.4.1)
+      activerecord (>= 7.2)
+      activesupport (>= 7.2)
+      i18n
     rdoc (7.0.3)
       erb
       psych (>= 4.0.0)
@@ -390,6 +397,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yaml (0.4.0)
     zeitwerk (2.7.4)
 
 PLATFORMS
@@ -415,10 +423,12 @@ DEPENDENCIES
   jbuilder
   kamal
   lucide-rails (~> 0.7.3)
+  pagy
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
+  ransack
   rubocop-rails-omakase
   selenium-webdriver
   solid_cable

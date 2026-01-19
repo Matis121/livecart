@@ -76,6 +76,15 @@ class Order < ApplicationRecord
     order_paid? ? "badge-success" : "badge-error"
   end
 
+  # Ransack - dozwolone atrybuty do wyszukiwania
+  def self.ransackable_attributes(auth_object = nil)
+    %w[order_number email phone status created_at total_amount payment_method shipping_method]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[customer shipping_address billing_address]
+  end
+
   private
 
   def build_blank_addresses

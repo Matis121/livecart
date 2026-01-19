@@ -9,4 +9,8 @@ class BillingAddress < ApplicationRecord
   validates :city, presence: true, if: -> { needs_invoice? && !order&.draft_status? }
   validates :postal_code, presence: true, if: -> { needs_invoice? && !order&.draft_status? }
   validates :country, presence: true, if: -> { needs_invoice? && !order&.draft_status? }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[company_name nip first_name last_name address_line1 city]
+  end
 end
