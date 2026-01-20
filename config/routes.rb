@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"
   resources :orders, controller: "orders" do
+    collection do
+      patch :bulk_action
+    end
     resources :order_items, only: [ :new, :create, :edit, :update, :destroy ] do
       post :quick_add, on: :collection
     end

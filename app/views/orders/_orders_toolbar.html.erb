@@ -1,4 +1,7 @@
 <div class="flex items-center justify-between gap-4 mb-3">
+  <%= form_with url: bulk_action_orders_path, method: :patch, id: "bulk_action_form" do |f| %>
+    <%= render "orders/bulk_actions_toolbar" %>
+  <% end %>
   <%= search_form_for @q, url: orders_path, method: :get, html: { class: "flex-1 max-w-sm" } do |f| %>
     <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
     <div class="relative">

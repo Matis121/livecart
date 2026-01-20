@@ -1,0 +1,28 @@
+<div class="flex items-center gap-2">
+  <!-- 2. Dropdown zmiany statusu -->
+  <div class="dropdown">
+    <div tabindex="0" role="button" class="btn btn-sm">
+      <%= lucide_icon('flag', class: 'w-4 h-4') %>
+    </div>
+    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-lg">
+      <% Order.statuses.each do |status, _| %>
+        <li>
+          <button type="submit" 
+            form="bulk_action_form"
+            formaction="<%= bulk_action_orders_path(action_type: 'update_status', new_status: status) %>"
+            class="w-full text-left px-4 py-2 hover:bg-base-200">
+            <%= Order::STATUS_NAMES[status.to_sym] %>
+          </button>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+  <!-- 3. Przycisk usuwania -->
+  <button type="submit"
+        form="bulk_action_form"
+        formaction="<%= bulk_action_orders_path(action_type: 'delete') %>"
+        class="btn btn-sm"
+        onclick="return confirm('Czy na pewno chcesz usunąć zaznaczone zamówienia?')">
+    <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
+  </button>
+</div>

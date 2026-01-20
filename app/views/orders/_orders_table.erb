@@ -1,7 +1,14 @@
-<div class="bg-base-100 rounded-lg shadow-sm">
+<div class="bg-base-100 rounded-lg shadow-sm" data-controller="checkbox-select-all">
   <table class="table">
     <thead>
       <tr>
+        <th class="font-semibold w-12">
+          <input 
+            type="checkbox" 
+            data-checkbox-select-all-target="parent"
+            data-action="click->checkbox-select-all#toggleChildren"
+          >
+        </th>
         <th class="font-semibold w-25 min-w-25">Numer</th>
         <th class="font-semibold min-w-28 w-28">Klient</th>
         <th class="font-semibold min-w-80 w-80">Produkty</th>
@@ -14,6 +21,13 @@
       <% if @orders.any? %>
         <% @orders.each do |order| %>
           <tr>
+            <td class="align-top">
+              <%= check_box_tag "order_ids[]", order.order_number, nil, { 
+              multiple: true, 
+              form: "bulk_action_form", 
+              data: { checkbox_select_all_target: "child", action: "click->checkbox-select-all#toggleParent" }
+            } %>
+            </td>
             <td class="align-top">
               <%= link_to order.order_number, order_path(order), class: "text-primary font-semibold hover:underline" %>
             </td>
@@ -75,7 +89,7 @@
         <% end %>
       <% else %>
         <tr>
-          <td colspan="7" class="text-center py-8">
+          <td colspan="8" class="text-center py-8">
             <%= render "orders/orders_empty_state" %>
           </td>
         </tr>

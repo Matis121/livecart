@@ -186,6 +186,38 @@ class OrdersController < ApplicationController
     redirect_to orders_path, notice: "Zamówienie zostało usunięte"
   end
 
+  def bulk_action
+    order_ids = params[:order_ids] || []
+    action_type = params[:action_type]
+
+    if order_ids.empty?
+      redirect_to orders_path, alert: "Nie wybrano żadnych zamówień"
+      return
+    end
+
+    # Znajdź zamówienia należące do current_account
+    orders = current_account.orders.where(order_number: order_ids)
+
+    case action_type
+    when "delete"
+      count = orders.count
+      orders.destroy_all
+      redirect_to orders_path, notice: "Usunięto #{count} zamówień"
+
+    when "update_status"
+      new_status = params[:new_status]
+      if new_status.present? && Order.statuses.keys.include?(new_status)
+        count = orders.update_all(status: Order.statuses[new_status])
+        redirect_to orders_path, notice: "Zaktualizowano status #{count} zamówień"
+      else
+        redirect_to orders_path, alert: "Nieprawidłowy status"
+      end
+
+    else
+      redirect_to orders_path, alert: "Nieznana akcja"
+    end
+  end
+
   def activate_checkout
     @order = current_account.orders.find_by!(order_number: params[:id])
 
