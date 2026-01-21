@@ -3,7 +3,7 @@ class ProductsController < ApplicationController
   DEFAULT_PER_PAGE = 10
 
   before_action :set_product, only: [ :show, :edit, :update, :destroy ]
-  
+
   def index
     @all_products = current_account.products
     @q = @all_products.ransack(params[:q])

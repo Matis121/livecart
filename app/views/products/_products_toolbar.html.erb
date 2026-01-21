@@ -1,71 +1,89 @@
-<div class="mb-4">  
+<div class="mb-4" data-controller="collapse" data-collapse-storage-key-value="products-filters-open" data-collapse-default-open-value="true">  
   <!-- Formularz wyszukiwania -->
   <%= search_form_for @q, url: products_path, method: :get, html: { class: "mb-4" } do |f| %>
-    <div class="bg-base-100 rounded-lg shadow-sm p-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-        <!-- Nazwa -->
-        <div class="form-control">
-          <%= f.label :name_cont, "Nazwa", class: "label label-text text-xs" %>
-          <%= f.search_field :name_cont, 
-              placeholder: "Szukaj po nazwie...",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- EAN -->
-        <div class="form-control">
-          <%= f.label :ean_cont, "EAN", class: "label label-text text-xs" %>
-          <%= f.search_field :ean_cont, 
-              placeholder: "Szukaj po EAN...",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- SKU -->
-        <div class="form-control">
-          <%= f.label :sku_cont, "SKU", class: "label label-text text-xs" %>
-          <%= f.search_field :sku_cont, 
-              placeholder: "Szukaj po SKU...",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- Stan od -->
-        <div class="form-control">
-          <%= f.label :product_stock_quantity_gteq, "Stan od", class: "label label-text text-xs" %>
-          <%= f.number_field :product_stock_quantity_gteq, 
-              placeholder: "Min...",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- Stan do -->
-        <div class="form-control">
-          <%= f.label :product_stock_quantity_lteq, "Stan do", class: "label label-text text-xs" %>
-          <%= f.number_field :product_stock_quantity_lteq, 
-              placeholder: "Max...",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- Cena od -->
-        <div class="form-control">
-          <%= f.label :gross_price_gteq, "Cena od", class: "label label-text text-xs" %>
-          <%= f.number_field :gross_price_gteq, 
-              placeholder: "Min...",
-              step: "0.01",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
-
-        <!-- Cena do -->
-        <div class="form-control">
-          <%= f.label :gross_price_lteq, "Cena do", class: "label label-text text-xs" %>
-          <%= f.number_field :gross_price_lteq, 
-              placeholder: "Max...",
-              step: "0.01",
-              class: "input input-sm input-bordered w-full" %>
-        </div>
+    <div class="bg-base-100 rounded-lg shadow-sm">
+      <!-- Header z przyciskiem toggle -->
+      <div class="flex items-center justify-between p-4 border-b border-base-200">
+        <h3 class="text-sm font-semibold flex items-center gap-2">
+          <%= lucide_icon('filter', class: 'w-4 h-4') %>
+          Filtry
+        </h3>
+        <button 
+          type="button"
+          data-action="click->collapse#toggle"
+          class="btn btn-ghost flex gap-2"
+        >
+          <%= lucide_icon('chevron-down', class: 'w-5 h-5 transition-transform', data: { collapse_target: 'icon' }) %>
+        </button>
       </div>
+      
+      <!-- Zawartość filtrów -->
+      <div data-collapse-target="content" class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          <!-- Nazwa -->
+          <div class="form-control">
+            <%= f.label :name_cont, "Nazwa", class: "label label-text text-xs" %>
+            <%= f.search_field :name_cont, 
+                placeholder: "Szukaj po nazwie...",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
 
-      <!-- Przyciski -->
-      <div class="flex items-center gap-2 mt-4">
-        <%= f.submit "Filtruj", class: "btn btn-sm btn-primary" %>
-        <%= link_to "Wyczyść", products_path, class: "btn btn-sm btn-ghost" %>
+          <!-- EAN -->
+          <div class="form-control">
+            <%= f.label :ean_cont, "EAN", class: "label label-text text-xs" %>
+            <%= f.search_field :ean_cont, 
+                placeholder: "Szukaj po EAN...",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+
+          <!-- SKU -->
+          <div class="form-control">
+            <%= f.label :sku_cont, "SKU", class: "label label-text text-xs" %>
+            <%= f.search_field :sku_cont, 
+                placeholder: "Szukaj po SKU...",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+
+          <!-- Stan od -->
+          <div class="form-control">
+            <%= f.label :product_stock_quantity_gteq, "Stan od", class: "label label-text text-xs" %>
+            <%= f.number_field :product_stock_quantity_gteq, 
+                placeholder: "Min...",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+
+          <!-- Stan do -->
+          <div class="form-control">
+            <%= f.label :product_stock_quantity_lteq, "Stan do", class: "label label-text text-xs" %>
+            <%= f.number_field :product_stock_quantity_lteq, 
+                placeholder: "Max...",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+
+          <!-- Cena od -->
+          <div class="form-control">
+            <%= f.label :gross_price_gteq, "Cena od", class: "label label-text text-xs" %>
+            <%= f.number_field :gross_price_gteq, 
+                placeholder: "Min...",
+                step: "0.01",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+
+          <!-- Cena do -->
+          <div class="form-control">
+            <%= f.label :gross_price_lteq, "Cena do", class: "label label-text text-xs" %>
+            <%= f.number_field :gross_price_lteq, 
+                placeholder: "Max...",
+                step: "0.01",
+                class: "input input-sm input-bordered w-full" %>
+          </div>
+        </div>
+
+        <!-- Przyciski -->
+        <div class="flex justify-end gap-2 mt-6">
+          <%= link_to "Wyczyść", products_path, class: "btn btn-sm btn-ghost" %>
+          <%= f.submit "Filtruj", class: "btn btn-sm btn-primary" %>
+        </div>
       </div>
     </div>
   <% end %>

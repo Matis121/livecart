@@ -22,10 +22,10 @@ class Product < ApplicationRecord
 
   # Ransack configuration
   def self.ransackable_attributes(auth_object = nil)
-    ["name", "sku", "ean", "gross_price", "created_at", "updated_at"]
+    [ "name", "sku", "ean", "gross_price", "created_at", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["product_stock"]
+    [ "product_stock" ]
   end
 end

@@ -20,7 +20,7 @@ class OrdersController < ApplicationController
   def index
     @all_orders = current_account.orders
     @q = @all_orders.ransack(params[:q])
-    orders = @q.result.order(created_at: :desc)
+    orders = @q.result.includes(:customer, :order_items).order(created_at: :desc).distinct
     orders = orders.where(status: params[:status]) if params[:status].present?
 
     # Pobierz per_page: najpierw z params, potem z cookies, na końcu default

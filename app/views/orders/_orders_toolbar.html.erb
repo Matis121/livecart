@@ -1,21 +1,127 @@
+<div class="mb-4" data-controller="collapse" data-collapse-storage-key-value="orders-filters-open" data-collapse-default-open-value="true">  
+  <!-- Formularz wyszukiwania -->
+  <%= search_form_for @q, url: orders_path, method: :get, html: { class: "mb-4" } do |f| %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <div class="bg-base-100 rounded-lg shadow-sm">
+      <!-- Header z przyciskiem toggle -->
+      <div class="flex items-center justify-between p-4 border-b border-base-200">
+        <div class="dropdown dropdown-start">
+        <label tabindex="0" class="btn">
+          <% if params[:status].blank? %>
+            Wszystkie
+          <% else %>
+            <%= Order::STATUS_NAMES[params[:status].to_sym] %>
+          <% end %>
+        </label>
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <li>
+          <%= link_to orders_path, class: "flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-base-200 #{'bg-base-200 font-medium' if params[:status].blank?}" do %>
+            Wszystkie
+            <span class="ml-auto text-xs text-base-content/50"><%= @all_orders.count %></span>
+          <% end %>
+          </li>
+          <% Order::STATUS_NAMES.each do |key, name| %>
+            <li>
+              <%= link_to orders_path(status: key), class: "flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-base-200 #{'bg-base-200 font-medium' if params[:status] == key.to_s}" do %>
+                <%= name %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+        <button 
+          type="button"
+          data-action="click->collapse#toggle"
+          class="btn btn-ghost flex gap-2"
+        > <span class="text-xs">Filtry</span>
+          <%= lucide_icon('chevron-down', class: 'w-5 h-5 transition-transform', data: { collapse_target: 'icon' }) %>
+        </button>
+      </div>
+      
+      <!-- Zawartość filtrów -->
+      <div data-collapse-target="content" class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Imię i nazwisko -->
+        <div class="form-control">
+          <%= f.label :customer_first_name_or_customer_last_name_cont, "Imię i nazwisko", class: "label label-text text-xs" %>
+          <%= f.search_field :customer_first_name_or_customer_last_name_cont, 
+              placeholder: "Szukaj po imieniu lub nazwisku...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Sposób wysyłki -->
+        <div class="form-control">
+          <%= f.label :shipping_method_cont, "Sposób wysyłki", class: "label label-text text-xs" %>
+          <%= f.search_field :shipping_method_cont, 
+              placeholder: "Szukaj po sposobie wysyłki...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Sposób płatności -->
+        <div class="form-control">
+          <%= f.label :payment_method_cont, "Sposób płatności", class: "label label-text text-xs" %>
+          <%= f.search_field :payment_method_cont, 
+              placeholder: "Szukaj po sposobie płatności...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Kwota dostawy od -->
+        <div class="form-control">
+          <%= f.label :shipping_cost_gteq, "Kwota dostawy od", class: "label label-text text-xs" %>
+          <%= f.number_field :shipping_cost_gteq, 
+              placeholder: "Min...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Kwota dostawy do -->
+        <div class="form-control">
+          <%= f.label :shipping_cost_lteq, "Kwota dostawy do", class: "label label-text text-xs" %>
+          <%= f.number_field :shipping_cost_lteq, 
+              placeholder: "Max...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Kwota zamówienia od -->
+        <div class="form-control">
+          <%= f.label :total_amount_gteq, "Kwota zamówienia od", class: "label label-text text-xs" %>
+          <%= f.number_field :total_amount_gteq, 
+              placeholder: "Min...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Kwota zamówienia do -->
+        <div class="form-control">
+          <%= f.label :total_amount_lteq, "Kwota zamówienia do", class: "label label-text text-xs" %>
+          <%= f.number_field :total_amount_lteq, 
+              placeholder: "Max...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Produkt -->
+        <div class="form-control">
+          <%= f.label :order_items_name_cont, "Produkt", class: "label label-text text-xs" %>
+          <%= f.search_field :order_items_name_cont, 
+              placeholder: "Szukaj po nazwie produktu...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+        </div>
+
+        <!-- Przyciski -->
+        <div class="flex justify-end gap-2 mt-6">
+          <%= link_to "Wyczyść", orders_path(status: params[:status]), class: "btn btn-sm btn-ghost" %>
+          <%= f.submit "Filtruj", class: "btn btn-sm btn-primary" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
 <div class="flex items-center justify-between gap-4 mb-3">
   <%= form_with url: bulk_action_orders_path, method: :patch, id: "bulk_action_form" do |f| %>
     <%= render "orders/bulk_actions_toolbar" %>
-  <% end %>
-  <%= search_form_for @q, url: orders_path, method: :get, html: { class: "flex-1 max-w-sm" } do |f| %>
-    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
-    <div class="relative">
-      <%= lucide_icon('search', class: 'w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40') %>
-      <%= f.search_field :order_number_or_customer_first_name_or_customer_last_name_or_email_or_shipping_address_first_name_or_shipping_address_last_name_cont,
-                  placeholder: "Szukaj...",
-                  class: "input input-sm input-bordered w-full pl-4 pr-8 bg-base-100 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
-                  data: { action: "input->search#submit" } %>
-      <% if params.dig(:q, :order_number_or_customer_first_name_or_customer_last_name_or_email_or_shipping_address_first_name_or_shipping_address_last_name_cont).present? %>
-        <%= link_to orders_path(status: params[:status]), class: "absolute right-2 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content" do %>
-          <%= lucide_icon('x', class: 'w-6 h-6') %>
-        <% end %>
-      <% end %>
-    </div>
   <% end %>
   <div class="flex items-center gap-3 text-sm text-base-content/60">
     <!-- Per page selector -->

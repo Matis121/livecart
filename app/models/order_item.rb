@@ -19,6 +19,10 @@ class OrderItem < ApplicationRecord
   after_create :create_reservation, if: :should_reserve?
   after_update :update_reservation_quantity, if: :quantity_changed_and_draft?
 
+  # Ransack - dozwolone atrybuty do wyszukiwania
+  def self.ransackable_attributes(auth_object = nil)
+    %w[name unit_price quantity total_price]
+  end
 
   private
 
