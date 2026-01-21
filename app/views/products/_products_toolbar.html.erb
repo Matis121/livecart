@@ -1,0 +1,117 @@
+<div class="mb-4">
+  <%= form_with url: bulk_action_products_path, method: :patch, id: "bulk_action_form" do |f| %>
+    <%= render "products/bulk_actions_toolbar" %>
+  <% end %>
+  
+  <!-- Formularz wyszukiwania -->
+  <%= search_form_for @q, url: products_path, method: :get, html: { class: "mb-4" } do |f| %>
+    <div class="bg-base-100 rounded-lg shadow-sm p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- Nazwa -->
+        <div class="form-control">
+          <%= f.label :name_cont, "Nazwa", class: "label label-text text-xs" %>
+          <%= f.search_field :name_cont, 
+              placeholder: "Szukaj po nazwie...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- EAN -->
+        <div class="form-control">
+          <%= f.label :ean_cont, "EAN", class: "label label-text text-xs" %>
+          <%= f.search_field :ean_cont, 
+              placeholder: "Szukaj po EAN...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- SKU -->
+        <div class="form-control">
+          <%= f.label :sku_cont, "SKU", class: "label label-text text-xs" %>
+          <%= f.search_field :sku_cont, 
+              placeholder: "Szukaj po SKU...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Stan od -->
+        <div class="form-control">
+          <%= f.label :product_stock_quantity_gteq, "Stan od", class: "label label-text text-xs" %>
+          <%= f.number_field :product_stock_quantity_gteq, 
+              placeholder: "Min...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Stan do -->
+        <div class="form-control">
+          <%= f.label :product_stock_quantity_lteq, "Stan do", class: "label label-text text-xs" %>
+          <%= f.number_field :product_stock_quantity_lteq, 
+              placeholder: "Max...",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Cena od -->
+        <div class="form-control">
+          <%= f.label :gross_price_gteq, "Cena od", class: "label label-text text-xs" %>
+          <%= f.number_field :gross_price_gteq, 
+              placeholder: "Min...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+
+        <!-- Cena do -->
+        <div class="form-control">
+          <%= f.label :gross_price_lteq, "Cena do", class: "label label-text text-xs" %>
+          <%= f.number_field :gross_price_lteq, 
+              placeholder: "Max...",
+              step: "0.01",
+              class: "input input-sm input-bordered w-full" %>
+        </div>
+      </div>
+
+      <!-- Przyciski -->
+      <div class="flex items-center gap-2 mt-4">
+        <%= f.submit "Filtruj", class: "btn btn-sm btn-primary" %>
+        <%= link_to "Wyczyść", products_path, class: "btn btn-sm btn-ghost" %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Pagination controls -->
+  <div class="flex items-center justify-end gap-3 text-sm text-base-content/60 mt-3">
+    <!-- Per page selector -->
+    <div class="flex items-center gap-2">
+      <select
+        onchange="window.location.href = this.value"
+        class="select select-sm select-bordered bg-base-100 min-h-0 h-8 pr-8"
+      >
+        <% @per_page_options.each do |option| %>
+          <option
+            value="<%= products_path(request.params.merge(per_page: option, page: 1)) %>"
+            <%= 'selected' if @pagy.limit == option %>
+          >
+            <%= option %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <!-- Page navigation -->
+    <div class="flex items-center gap-1">
+      <% if @pagy.page > 1 %>
+        <%= link_to products_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
+      <% end %>
+      
+      <span class="px-2 tabular-nums"><%= @pagy.page %> / <%= @pagy.pages %></span>
+      
+      <% if @pagy.page < @pagy.pages %>
+        <%= link_to products_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -4,12 +4,17 @@
     <h1 class="text-2xl sm:text-3xl font-bold">Produkty</h1>
     <%= link_to "Nowy produkt", new_product_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
-  <% if @products.any? %>
-    <%= render "products/table" %>
+  
+  <% if @all_products.any? %>
+    <div class="flex-1 min-w-0">
+      <%= render "products/products_toolbar" %>
+      <%= render "products/products_table" %>
+    </div>
   <% else %>
     <%= render "products/empty_state" %>
   <% end %>
 </div>
+
 <!-- Modale dla wszystkich produktów -->
 <% @products.each do |product| %>
   <%= render "products/reservations_modal", product: product %>

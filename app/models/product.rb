@@ -19,4 +19,13 @@ class Product < ApplicationRecord
   validates :images, content_type: [ "image/png", "image/jpeg" ],
                    size: { less_than: 5.megabytes }
   validates :currency, presence: true, inclusion: { in: [ "PLN", "EUR", "USD" ] }
+
+  # Ransack configuration
+  def self.ransackable_attributes(auth_object = nil)
+    ["name", "sku", "ean", "gross_price", "created_at", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["product_stock"]
+  end
 end

@@ -1,0 +1,121 @@
+<div class="bg-base-100 rounded-lg shadow-sm" data-controller="checkbox-select-all">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="font-semibold w-12">
+          <input 
+            type="checkbox" 
+            data-checkbox-select-all-target="parent"
+            data-action="click->checkbox-select-all#toggleChildren"
+          >
+        </th>
+        <th class="font-semibold">Produkt</th>
+        <th class="font-semibold w-32">EAN</th>
+        <th class="font-semibold w-32">SKU</th>
+        <th class="font-semibold w-32">Cena brutto</th>
+        <th class="font-semibold w-24">VAT</th>
+        <th class="font-semibold w-32">Stan</th>
+        <th class="text-end font-semibold w-24">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @products.any? %>
+        <% @products.each do |product| %>
+          <tr>
+            <td class="align-top">
+              <%= check_box_tag "product_ids[]", product.id, nil, { 
+                multiple: true, 
+                form: "bulk_action_form", 
+                data: { checkbox_select_all_target: "child", action: "click->checkbox-select-all#toggleParent" }
+              } %>
+            </td>
+            <td>
+              <div class="flex items-center gap-3">
+                <div>
+                  <% if product.images.attached? %>
+                    <%= image_tag product.images.first, class: "w-14 h-14 object-cover rounded" %>
+                  <% else %>
+                    <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
+                  <% end %>
+                </div>
+                <div>
+                  <div class="font-medium">
+                    <%= link_to product.name, edit_product_path(product), class: "hover:underline text-primary" %>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="text-sm">
+                <%= product.ean.presence || '-' %>
+              </div>
+            </td>
+            <td>
+              <div class="text-sm">
+                <%= product.sku.presence || '-' %>
+              </div>
+            </td>
+            <td>
+              <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
+            </td>
+            <td>
+              <%= product.tax_rate %>%
+            </td>
+            <td>
+              <div class="flex items-center gap-2">
+                <div>
+                  <%= product.available_quantity %>
+                </div>
+                <% reserved = product.reserved_quantity || 0 %>
+                <% if reserved > 0 %>
+                  <div class="text-sm text-gray-500">
+                    +(<%= reserved %>)
+                  </div>
+                <% end %>
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                  <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
+                </div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                  <li>
+                    <%= link_to edit_product_path(product) do %>
+                      <%= lucide_icon('edit', class: 'w-4 h-4') %>
+                      Edytuj
+                    <% end %>
+                  </li>
+                  <li>
+                    <a onclick="reservations_modal_<%= product.id %>.showModal()">
+                      <%= lucide_icon('calendar-check', class: 'w-4 h-4') %>
+                      Rezerwacje
+                    </a>
+                  </li>
+                  <li>
+                    <a onclick="history_modal_<%= product.id %>.showModal()">
+                      <%= lucide_icon('history', class: 'w-4 h-4') %>
+                      Historia produktu
+                    </a>
+                  </li>
+                  <li>
+                    <%= link_to product_path(product), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć ten produkt?" }, class: "text-error" do %>
+                      <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
+                      Usuń
+                    <% end %>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="8" class="text-center py-8">
+            <%= render "products/empty_state" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

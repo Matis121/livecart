@@ -50,4 +50,9 @@ class ProductStock < ApplicationRecord
       )
     end
   end
+
+  # Ransack configuration
+  def self.ransackable_attributes(auth_object = nil)
+    ["quantity", "available_quantity", "reserved_quantity"]
+  end
 end

@@ -1,7 +1,30 @@
 class ProductsController < ApplicationController
+  PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
+  DEFAULT_PER_PAGE = 10
+
   before_action :set_product, only: [ :show, :edit, :update, :destroy ]
+  
   def index
-    @products = current_account.products.order(created_at: :asc)
+    @all_products = current_account.products
+    @q = @all_products.ransack(params[:q])
+    products = @q.result.includes(:product_stock).order(created_at: :desc)
+
+    # Pobierz per_page: najpierw z params, potem z cookies, na końcu default
+    per_page = if params[:per_page].present?
+      params[:per_page].to_i
+    elsif cookies[:products_per_page].present?
+      cookies[:products_per_page].to_i
+    else
+      DEFAULT_PER_PAGE
+    end
+
+    per_page = DEFAULT_PER_PAGE unless PER_PAGE_OPTIONS.include?(per_page)
+
+    # Zapisz do cookies (na 1 rok)
+    cookies[:products_per_page] = { value: per_page, expires: 1.year.from_now }
+
+    @per_page_options = PER_PAGE_OPTIONS
+    @pagy, @products = pagy(products, limit: per_page)
   end
 
   def show
@@ -45,6 +68,29 @@ class ProductsController < ApplicationController
   def destroy
     @product.destroy
     redirect_to products_path, notice: "Produkt został usunięty"
+  end
+
+  def bulk_action
+    product_ids = params[:product_ids] || []
+    action_type = params[:action_type]
+
+    if product_ids.empty?
+      redirect_to products_path, alert: "Nie wybrano żadnych produktów"
+      return
+    end
+
+    # Znajdź produkty należące do current_account
+    products = current_account.products.where(id: product_ids)
+
+    case action_type
+    when "delete"
+      count = products.count
+      products.destroy_all
+      redirect_to products_path, notice: "Usunięto #{count} produktów"
+
+    else
+      redirect_to products_path, alert: "Nieznana akcja"
+    end
   end
 
   private
