@@ -6,7 +6,7 @@
   </div>
   
   <% if @all_products.any? %>
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0" data-controller="checkbox-select-all">
       <%= render "products/products_toolbar" %>
       <%= render "products/products_table" %>
     </div>

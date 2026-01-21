@@ -7,7 +7,7 @@
   <% if @all_orders.any? %>
     <div class="flex gap-4">
       <%= render "orders/orders_sidebar" %>
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-0" data-controller="checkbox-select-all">
         <%= render "orders/orders_toolbar" %>
         <%= render "orders/orders_table" %>
       </div>

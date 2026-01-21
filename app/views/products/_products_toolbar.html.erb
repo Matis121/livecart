@@ -1,8 +1,4 @@
-<div class="mb-4">
-  <%= form_with url: bulk_action_products_path, method: :patch, id: "bulk_action_form" do |f| %>
-    <%= render "products/bulk_actions_toolbar" %>
-  <% end %>
-  
+<div class="mb-4">  
   <!-- Formularz wyszukiwania -->
   <%= search_form_for @q, url: products_path, method: :get, html: { class: "mb-4" } do |f| %>
     <div class="bg-base-100 rounded-lg shadow-sm p-4">
@@ -75,8 +71,30 @@
   <% end %>
 
   <!-- Pagination controls -->
-  <div class="flex items-center justify-end gap-3 text-sm text-base-content/60 mt-3">
-    <!-- Per page selector -->
+  <div class="flex items-center justify-between gap-3 text-sm text-base-content/60 mt-3">
+    <div class="flex items-center gap-2" >
+        <div class="dropdown dropdown-start" data-checkbox-select-all-target="parent">
+          <label tabindex="0" class="btn btn-sm bg-base-100 flex items-center gap-2">
+            <%= lucide_icon('check-square', class: 'w-4 h-4') %>
+            <span 
+                class="font-medium tabular-nums hidden" 
+                data-checkbox-select-all-target="counter"
+            >
+                0 / <%= @products.count %>
+            </span>
+            </label>
+            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a data-action="click->checkbox-select-all#toggleChildren" data-value="true">Zaznacz wszystkie</a></li>
+                <li><a data-action="click->checkbox-select-all#toggleChildren" value="false">Odznacz wszystkie</a></li>
+            </ul>
+        </div>
+        <%= form_with url: bulk_action_products_path, method: :patch, id: "bulk_action_form" do |f| %>
+            <%= render "products/bulk_actions_toolbar" %>
+        <% end %>
+    </div>
+
+    <div class="flex gap-4">
+            <!-- Per page selector -->
     <div class="flex items-center gap-2">
       <select
         onchange="window.location.href = this.value"
@@ -112,6 +130,7 @@
       <% else %>
         <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
       <% end %>
+    </div>
     </div>
   </div>
 </div>

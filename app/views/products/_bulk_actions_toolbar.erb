@@ -1,11 +1,10 @@
-<div class="flex items-center gap-2 mb-3">
+<div class="flex items-center gap-2">
   <!-- Przycisk usuwania -->
   <button type="submit"
         form="bulk_action_form"
         formaction="<%= bulk_action_products_path(action_type: 'delete') %>"
-        class="btn btn-sm"
+        class="btn btn-sm bg-base-100"
         onclick="return confirm('Czy na pewno chcesz usunąć zaznaczone produkty?')">
     <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
-    Usuń zaznaczone
   </button>
 </div>

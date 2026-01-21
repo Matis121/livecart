@@ -1,7 +1,22 @@
 <div class="flex items-center gap-2">
+  <div class="dropdown dropdown-start" data-checkbox-select-all-target="parent">
+    <label tabindex="0" class="btn btn-sm bg-base-100 flex items-center gap-2">
+      <%= lucide_icon('check-square', class: 'w-4 h-4') %>
+      <span 
+          class="font-medium tabular-nums hidden" 
+          data-checkbox-select-all-target="counter"
+      >
+          0 / <%= @orders.count %>
+      </span>
+    </label>
+    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+        <li><a data-action="click->checkbox-select-all#toggleChildren" data-value="true">Zaznacz wszystkie</a></li>
+        <li><a data-action="click->checkbox-select-all#toggleChildren" value="false">Odznacz wszystkie</a></li>
+    </ul>
+  </div>
   <!-- 2. Dropdown zmiany statusu -->
   <div class="dropdown">
-    <div tabindex="0" role="button" class="btn btn-sm">
+    <div tabindex="0" role="button" class="btn btn-sm bg-base-100">
       <%= lucide_icon('flag', class: 'w-4 h-4') %>
     </div>
     <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-lg">
@@ -21,7 +36,7 @@
   <button type="submit"
         form="bulk_action_form"
         formaction="<%= bulk_action_orders_path(action_type: 'delete') %>"
-        class="btn btn-sm"
+        class="btn btn-sm bg-base-100"
         onclick="return confirm('Czy na pewno chcesz usunąć zaznaczone zamówienia?')">
     <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
   </button>
