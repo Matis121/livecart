@@ -1,0 +1,52 @@
+<div class="bg-base-100 rounded-lg shadow-sm">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="font-semibold">Email</th>
+        <th class="font-semibold">Rola</th>
+        <th class="font-semibold">Data utworzenia</th>
+        <th class="text-end font-semibold">Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+                <span class="text-xs font-medium text-base-content/70"><%= user.email[0].upcase %></span>
+              </div>
+              <span><%= user.email %></span>
+              <% if user == current_user %>
+                <span class="badge badge-sm badge-ghost">Ty</span>
+              <% end %>
+            </div>
+          </td>
+          <td>
+            <span class="badge <%= user.admin? ? 'badge-primary' : 'badge-ghost' %>">
+              <%= I18n.t("user.roles.#{user.role}", default: user.role.humanize) %>
+            </span>
+          </td>
+          <td><%= l(user.created_at, format: :short) rescue user.created_at.strftime("%d.%m.%Y") %></td>
+          <td class="text-end">
+            <% unless user.admin? %>
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                  <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
+                </div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                  <li>
+                    <%= link_to employee_path(user), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tego pracownika?" }, class: "text-error" do %>
+                      <%= lucide_icon('trash', class: 'w-4 h-4') %>
+                      Usuń
+                    <% end %>
+                  </li>
+                </ul>
+              </div>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   end
   resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"
+  resources :employees, controller: "users"
   resources :orders, controller: "orders" do
     collection do
       patch :bulk_action

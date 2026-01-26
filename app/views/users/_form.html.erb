@@ -1,0 +1,35 @@
+<%= form_with model: @user, url: @user.new_record? ? employees_path : employee_path(@user), class: "space-y-4" do |f| %>
+  <% if @user.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :email, "Email", class: "label" %>
+    <span class="label-text">Email</span>
+    <%= f.email_field :email, class: "input input-bordered w-full focus:input-primary", placeholder: "np. jan@firma.pl" %>
+  </div>
+
+  <% if @user.new_record? %>
+    <div class="form-control w-full">
+      <%= f.label :password, "Hasło", class: "label" %>
+      <span class="label-text">Hasło</span>
+      <%= f.password_field :password, class: "input input-bordered w-full focus:input-primary", placeholder: "Minimum 6 znaków" %>
+    </div>
+
+    <div class="form-control w-full">
+      <%= f.label :password_confirmation, "Powtórz hasło", class: "label" %>
+      <span class="label-text">Powtórz hasło</span>
+      <%= f.password_field :password_confirmation, class: "input input-bordered w-full focus:input-primary" %>
+    </div>
+  <% end %>
+
+  <div class="pt-4">
+    <%= f.submit @user.new_record? ? "Utwórz pracownika" : "Zapisz zmiany", class: "btn btn-primary" %>
+  </div>
+<% end %>

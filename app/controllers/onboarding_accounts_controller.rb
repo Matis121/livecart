@@ -9,7 +9,7 @@ class OnboardingAccountsController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       account = Account.create!(account_params)
-      current_user.update!(account: account)
+      current_user.update!(account: account, role: :admin)
     end
     redirect_to root_path, notice: "Account created successfully"
 
