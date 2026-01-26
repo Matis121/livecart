@@ -1,0 +1,31 @@
+<!-- app/views/settings/terms/edit.html.erb -->
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-5xl">
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2">Regulamin i polityka prywatności</h1>
+    <p class="text-base-content/70">Edytuj treść regulaminu i polityki prywatności</p>
+  </div>
+  <%= form_with model: current_account, url: settings_terms_path, method: :patch, local: true do |f| %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body space-y-6">
+        <div class="form-control">
+          <%= f.label :terms_content, "Regulamin", class: "label" %>
+          <%= f.text_area :terms_content, 
+              value: @terms['terms_content'],
+              rows: 15,
+              class: "textarea textarea-bordered w-full font-mono text-sm" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :privacy_policy_content, "Polityka prywatności", class: "label" %>
+          <%= f.text_area :privacy_policy_content, 
+              value: @terms['privacy_policy_content'],
+              rows: 15,
+              class: "textarea textarea-bordered w-full font-mono text-sm" %>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-6">
+      <%= link_to "Anuluj", settings_root_path, class: "btn btn-ghost" %>
+      <%= f.submit "Zapisz", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

@@ -13,6 +13,12 @@ Rails.application.routes.draw do
       patch :bulk_action
     end
   end
+  namespace :settings do
+    root to: "dashboard#index"
+
+    resource :checkout, only: [ :edit, :update ], controller: "checkout"
+    resource :terms, only: [ :edit, :update ], controller: "terms"
+  end
   resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"
   resources :employees, controller: "users"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_26_192555) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_26_222651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,6 +19,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_26_192555) do
     t.string "nip", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "checkout_settings"
+    t.jsonb "terms"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|

@@ -1,0 +1,70 @@
+<%# app/views/settings/settings/index.html.erb %>
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">Ustawienia</h1>
+    <p class="text-base-content/70">Zarządzaj ustawieniami swojego sklepu</p>
+  </div>
+  <!-- Tabs -->
+  <div class="tabs tabs-boxed mb-8 bg-base-100">
+    <%= link_to settings_root_path(tab: 'all'), 
+        class: "tab #{@active_tab == 'all' ? 'tab-active' : ''}" do %>
+      Wszystko
+    <% end %>
+    <%= link_to settings_root_path(tab: 'shop'), 
+        class: "tab #{@active_tab == 'shop' ? 'tab-active' : ''}" do %>
+      Ustawienia sklepu
+    <% end %>
+    <%= link_to settings_root_path(tab: 'payments'), 
+        class: "tab #{@active_tab == 'payments' ? 'tab-active' : ''}" do %>
+      Płatności i wysyłki
+    <% end %>
+  </div>
+  <!-- Settings Cards -->
+  <% if @active_tab == 'all' || @active_tab == 'shop' %>
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Ustawienia sklepu</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Ogólne -->
+        <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+          <div class="card-body">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-semibold">Ogólne</h3>
+              <%= lucide_icon('grid-3x3', class: 'w-5 h-5 text-primary') %>
+            </div>
+            <p class="text-sm text-base-content/70 mb-4">
+              Edytuj podstawowe informacje o sklepie takie jak nazwa, zdjęcie profilowe
+            </p>
+            <%= link_to edit_settings_checkout_path, class: "btn btn-sm btn-ghost w-full justify-start" do %>
+              Przejdź
+              <%= lucide_icon('chevron-right', class: 'w-4 h-4 ml-auto') %>
+            <% end %>
+          </div>
+        </div>
+        <!-- Regulamin -->
+        <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+          <div class="card-body">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-semibold">Regulamin</h3>
+              <%= lucide_icon('file-text', class: 'w-5 h-5 text-primary') %>
+            </div>
+            <p class="text-sm text-base-content/70 mb-4">
+              Uzupełnij regulamin i zasady kupowania w Twoim sklepie
+            </p>
+            <%= link_to edit_settings_terms_path, class: "btn btn-sm btn-ghost w-full justify-start" do %>
+              Przejdź
+              <%= lucide_icon('chevron-right', class: 'w-4 h-4 ml-auto') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <!-- Płatności i wysyłki (na razie puste) -->
+  <% if @active_tab == 'all' || @active_tab == 'payments' %>
+    <div>
+      <h2 class="text-xl font-semibold mb-4">Płatności i wysyłki</h2>
+      <p class="text-base-content/70">Wkrótce...</p>
+    </div>
+  <% end %>
+</div>
