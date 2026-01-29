@@ -1,6 +1,7 @@
 class Order < ApplicationRecord
   belongs_to :account
   belongs_to :customer, optional: true
+  belongs_to :discount_code, optional: true
   has_many :order_items, dependent: :destroy
   has_one :shipping_address, dependent: :destroy
   has_one :billing_address, dependent: :destroy
@@ -83,6 +84,45 @@ class Order < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[customer shipping_address billing_address order_items]
+  end
+
+
+  def apply_discount_code(code_string)
+    code_string = code_string.to_s.strip
+    if code_string.blank?
+      self.discount_code_id = nil
+      self.discount_name = nil
+      self.discount_amount = 0
+      recalculate_total!
+      save  # zapisuje discount_code_id, discount_amount i ewent. inne zmiany
+      return true
+    end
+
+    code = account.discount_codes.find_by("LOWER(code) = ?", code_string.downcase)
+    unless code
+      errors.add(:base, "Nieprawidłowy kod rabatowy")
+      return false
+    end
+
+    subtotal = order_items.sum(:total_price)
+    unless code.applicable_for?(subtotal)
+      errors.add(:base, "Ten kod nie jest ważny lub nie spełnia warunków")
+      return false
+    end
+
+    self.discount_code_id = code.id
+    self.discount_amount = code.discount_for_order(self)
+    self.discount_name = code.code
+    recalculate_total!
+    save   # zapisuje discount_code_id, discount_amount
+    true
+  end
+
+  def recalculate_total!
+    items_total = order_items.sum(:total_price)
+    new_total = items_total + (shipping_cost || 0) - (discount_amount || 0)
+    new_total = 0 if new_total < 0
+    update_column(:total_amount, new_total)
   end
 
   private

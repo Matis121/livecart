@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_26_222651) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_29_224519) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -97,6 +97,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_26_222651) do
     t.index ["account_id"], name: "index_customers_on_account_id"
   end
 
+  create_table "discount_codes", force: :cascade do |t|
+    t.string "code", null: false
+    t.integer "kind", default: 0, null: false
+    t.decimal "value", precision: 8, scale: 2, default: "0.0", null: false
+    t.decimal "minimum_order_amount", precision: 8, scale: 2
+    t.boolean "free_shipping", default: false
+    t.datetime "valid_from"
+    t.datetime "valid_until"
+    t.integer "usage_limit"
+    t.integer "used_count", default: 0
+    t.boolean "active", default: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_discount_codes_on_account_id"
+    t.index ["code"], name: "index_discount_codes_on_code"
+  end
+
   create_table "integrations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider", null: false
@@ -161,8 +179,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_26_222651) do
     t.string "payment_method"
     t.decimal "paid_amount", default: "0.0", null: false
     t.integer "status", default: 0, null: false
+    t.bigint "discount_code_id"
+    t.decimal "discount_amount", precision: 8, scale: 2, default: "0.0", null: false
+    t.string "discount_name"
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
+    t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
   end
 
   create_table "product_reservations", force: :cascade do |t|
@@ -249,12 +271,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_26_222651) do
   add_foreign_key "billing_addresses", "orders"
   add_foreign_key "checkouts", "orders"
   add_foreign_key "customers", "accounts"
+  add_foreign_key "discount_codes", "accounts"
   add_foreign_key "integrations", "users"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_status_histories", "orders"
   add_foreign_key "orders", "accounts"
   add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "discount_codes"
   add_foreign_key "product_reservations", "order_items"
   add_foreign_key "product_reservations", "orders"
   add_foreign_key "product_reservations", "products"

@@ -62,6 +62,29 @@ class OrdersController < ApplicationController
     redirect_to @order unless turbo_frame_request?
   end
 
+  def edit_discount_code
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    redirect_to @order unless turbo_frame_request?
+  end
+
+  def update_discount_code
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    if @order.apply_discount_code(discount_code_params[:discount_code])
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "discount_code_section",
+            partial: "orders/discount_code_section",
+            locals: { order: @order }
+          )
+        end
+        format.html { redirect_to @order, notice: "Kod rabatowy został zastosowany" }
+      end
+    else
+      render :edit_discount_code, status: :unprocessable_entity
+    end
+  end
+
   def update_contact_info
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(contact_info_params)
@@ -239,6 +262,10 @@ class OrdersController < ApplicationController
   end
 
   private
+
+  def discount_code_params
+    params.require(:order).permit(:discount_code)
+  end
 
   def order_params
     params.require(:order).permit(:customer_id, :status)

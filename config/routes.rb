@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 
     resource :checkout, only: [ :edit, :update ], controller: "checkout"
     resource :terms, only: [ :edit, :update ], controller: "terms"
+    resources :discount, only: [ :index, :new, :create, :update, :destroy ], controller: "discount"
   end
   resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"
@@ -37,6 +38,8 @@ Rails.application.routes.draw do
     end
     member do
       get :edit_customer
+      get :edit_discount_code
+      patch :update_discount_code
       get :edit_contact_info
       patch :update_contact_info
       get :edit_payment

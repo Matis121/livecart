@@ -4,6 +4,7 @@ class Account < ApplicationRecord
   has_many :products
   has_many :customers
   has_many :orders
+  has_many :discount_codes
 
   has_one_attached :logo
 

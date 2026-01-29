@@ -1,6 +1,5 @@
 <!-- app/views/checkouts/show.html.erb -->
 <div class="min-h-screen container mx-auto px-4 py-8 max-w-6xl flex flex-col items-center justify-center">
-  
   <% if @checkout.completed? %>
     <!-- Strona sukcesu - minimalistyczny styl -->
     <div class="max-w-2xl mx-auto py-16">
@@ -12,7 +11,6 @@
         <h1 class="text-3xl  mb-2 tracking-tight">Zamówienie złożone</h1>
         <p class="text-base-content/50">Dziękujemy za zakup</p>
       </div>
-      
       <!-- Informacja o emailu -->
       <div class="text-center">
         <p class="text-sm text-base-content/40">
@@ -20,201 +18,174 @@
         </p>
       </div>
     </div>
-    
   <% else %>
     <!-- Formularz zamówienia -->
     <h1 class="text-3xl font-bold mb-6">Finalizacja zamówienia</h1>
-    
     <div class="xl:grid xl:grid-cols-3 gap-6 flex flex-col-reverse">
-    <!-- Lewa kolumna - Formularz -->
-    <div class="lg:col-span-2 space-y-6">
-      <%= form_with model: @order, url: checkout_path(@checkout.token), method: :patch, local: true do |f| %>
-        <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
-          <div class="p-8">
-            <!-- Dane kontaktowe -->
-            <div class="mb-8">
-              <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
-                <%= lucide_icon "user", class: "w-5 h-5" %>
-                Dane kontaktowe
-              </h2>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                  <%= f.label :email, "Email *", class: "label" %>
-                  <%= f.email_field :email, 
+      <!-- Lewa kolumna - Formularz -->
+      <div class="lg:col-span-2 space-y-6">
+        <%= form_with model: @order, url: checkout_path(@checkout.token), method: :patch, local: true do |f| %>
+          <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
+            <div class="p-8">
+              <!-- Dane kontaktowe -->
+              <div class="mb-8">
+                <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
+                  <%= lucide_icon "user", class: "w-5 h-5" %>
+                  Dane kontaktowe
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <%= f.label :email, "Email *", class: "label" %>
+                    <%= f.email_field :email, 
                       class: "input input-bordered w-full", 
                       required: true,
                       placeholder: "twoj@email.pl" %>
-                </div>
-                
-                <div class="form-control">
-                  <%= f.label :phone, "Telefon *", class: "label" %>
-                  <%= f.telephone_field :phone, 
+                  </div>
+                  <div class="form-control">
+                    <%= f.label :phone, "Telefon *", class: "label" %>
+                    <%= f.telephone_field :phone, 
                       class: "input input-bordered w-full", 
                       required: true,
                       placeholder: "+48 123 456 789" %>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-8"></div>
-
-            <!-- Adres dostawy -->
-            <div class="mb-8">
-              <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
-                <%= lucide_icon "truck", class: "w-5 h-5" %>
-                Adres dostawy
-              </h2>
-              
-              <%= f.fields_for :shipping_address_attributes, @order.shipping_address do |sa| %>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="form-control">
-                    <%= sa.label :first_name, "Imię *", class: "label" %>
-                    <%= sa.text_field :first_name, 
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-8"></div>
+              <!-- Adres dostawy -->
+              <div class="mb-8">
+                <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
+                  <%= lucide_icon "truck", class: "w-5 h-5" %>
+                  Adres dostawy
+                </h2>
+                <%= f.fields_for :shipping_address_attributes, @order.shipping_address do |sa| %>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control">
+                      <%= sa.label :first_name, "Imię *", class: "label" %>
+                      <%= sa.text_field :first_name, 
                         class: "input input-bordered w-full", 
                         required: true %>
-                  </div>
-                  
-                  <div class="form-control">
-                    <%= sa.label :last_name, "Nazwisko *", class: "label" %>
-                    <%= sa.text_field :last_name, 
+                    </div>
+                    <div class="form-control">
+                      <%= sa.label :last_name, "Nazwisko *", class: "label" %>
+                      <%= sa.text_field :last_name, 
                         class: "input input-bordered w-full", 
                         required: true %>
-                  </div>
-                  
-                  <div class="form-control md:col-span-2">
-                    <%= sa.label :address_line1, "Ulica i numer *", class: "label" %>
-                    <%= sa.text_field :address_line1, 
+                    </div>
+                    <div class="form-control md:col-span-2">
+                      <%= sa.label :address_line1, "Ulica i numer *", class: "label" %>
+                      <%= sa.text_field :address_line1, 
                         class: "input input-bordered w-full", 
                         required: true,
                         placeholder: "np. ul. Główna 123" %>
-                  </div>
-                  
-                  <div class="form-control md:col-span-2">
-                    <%= sa.label :address_line2, "Dodatkowe informacje", class: "label" %>
-                    <%= sa.text_field :address_line2, 
+                    </div>
+                    <div class="form-control md:col-span-2">
+                      <%= sa.label :address_line2, "Dodatkowe informacje", class: "label" %>
+                      <%= sa.text_field :address_line2, 
                         class: "input input-bordered w-full",
                         placeholder: "np. mieszkanie 4, kod domofonu" %>
-                  </div>
-                  
-                  <div class="form-control">
-                    <%= sa.label :postal_code, "Kod pocztowy *", class: "label" %>
-                    <%= sa.text_field :postal_code, 
+                    </div>
+                    <div class="form-control">
+                      <%= sa.label :postal_code, "Kod pocztowy *", class: "label" %>
+                      <%= sa.text_field :postal_code, 
                         class: "input input-bordered w-full", 
                         required: true,
                         placeholder: "00-000" %>
-                  </div>
-                  
-                  <div class="form-control">
-                    <%= sa.label :city, "Miasto *", class: "label" %>
-                    <%= sa.text_field :city, 
+                    </div>
+                    <div class="form-control">
+                      <%= sa.label :city, "Miasto *", class: "label" %>
+                      <%= sa.text_field :city, 
                         class: "input input-bordered w-full", 
                         required: true %>
-                  </div>
-                  
-                  <div class="form-control md:col-span-2">
-                    <%= sa.label :country, "Kraj *", class: "label" %>
-                    <%= sa.text_field :country, 
+                    </div>
+                    <div class="form-control md:col-span-2">
+                      <%= sa.label :country, "Kraj *", class: "label" %>
+                      <%= sa.text_field :country, 
                         class: "input input-bordered w-full", 
                         required: true,
                         value: "Polska" %>
+                    </div>
                   </div>
-                </div>
-              <% end %>
-            </div>
-
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-8"></div>
-
-            <!-- Dane do faktury -->
-            <div class="mb-8">
-              <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
-                <%= lucide_icon "file-text", class: "w-5 h-5" %>
-                Dane do faktury
-              </h2>
-              
-              <%= f.fields_for :billing_address_attributes, @order.billing_address do |ba| %>
-                <div class="form-control mb-4">
-                  <label class="label cursor-pointer justify-start gap-3">
-                    <%= ba.check_box :needs_invoice, 
+                <% end %>
+              </div>
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-8"></div>
+              <!-- Dane do faktury -->
+              <div class="mb-8">
+                <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
+                  <%= lucide_icon "file-text", class: "w-5 h-5" %>
+                  Dane do faktury
+                </h2>
+                <%= f.fields_for :billing_address_attributes, @order.billing_address do |ba| %>
+                  <div class="form-control mb-4">
+                    <label class="label cursor-pointer justify-start gap-3">
+                      <%= ba.check_box :needs_invoice, 
                         class: "checkbox checkbox-primary",
                         onchange: "document.getElementById('invoice-fields').classList.toggle('hidden')" %>
-                    <span class="label-text font-medium">Chcę otrzymać fakturę VAT</span>
-                  </label>
-                </div>
-                
-                <div id="invoice-fields" class="<%= 'hidden' unless @order.billing_address.needs_invoice %> space-y-4">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-control md:col-span-2">
-                      <%= ba.label :company_name, "Nazwa firmy", class: "label" %>
-                      <%= ba.text_field :company_name, 
+                      <span class="label-text font-medium">Chcę otrzymać fakturę VAT</span>
+                    </label>
+                  </div>
+                  <div id="invoice-fields" class="<%= 'hidden' unless @order.billing_address.needs_invoice %> space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="form-control md:col-span-2">
+                        <%= ba.label :company_name, "Nazwa firmy", class: "label" %>
+                        <%= ba.text_field :company_name, 
                           class: "input input-bordered w-full" %>
-                    </div>
-                    
-                    <div class="form-control">
-                      <%= ba.label :nip, "NIP", class: "label" %>
-                      <%= ba.text_field :nip, 
+                      </div>
+                      <div class="form-control">
+                        <%= ba.label :nip, "NIP", class: "label" %>
+                        <%= ba.text_field :nip, 
                           class: "input input-bordered w-full",
                           placeholder: "0000000000" %>
-                    </div>
-                    
-                    <div class="form-control">
-                      <%= ba.label :first_name, "Imię", class: "label" %>
-                      <%= ba.text_field :first_name, 
+                      </div>
+                      <div class="form-control">
+                        <%= ba.label :first_name, "Imię", class: "label" %>
+                        <%= ba.text_field :first_name, 
                           class: "input input-bordered w-full" %>
-                    </div>
-                    
-                    <div class="form-control">
-                      <%= ba.label :last_name, "Nazwisko", class: "label" %>
-                      <%= ba.text_field :last_name, 
+                      </div>
+                      <div class="form-control">
+                        <%= ba.label :last_name, "Nazwisko", class: "label" %>
+                        <%= ba.text_field :last_name, 
                           class: "input input-bordered w-full" %>
-                    </div>
-                    
-                    <div class="form-control md:col-span-2">
-                      <%= ba.label :address_line1, "Ulica i numer", class: "label" %>
-                      <%= ba.text_field :address_line1, 
+                      </div>
+                      <div class="form-control md:col-span-2">
+                        <%= ba.label :address_line1, "Ulica i numer", class: "label" %>
+                        <%= ba.text_field :address_line1, 
                           class: "input input-bordered w-full" %>
-                    </div>
-                    
-                    <div class="form-control">
-                      <%= ba.label :postal_code, "Kod pocztowy", class: "label" %>
-                      <%= ba.text_field :postal_code, 
+                      </div>
+                      <div class="form-control">
+                        <%= ba.label :postal_code, "Kod pocztowy", class: "label" %>
+                        <%= ba.text_field :postal_code, 
                           class: "input input-bordered w-full",
                           placeholder: "00-000" %>
-                    </div>
-                    
-                    <div class="form-control">
-                      <%= ba.label :city, "Miasto", class: "label" %>
-                      <%= ba.text_field :city, 
+                      </div>
+                      <div class="form-control">
+                        <%= ba.label :city, "Miasto", class: "label" %>
+                        <%= ba.text_field :city, 
                           class: "input input-bordered w-full" %>
-                    </div>
-                    
-                    <div class="form-control md:col-span-2">
-                      <%= ba.label :country, "Kraj", class: "label" %>
-                      <%= ba.text_field :country, 
+                      </div>
+                      <div class="form-control md:col-span-2">
+                        <%= ba.label :country, "Kraj", class: "label" %>
+                        <%= ba.text_field :country, 
                           class: "input input-bordered w-full",
                           value: "Polska" %>
+                      </div>
                     </div>
                   </div>
-                </div>
-              <% end %>
-            </div>
-
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-8"></div>
-
-            <!-- Metoda płatności i dostawy -->
-            <div class="mb-8">
-              <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
-                <%= lucide_icon "credit-card", class: "w-5 h-5" %>
-                Płatność i dostawa
-              </h2>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                  <%= f.label :payment_method, "Metoda płatności *", class: "label" %>
-                  <%= f.select :payment_method, 
+                <% end %>
+              </div>
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-8"></div>
+              <!-- Metoda płatności i dostawy -->
+              <div class="mb-8">
+                <h2 class="text-xl  tracking-tight flex items-center gap-2 mb-6">
+                  <%= lucide_icon "credit-card", class: "w-5 h-5" %>
+                  Płatność i dostawa
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-control">
+                    <%= f.label :payment_method, "Metoda płatności *", class: "label" %>
+                    <%= f.select :payment_method, 
                       [
                         ["Przelew bankowy", "bank_transfer"],
                         ["Płatność online", "online"],
@@ -223,11 +194,10 @@
                       ],
                       { include_blank: "Wybierz metodę płatności" },
                       { class: "select select-bordered w-full", required: true } %>
-                </div>
-                
-                <div class="form-control">
-                  <%= f.label :shipping_method, "Metoda dostawy *", class: "label" %>
-                  <%= f.select :shipping_method,
+                  </div>
+                  <div class="form-control">
+                    <%= f.label :shipping_method, "Metoda dostawy *", class: "label" %>
+                    <%= f.select :shipping_method,
                       [
                         ["Kurier InPost", "inpost_courier"],
                         ["Paczkomat InPost", "inpost_locker"],
@@ -236,125 +206,112 @@
                       ],
                       { include_blank: "Wybierz metodę dostawy" },
                       { class: "select select-bordered w-full", required: true } %>
-                </div>
-              </div>
-            </div>
-
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-8"></div>
-
-            <!-- Przycisk finalizacji -->
-            <div>
-              <div class="form-control mb-6">
-                <label class="label cursor-pointer justify-start gap-3">
-                  <input type="checkbox" class="checkbox checkbox-primary" required />
-                  <span class="label-text">Akceptuję regulamin i politykę prywatności *</span>
-                </label>
-              </div>
-              
-              <%= f.submit "Złóż zamówienie", 
-                  class: "btn btn-primary btn-lg w-full",
-                  data: { disable_with: "Przetwarzanie..." } %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- Prawa kolumna - Podsumowanie -->
-    <div class="lg:col-span-1">
-      <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
-        <div class="p-6">
-          <h2 class="text-xl  tracking-tight mb-6">Twoje zamówienie</h2>
-          
-          <% if @order.order_items.any? %>
-            <!-- Lista produktów -->
-            <div class="space-y-4 mb-6">
-              <% @order.order_items.includes(:product).each do |item| %>
-                <div class="flex gap-4">
-                  <% if item.product&.images.attached? %>
-                    <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
-                      <%= image_tag item.product.images.first, class: "object-cover w-full h-full" %>
-                    </div>
-                  <% else %>
-                    <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 flex items-center justify-center">
-                      <%= lucide_icon "image", class: "w-8 h-8 text-base-content/20" %>
-                    </div>
-                  <% end %>
-                  
-                  <div class="flex-1 min-w-0">
-                    <h3 class="font-medium text-sm mb-1 truncate">
-                      <%= item.product&.name || "Produkt" %>
-                    </h3>
-                    <p class="text-xs text-base-content/50 mb-2">
-                      Ilość: <%= item.quantity %>
-                    </p>
-                    <p class="text-sm font-medium">
-                      <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
-                    </p>
                   </div>
                 </div>
-              <% end %>
-            </div>
-            
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-6"></div>
-            
-            <!-- Podsumowanie kosztów -->
-            <div class="space-y-3 mb-6">
-              <div class="flex justify-between text-sm">
-                <span class="text-base-content/60">Produkty</span>
-                <span class="font-medium">
-                  <%= number_to_currency(@order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %>
-                </span>
               </div>
-              
-              <div class="flex justify-between text-sm">
-                <span class="text-base-content/60">Dostawa</span>
-                <span class="font-medium">
-                  <% if @order.shipping_cost > 0 %>
-                    <%= number_to_currency(@order.shipping_cost, unit: "zł", format: "%n %u") %>
-                  <% else %>
-                    <span class="text-success">Darmowa</span>
-                  <% end %>
-                </span>
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-8"></div>
+              <!-- Przycisk finalizacji -->
+              <div>
+                <div class="form-control mb-6">
+                  <label class="label cursor-pointer justify-start gap-3">
+                    <input type="checkbox" class="checkbox checkbox-primary" required />
+                    <span class="label-text">Akceptuję regulamin i politykę prywatności *</span>
+                  </label>
+                </div>
+                <%= f.submit "Złóż zamówienie", 
+                  class: "btn btn-primary btn-lg w-full",
+                  data: { disable_with: "Przetwarzanie..." } %>
               </div>
-            </div>
-            
-            <!-- Separator -->
-            <div class="border-t border-base-300 mb-6"></div>
-            
-            <!-- Suma końcowa -->
-            <div class="flex justify-between items-baseline">
-              <span class="text-base  text-base-content/80">Do zapłaty</span>
-              <span class="text-3xl  tracking-tight">
-                <%= number_to_currency(@order.total_amount, unit: "zł", format: "%n %u") %>
-              </span>
-            </div>
-            
-          <% else %>
-            <div class="text-center py-8">
-              <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-base-200 mb-3">
-                <%= lucide_icon "shopping-bag", class: "w-6 h-6 text-base-content/30" %>
-              </div>
-              <p class="text-sm text-base-content/50">Brak produktów w koszyku</p>
-            </div>
-          <% end %>
-        </div>
-        
-        <!-- Stopka z informacją -->
-        <% if @order.order_items.any? %>
-          <div class="bg-base-200/50 px-6 py-4 border-t border-base-300">
-            <div class="flex items-start gap-2">
-              <%= lucide_icon "shield-check", class: "w-4 h-4 text-success mt-0.5 flex-shrink-0" %>
-              <p class="text-xs text-base-content/60 leading-relaxed">
-                Twoje dane są bezpieczne. Płatność jest szyfrowana.
-              </p>
             </div>
           </div>
         <% end %>
       </div>
-    </div>
+      <!-- Prawa kolumna - Podsumowanie -->
+      <div class="lg:col-span-1">
+        <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
+          <div class="p-6">
+            <h2 class="text-xl  tracking-tight mb-6">Twoje zamówienie</h2>
+            <% if @order.order_items.any? %>
+              <!-- Lista produktów -->
+              <div class="space-y-4 mb-6">
+                <% @order.order_items.includes(:product).each do |item| %>
+                  <div class="flex gap-4">
+                    <% if item.product&.images.attached? %>
+                      <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
+                        <%= image_tag item.product.images.first, class: "object-cover w-full h-full" %>
+                      </div>
+                    <% else %>
+                      <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 flex items-center justify-center">
+                        <%= lucide_icon "image", class: "w-8 h-8 text-base-content/20" %>
+                      </div>
+                    <% end %>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-medium text-sm mb-1 truncate">
+                        <%= item.product&.name || "Produkt" %>
+                      </h3>
+                      <p class="text-xs text-base-content/50 mb-2">
+                        Ilość: <%= item.quantity %>
+                      </p>
+                      <p class="text-sm font-medium">
+                        <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
+                      </p>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-6"></div>
+              <!-- Podsumowanie kosztów -->
+              <div class="space-y-3 mb-6">
+                <div class="flex justify-between text-sm">
+                  <span class="text-base-content/60">Produkty</span>
+                  <span class="font-medium">
+                    <%= number_to_currency(@order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %>
+                  </span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-base-content/60">Dostawa</span>
+                  <span class="font-medium">
+                    <% if @order.shipping_cost > 0 %>
+                      <%= number_to_currency(@order.shipping_cost, unit: "zł", format: "%n %u") %>
+                    <% else %>
+                      <span class="text-success">Darmowa</span>
+                    <% end %>
+                  </span>
+                </div>
+              </div>
+              <!-- Separator -->
+              <div class="border-t border-base-300 mb-6"></div>
+              <!-- Suma końcowa -->
+              <div class="flex justify-between items-baseline">
+                <span class="text-base  text-base-content/80">Do zapłaty</span>
+                <span class="text-3xl  tracking-tight">
+                  <%= number_to_currency(@order.total_amount, unit: "zł", format: "%n %u") %>
+                </span>
+              </div>
+            <% else %>
+              <div class="text-center py-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-base-200 mb-3">
+                  <%= lucide_icon "shopping-bag", class: "w-6 h-6 text-base-content/30" %>
+                </div>
+                <p class="text-sm text-base-content/50">Brak produktów w koszyku</p>
+              </div>
+            <% end %>
+          </div>
+          <!-- Stopka z informacją -->
+          <% if @order.order_items.any? %>
+            <div class="bg-base-200/50 px-6 py-4 border-t border-base-300">
+              <div class="flex items-start gap-2">
+                <%= lucide_icon "shield-check", class: "w-4 h-4 text-success mt-0.5 flex-shrink-0" %>
+                <p class="text-xs text-base-content/60 leading-relaxed">
+                  Twoje dane są bezpieczne. Płatność jest szyfrowana.
+                </p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
   <% end %>
 </div>

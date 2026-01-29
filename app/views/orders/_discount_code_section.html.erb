@@ -1,0 +1,21 @@
+<turbo-frame id="discount_code_section">
+  <div class="flex justify-between items-start mb-3">
+    <h3 class="font-semibold text-base">Kod rabatowy</h3>
+    <%= link_to edit_discount_code_order_path(order), 
+        class: "btn btn-ghost btn-sm btn-square" do %>
+      <%= lucide_icon "pencil", class: "w-4 h-4" %>
+    <% end %>
+  </div>
+  <% if order.discount_name.present? %>
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-base-content/60">Kod rabatowy</span>
+        <span class="font-medium text-sm"><%= order.discount_name.presence || "—" %></span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-base-content/60">Wartość</span>
+        <span class="font-medium text-sm"><%= number_to_currency(order.discount_amount, unit: order.currency, format: "%n %u") %></span>
+      </div>
+    </div>
+  <% end %>
+</turbo-frame>
