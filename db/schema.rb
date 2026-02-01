@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_29_224519) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_01_190218) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -251,6 +251,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_29_224519) do
     t.index ["order_id"], name: "index_shipping_addresses_on_order_id"
   end
 
+  create_table "shipping_methods", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.decimal "price", precision: 8, scale: 2
+    t.decimal "free_above", precision: 8, scale: 2
+    t.boolean "is_pickup_point", default: false
+    t.integer "pickup_point_provider"
+    t.integer "position", default: 0
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_shipping_methods_on_account_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -287,5 +301,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_29_224519) do
   add_foreign_key "product_stocks", "products"
   add_foreign_key "products", "accounts"
   add_foreign_key "shipping_addresses", "orders"
+  add_foreign_key "shipping_methods", "accounts"
   add_foreign_key "users", "accounts"
 end

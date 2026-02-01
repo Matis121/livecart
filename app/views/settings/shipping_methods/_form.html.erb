@@ -1,0 +1,37 @@
+<%# app/views/settings/shipping_methods/_form.html.erb %>
+<%= form_with model: @shipping_method, url: @shipping_method.persisted? ? settings_shipping_method_path(@shipping_method) : settings_shipping_methods_path, data: { controller: "shipping-method-form" }, local: true do |f| %>
+  <div class="card-body">
+    <div class="form-control">
+      <%= f.label :name, "Nazwa", class: "label" %>
+      <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "np. Kurier DPD, Paczkomat InPost" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :price, "Cena (zł)", class: "label" %>
+      <%= f.number_field :price, class: "input input-bordered w-full", step: 0.01, min: 0 %>
+    </div>
+    <div class="form-control">
+      <%= f.label :free_above, "Darmowa od kwoty (zł)", class: "label" %>
+      <%= f.number_field :free_above, class: "input input-bordered w-full", step: 0.01, min: 0, placeholder: "Zostaw puste jeśli nie dotyczy" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :is_pickup_point, class: "label cursor-pointer justify-start gap-3" %>
+      <%= f.check_box :is_pickup_point, class: "checkbox checkbox-sm", data: { action: "change->shipping-method-form#togglePickupProvider" } %>
+      <span>Punkt odbioru (wymaga wyboru z mapy)</span>
+    </label>
+  </div>
+  <div class="form-control" data-shipping-method-form-target="pickupProvider" style="<%= 'display: none;' unless @shipping_method.is_pickup_point? %>">
+    <%= f.label :pickup_point_provider, "Dostawca punktów", class: "label" %>
+    <%= f.select :pickup_point_provider, options_for_select(ShippingMethod.pickup_point_providers.keys.map { |k| [k.humanize, k] }, @shipping_method.pickup_point_provider), { include_blank: "Wybierz dostawcę..." }, class: "select select-bordered w-full" %>
+  </div>
+  <div class="form-control">
+    <label class="label cursor-pointer justify-start gap-3">
+      <%= f.check_box :active, class: "checkbox checkbox-sm" %>
+      <span>Aktywna</span>
+    </label>
+  </div>
+</div>
+<div class="card-actions justify-end p-4">
+  <%= link_to "Anuluj", settings_shipping_methods_path, class: "btn btn-ghost" %>
+  <%= f.submit "Zapisz", class: "btn btn-primary" %>
+</div>
+<% end %>

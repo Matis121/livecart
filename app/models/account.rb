@@ -5,6 +5,7 @@ class Account < ApplicationRecord
   has_many :customers
   has_many :orders
   has_many :discount_codes
+  has_many :shipping_methods
 
   has_one_attached :logo
 

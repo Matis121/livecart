@@ -1,0 +1,14 @@
+<%# app/views/settings/shipping_methods/new.html.erb %>
+<% if @shipping_method.errors.any? %>
+  <div class="alert alert-error mb-6">
+    <%= @shipping_method.errors.full_messages.to_sentence %>
+  </div>
+<% end %>
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">Nowa metoda wysyłki</h1>
+  </div>
+  <div class="card bg-base-100 shadow-sm">
+    <%= render "form" %>
+  </div>
+</div>

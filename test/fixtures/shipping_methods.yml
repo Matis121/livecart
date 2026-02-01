@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  account: one
+  name: MyString
+  price: 9.99
+  free_above: 9.99
+  is_pickup_point: false
+  pickup_point_provider: MyString
+  position: 1
+  active: false
+
+two:
+  account: two
+  name: MyString
+  price: 9.99
+  free_above: 9.99
+  is_pickup_point: false
+  pickup_point_provider: MyString
+  position: 1
+  active: false

@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     resource :checkout, only: [ :edit, :update ], controller: "checkout"
     resource :terms, only: [ :edit, :update ], controller: "terms"
     resources :discount, only: [ :index, :new, :create, :update, :destroy ], controller: "discount"
+    resources :shipping_methods, only: [ :index, :new, :create, :edit, :update, :destroy ], controller: "shipping_methods"
   end
   resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"

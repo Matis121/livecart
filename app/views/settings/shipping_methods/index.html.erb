@@ -1,0 +1,93 @@
+<%# app/views/settings/shipping_methods/index.html.erb %>
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold mb-1">Metody wysyłki</h1>
+      <p class="text-base-content/70 text-sm sm:text-base">Zarządzaj metodami wysyłki swojego sklepu</p>
+    </div>
+    <%= link_to "Nowa metoda wysyłki", new_settings_shipping_method_path, class: "btn btn-primary w-full sm:w-auto" %>
+  </div>
+  <% if @shipping_methods.any? %>
+    <div class="bg-base-100 rounded-lg shadow-sm">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="font-semibold w-4">
+              <%= lucide_icon("sort-asc", class: "w-4 h-4") %>
+            </th>
+            <th class="font-semibold">Nazwa</th>
+            <th class="font-semibold">Cena</th>
+            <th class="font-semibold">Darmowa od</th>
+            <th class="font-semibold">Punkt odbioru</th>
+            <th class="font-semibold">Status</th>
+            <th class="text-end font-semibold w-24">Akcje</th>
+          </tr>
+        </thead>
+        <tbody data-controller="sortable" data-sortable-resource-name-value="shipping_method" data-sortable-handle-value=".handle">
+          <% @shipping_methods.each do |shipping_method| %>
+            <tr class="hover" data-sortable-update-url="<%= settings_shipping_method_path(shipping_method) %>">
+              <td class="handle cursor-move">
+                <div class="flex items-center justify-center w-8 h-8 text-base-content/40 hover:text-base-content/70 transition-colors">
+                  <%= lucide_icon("grip-vertical", class: "w-4 h-4") %>
+                </div>
+              </td>
+              <td>
+                <span class="font-medium"><%= shipping_method.name %></span>
+              </td>
+              <td>
+                <%= number_to_currency(shipping_method.price, unit: "zł", format: "%n %u") %>
+              </td>
+              <td>
+                <%= shipping_method.free_above.present? ? number_to_currency(shipping_method.free_above, unit: "zł", format: "%n %u") : "—" %>
+              </td>
+              <td>
+                <% if shipping_method.is_pickup_point? %>
+                  <span class="badge badge-sm badge-info"><%= shipping_method.pickup_point_provider&.humanize %></span>
+                <% else %>
+                  <span class="text-base-content/50">—</span>
+                <% end %>
+              </td>
+              <td>
+                <% if shipping_method.active? %>
+                  <span class="badge badge-sm badge-success">Aktywna</span>
+                <% else %>
+                  <span class="badge badge-sm badge-ghost">Nieaktywna</span>
+                <% end %>
+              </td>
+              <td class="text-end">
+                <div class="dropdown dropdown-end">
+                  <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                    <%= lucide_icon("more-vertical", class: "w-4 h-4") %>
+                  </div>
+                  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                    <li>
+                      <%= link_to edit_settings_shipping_method_path(shipping_method) do %>
+                        <%= lucide_icon("pencil", class: "w-4 h-4") %>
+                        Edytuj
+                      <% end %>
+                    </li>
+                    <li>
+                      <%= link_to settings_shipping_method_path(shipping_method), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tę metodę wysyłki?" }, class: "text-error" do %>
+                        <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+                        Usuń
+                      <% end %>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body items-center text-center py-12">
+        <%= lucide_icon("truck", class: "w-16 h-16 opacity-30") %>
+        <h3 class="text-lg font-semibold mt-2">Brak metod wysyłki</h3>
+        <p class="text-base-content/70 text-sm mb-4">Dodaj pierwszą metodę, aby oferować wysyłkę klientom.</p>
+        <%= link_to "Nowa metoda wysyłki", new_settings_shipping_method_path, class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+</div>
