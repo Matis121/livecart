@@ -39,14 +39,14 @@
                     <%= f.email_field :email, 
                       class: "input input-bordered w-full", 
                       required: true,
-                      placeholder: "twoj@email.pl" %>
+                      placeholder: "twoj@email.pl", value: "test@test.com" %>
                   </div>
                   <div class="form-control">
                     <%= f.label :phone, "Telefon *", class: "label" %>
                     <%= f.telephone_field :phone, 
                       class: "input input-bordered w-full", 
                       required: true,
-                      placeholder: "+48 123 456 789" %>
+                      placeholder: "+48 123 456 789", value: "+48 123 456 789" %>
                   </div>
                 </div>
               </div>
@@ -64,39 +64,39 @@
                       <%= sa.label :first_name, "Imię *", class: "label" %>
                       <%= sa.text_field :first_name, 
                         class: "input input-bordered w-full", 
-                        required: true %>
+                        required: true, value: "Jan" %>
                     </div>
                     <div class="form-control">
                       <%= sa.label :last_name, "Nazwisko *", class: "label" %>
                       <%= sa.text_field :last_name, 
                         class: "input input-bordered w-full", 
-                        required: true %>
+                        required: true, value: "Kowalski" %>
                     </div>
                     <div class="form-control md:col-span-2">
                       <%= sa.label :address_line1, "Ulica i numer *", class: "label" %>
                       <%= sa.text_field :address_line1, 
                         class: "input input-bordered w-full", 
                         required: true,
-                        placeholder: "np. ul. Główna 123" %>
+                        placeholder: "np. ul. Główna 123", value: "Główna 123" %>
                     </div>
                     <div class="form-control md:col-span-2">
                       <%= sa.label :address_line2, "Dodatkowe informacje", class: "label" %>
                       <%= sa.text_field :address_line2, 
                         class: "input input-bordered w-full",
-                        placeholder: "np. mieszkanie 4, kod domofonu" %>
+                        placeholder: "np. mieszkanie 4, kod domofonu", value: "mieszkanie 4, kod domofonu" %>
                     </div>
                     <div class="form-control">
                       <%= sa.label :postal_code, "Kod pocztowy *", class: "label" %>
                       <%= sa.text_field :postal_code, 
                         class: "input input-bordered w-full", 
                         required: true,
-                        placeholder: "00-000" %>
+                        placeholder: "00-000", value: "00-000" %>
                     </div>
                     <div class="form-control">
                       <%= sa.label :city, "Miasto *", class: "label" %>
                       <%= sa.text_field :city, 
                         class: "input input-bordered w-full", 
-                        required: true %>
+                        required: true, value: "Warszawa" %>
                     </div>
                     <div class="form-control md:col-span-2">
                       <%= sa.label :country, "Kraj *", class: "label" %>
@@ -182,30 +182,39 @@
                   <%= lucide_icon "credit-card", class: "w-5 h-5" %>
                   Płatność i dostawa
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid gap-4">
                   <div class="form-control">
                     <%= f.label :payment_method, "Metoda płatności *", class: "label" %>
-                    <%= f.select :payment_method, 
-                      [
-                        ["Przelew bankowy", "bank_transfer"],
-                        ["Płatność online", "online"],
-                        ["Za pobraniem", "cod"],
-                        ["BLIK", "blik"]
-                      ],
-                      { include_blank: "Wybierz metodę płatności" },
-                      { class: "select select-bordered w-full", required: true } %>
+                    <div class="space-y-3">
+                      <% payment_options = [
+                          ["Przelew bankowy", "Przelew bankowy"],
+                          ["Płatność online", "Płatność online"],
+                          ["Za pobraniem", "Za pobraniem"],
+                          ["BLIK", "Blik"]
+                        ] %>
+                      <% payment_options.each_with_index do |(label, value), index| %>
+                        <label class="flex items-center gap-4 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200/50 hover:border-primary/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                          <%= f.radio_button :payment_method, value, class: "radio radio-primary shrink-0", required: index.zero? %>
+                          <span class="font-medium"><%= label %></span>
+                        </label>
+                      <% end %>
+                    </div>
                   </div>
                   <div class="form-control">
-                    <%= f.label :shipping_method, "Metoda dostawy *", class: "label" %>
-                    <%= f.select :shipping_method,
-                      [
-                        ["Kurier InPost", "inpost_courier"],
-                        ["Paczkomat InPost", "inpost_locker"],
-                        ["DPD", "dpd"],
-                        ["Odbiór osobisty", "pickup"]
-                      ],
-                      { include_blank: "Wybierz metodę dostawy" },
-                      { class: "select select-bordered w-full", required: true } %>
+                    <%= f.label :shipping_method_id, "Metoda dostawy *", class: "label" %>
+                    <div class="space-y-3">
+                      <% @shipping_methods.each_with_index do |method, index| %>
+                        <label class="flex items-center justify-between gap-4 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200/50 hover:border-primary/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                          <div class="flex items-center gap-4">
+                            <%= f.radio_button :shipping_method_id, method.id, class: "radio radio-primary shrink-0", required: index.zero?   %>
+                            <span class="font-medium"><%= method.name %></span>
+                          </div>
+                          <span class="text-base-content/70">
+                            <%= method.free_above.present? ? "Darmowa od #{number_to_currency(method.free_above, unit: 'zł', format: '%n %u')}" : number_to_currency(method.price, unit: 'zł', format: '%n %u') %>
+                          </span>
+                        </label>
+                      <% end %>
+                    </div>
                   </div>
                 </div>
               </div>

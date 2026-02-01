@@ -4,6 +4,7 @@ class CheckoutsController < ApplicationController
   before_action :find_checkout, except: [ :not_found ]
   before_action :set_order, except: [ :not_found ]
   before_action :validate_availability, except: [ :not_found ]
+  before_action :set_shipping_methods, except: [ :not_found ]
 
   def show
     # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
@@ -34,6 +35,10 @@ class CheckoutsController < ApplicationController
   end
 
   private
+
+  def set_shipping_methods
+    @shipping_methods = @order.account.shipping_methods.active.order(:position)
+  end
 
   def set_order
     @order = @checkout.order
@@ -68,7 +73,12 @@ class CheckoutsController < ApplicationController
       end
 
       # Aktualizuj metodę płatności i dostawy
-      @order.update!(payment_shipping_params)
+      @order.update!(payment_method: params[:order][:payment_method])
+
+      # Aktualizuj koszt wysyłki
+      shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
+      @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
+
 
       # Zmień status zamówienia
       @order.update!(status: :payment_processing)
@@ -96,9 +106,5 @@ class CheckoutsController < ApplicationController
       :needs_invoice, :company_name, :nip, :first_name, :last_name,
       :address_line1, :address_line2, :city, :postal_code, :country
     )
-  end
-
-  def payment_shipping_params
-    params.require(:order).permit(:payment_method, :shipping_method)
   end
 end
