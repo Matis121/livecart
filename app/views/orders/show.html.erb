@@ -9,7 +9,7 @@
         <h1 class="text-xl sm:text-2xl font-bold"><%= @order.order_number %></h1>
         <%= render "orders/status_dropdown", order: @order %>
         <!-- Przycisk dla historii -->
-        <%= link_to status_history_order_path(@order), 
+        <%= link_to status_history_order_path(@order),
             data: { turbo_frame: "status_history_modal" },
             class: "btn btn-sm btn-ghost" do %>
           <%= lucide_icon('history', class: 'w-4 h-4') %>
@@ -38,7 +38,7 @@
         <div class="card-body">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-semibold">Produkty</h2>
-            <%= link_to new_order_order_item_path(@order), 
+            <%= link_to new_order_order_item_path(@order),
                 data: { turbo_frame: "new_order_item" },
                 class: "btn btn-sm" do %>
               Dodaj produkt

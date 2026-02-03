@@ -1,6 +1,6 @@
 <%= turbo_frame_tag "order_items" do %>
   <% if order.order_items.any? %>
-    <div class="overflow-x-auto">
+    <div>
       <table class="table">
         <thead>
           <tr>
@@ -47,19 +47,25 @@
                   <span class="badge badge-ghost"><%= item.quantity %></span>
                 </td>
                 <td class="text-right font-semibold"><%= number_to_currency(item.total_price, unit: order.currency, format: "%n %u") %></td>
-                <td>
-                  <div class="flex gap-1 justify-center">
-                    <%= link_to edit_order_order_item_path(order, item), 
-                        data: { turbo_frame: "order_item_frame_#{item.id}" },
-                        class: "btn btn-ghost btn-xs" do %>
-                      <%= lucide_icon("pencil", class: "w-4 h-4") %>
-                    <% end %>
-                    <%= button_to order_order_item_path(order, item), 
-                        method: :delete,
-                        data: { turbo_confirm: "Czy na pewno usunąć ten produkt?" },
-                        class: "btn btn-ghost btn-xs text-error" do %>
-                      <%= lucide_icon("trash-2", class: "w-4 h-4") %>
-                    <% end %>
+                <td class="text-center">
+                  <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                      <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
+                    </div>
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                      <li>
+                        <%= link_to edit_order_order_item_path(order, item), data: { turbo_frame: "order_item_frame_#{item.id}"} do %>
+                          <%= lucide_icon('edit', class: 'w-4 h-4') %>
+                          Edytuj
+                        <% end %>
+                      </li>
+                      <li>
+                        <%= link_to order_order_item_path(order, item), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć?" }, class: "text-error" do %>
+                          <%= lucide_icon('trash', class: 'w-4 h-4') %>
+                          Usuń
+                        <% end %>
+                      </li>
+                    </ul>
                   </div>
                 </td>
               </tr>
