@@ -52,7 +52,7 @@
                     <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
                       <%= lucide_icon('more-vertical', class: 'w-4 h-4') %>
                     </div>
-                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow">
                       <li>
                         <%= link_to edit_order_order_item_path(order, item), data: { turbo_frame: "order_item_frame_#{item.id}"} do %>
                           <%= lucide_icon('edit', class: 'w-4 h-4') %>

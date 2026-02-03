@@ -26,7 +26,7 @@
               </div>
               <button type="button"
                       onclick="navigator.clipboard.writeText('<%= order.checkout.public_url %>'); this.classList.add('btn-success'); setTimeout(() => this.classList.remove('btn-success'), 2000)"
-                      class="btn btn-ghost btn-sm btn-square flex-shrink-0"
+                      class="btn btn-ghost btn-sm btn-square shrink-0"
                       title="Kopiuj link">
                 <%= lucide_icon "copy", class: "w-4 h-4" %>
               </button>
