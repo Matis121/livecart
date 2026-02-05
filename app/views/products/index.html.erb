@@ -4,7 +4,7 @@
     <h1 class="text-2xl sm:text-3xl font-bold">Produkty</h1>
     <%= link_to "Nowy produkt", new_product_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
-  
+
   <% if @all_products.any? %>
     <div class="flex-1 min-w-0" data-controller="checkbox-select-all">
       <%= render "products/products_toolbar" %>
