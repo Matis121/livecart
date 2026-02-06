@@ -53,6 +53,39 @@ class OrdersController < ApplicationController
     end
   end
 
+  def update
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    if @order.update(order_params)
+      respond_to do |format|
+        format.turbo_stream do
+          # Sprawdź czy aktualizowano status czy klienta
+          if params[:order][:status].present?
+            render turbo_stream: turbo_stream.replace(
+              "order_status",
+              partial: "orders/status_dropdown",
+              locals: { order: @order }
+            )
+          else
+            render turbo_stream: turbo_stream.replace(
+              "customer_section",
+              partial: "orders/customer_section",
+              locals: { order: @order }
+            )
+          end
+        end
+        format.html { redirect_to @order, notice: "Zamówienie zostało zaktualizowane" }
+      end
+    else
+      redirect_to @order, alert: "Nie udało się zaktualizować zamówienia"
+    end
+  end
+
+  def destroy
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    @order.destroy
+    redirect_to orders_path, notice: "Zamówienie zostało usunięte"
+  end
+
   def edit_customer
     @order = current_account.orders.find_by!(order_number: params[:id])
     @customers = current_account.customers.order(:first_name, :last_name)
@@ -162,38 +195,6 @@ class OrdersController < ApplicationController
     redirect_to @order unless turbo_frame_request?
   end
 
-  def update
-    @order = current_account.orders.find_by!(order_number: params[:id])
-    if @order.update(order_params)
-      respond_to do |format|
-        format.turbo_stream do
-          # Sprawdź czy aktualizowano status czy klienta
-          if params[:order][:status].present?
-            render turbo_stream: turbo_stream.replace(
-              "order_status",
-              partial: "orders/status_dropdown",
-              locals: { order: @order }
-            )
-          else
-            render turbo_stream: turbo_stream.replace(
-              "customer_section",
-              partial: "orders/customer_section",
-              locals: { order: @order }
-            )
-          end
-        end
-        format.html { redirect_to @order, notice: "Zamówienie zostało zaktualizowane" }
-      end
-    else
-      redirect_to @order, alert: "Nie udało się zaktualizować zamówienia"
-    end
-  end
-
-  def destroy
-    @order = current_account.orders.find_by!(order_number: params[:id])
-    @order.destroy
-    redirect_to orders_path, notice: "Zamówienie zostało usunięte"
-  end
 
   def bulk_action
     order_ids = params[:order_ids] || []
@@ -207,17 +208,20 @@ class OrdersController < ApplicationController
     # Znajdź zamówienia należące do current_account
     orders = current_account.orders.where(order_number: order_ids)
 
+    count = orders.count
+    flash_message = count == 1 ? "zamówienie #{orders.first.order_number}" : "zamówienia"
+
     case action_type
     when "delete"
-      count = orders.count
       orders.destroy_all
-      redirect_to orders_path, notice: "Usunięto #{count} zamówień"
+
+      redirect_to orders_path, notice: "Usunięto #{flash_message}"
 
     when "update_status"
       new_status = params[:new_status]
       if new_status.present? && Order.statuses.keys.include?(new_status)
         count = orders.update_all(status: Order.statuses[new_status])
-        redirect_to orders_path, notice: "Zaktualizowano status #{count} zamówień"
+        redirect_to orders_path, notice: "Zaktualizowano #{flash_message}"
       else
         redirect_to orders_path, alert: "Nieprawidłowy status"
       end
