@@ -8,41 +8,31 @@ class BillingAddressesController < ApplicationController
 
   def update
     if @billing_address.update(billing_address_params)
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.update("billing_address_modal", ""),
-            turbo_stream.replace(
-              "billing_address_section",
-              partial: "orders/billing_address_section",
-              locals: { order: @order, billing_address: @billing_address }
-            )
-          ]
-        end
-        format.html { redirect_to @order, notice: "Dane do faktury zostały zaktualizowane" }
-      end
+      flash.now[:notice] = "Dane do faktury zostały zaktualizowane"
     else
-      render :edit, status: :unprocessable_entity
+      flash.now[:error] = "Nie udało się zaktualizować danych do faktury"
     end
+
+    render turbo_stream: [
+      turbo_stream.update("billing_address_modal", ""),
+      turbo_stream.replace("billing_address_section", partial: "orders/billing_address_section", locals: { order: @order, billing_address: @billing_address }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def copy_from_shipping
     shipping_address = @order.shipping_address
     if shipping_address.present?
       @billing_address.update(shipping_address_values(shipping_address))
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "billing_address_section",
-            partial: "orders/billing_address_section",
-            locals: { order: @order, billing_address: @billing_address }
-          )
-        end
-        format.html { redirect_to @order, notice: "Skopiowano dane z adresu dostawy" }
-      end
+      flash.now[:notice] = "Skopiowano dane z adresu dostawy"
     else
-      redirect_to @order, alert: "Brak adresu dostawy do skopiowania"
+      flash.now[:error] = "Nie udało się skopiować danych z adresu dostawy"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("billing_address_section", partial: "orders/billing_address_section", locals: { order: @order, billing_address: @billing_address }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   private
