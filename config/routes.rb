@@ -50,7 +50,7 @@ Rails.application.routes.draw do
       patch :update_status
       get :status_history
       get :activate_checkout
-      get :cancel_checkout
+      delete :cancel_checkout
     end
   end
 
