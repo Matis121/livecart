@@ -2,7 +2,7 @@ class ProductsController < ApplicationController
   PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
   DEFAULT_PER_PAGE = 10
 
-  before_action :set_product, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_product, only: [ :show, :edit, :update ]
 
   def index
     @all_products = current_account.products
@@ -38,7 +38,7 @@ class ProductsController < ApplicationController
   def create
     @product = current_account.products.build(product_params)
     if @product.save
-      redirect_to products_path, notice: "Produkt został utworzony"
+      redirect_to products_path, notice: "Utworzono produkt"
     else
       render :new
     end
@@ -54,7 +54,7 @@ class ProductsController < ApplicationController
     end
 
     if @product.update(product_params.except(:images_to_delete, :images))
-      redirect_to products_path, notice: "Produkt został zaktualizowany"
+      redirect_to products_path, notice: "Zaktualizowano produkt"
     else
       render :edit
     end
@@ -65,10 +65,6 @@ class ProductsController < ApplicationController
     @product.product_stock.quantity = @product.product_stock.quantity - @product.product_stock.reserved_quantity
   end
 
-  def destroy
-    @product.destroy
-    redirect_to products_path, notice: "Produkt został usunięty"
-  end
 
   def bulk_action
     product_ids = params[:product_ids] || []
@@ -82,11 +78,13 @@ class ProductsController < ApplicationController
     # Znajdź produkty należące do current_account
     products = current_account.products.where(id: product_ids)
 
+    count = products.count
+    flash_message = count == 1 ? "produkt id #{products.first.id}" : "produkty"
+
     case action_type
     when "delete"
-      count = products.count
       products.destroy_all
-      redirect_to products_path, notice: "Usunięto #{count} produktów"
+      redirect_to products_path, notice: "Usunięto #{flash_message}"
 
     else
       redirect_to products_path, alert: "Nieznana akcja"

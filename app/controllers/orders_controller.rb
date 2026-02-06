@@ -73,7 +73,7 @@ class OrdersController < ApplicationController
             )
           end
         end
-        format.html { redirect_to @order, notice: "Zamówienie zostało zaktualizowane" }
+        format.html { redirect_to @order, notice: "Zaktualizowano zamówienie" }
       end
     else
       redirect_to @order, alert: "Nie udało się zaktualizować zamówienia"
@@ -83,7 +83,7 @@ class OrdersController < ApplicationController
   def destroy
     @order = current_account.orders.find_by!(order_number: params[:id])
     @order.destroy
-    redirect_to orders_path, notice: "Zamówienie zostało usunięte"
+    redirect_to orders_path, notice: "Usunięto zamówienie"
   end
 
   def edit_customer
