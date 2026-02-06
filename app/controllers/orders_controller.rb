@@ -23,6 +23,9 @@ class OrdersController < ApplicationController
     orders = @q.result.includes(:customer, :order_items).order(created_at: :desc).distinct
     orders = orders.where(status: params[:status]) if params[:status].present?
 
+
+    @all_orders_count = @all_orders.count
+
     # Pobierz per_page: najpierw z params, potem z cookies, na końcu default
     per_page = if params[:per_page].present?
       params[:per_page].to_i
