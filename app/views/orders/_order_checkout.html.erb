@@ -1,4 +1,4 @@
-<%= turbo_frame_tag "order_checkout" do %>
+<%= turbo_frame_tag dom_id(order, :checkout) do %>
   <div class="card bg-base-100 shadow-sm border border-base-300">
     <div class="card-body p-3">
       <div class="flex flex-wrap items-center justify-between gap-3">
@@ -42,7 +42,8 @@
             <%# Stan pusty - inline %>
             <span class="text-xs text-base-content/50 mr-1 ">Brak aktywnego linku</span>
             <%= link_to activate_checkout_order_path(order),
-                        class: "btn btn-primary btn-xs gap-1" do %>
+                        class: "btn btn-primary btn-xs gap-1",
+                        data: { turbo_method: :post } do %>
               <%= lucide_icon "link", class: "w-3 h-3" %>
               Wygeneruj
             <% end %>

@@ -22,7 +22,9 @@
       <%= render "layouts/drawer" %>
     <% else %>
       <main>
-        <%= render "layouts/flash_messages" %>
+        <%= turbo_frame_tag "flash_messages" do %>
+          <%= render "layouts/flash_messages" %>
+        <% end %>
         <%= yield %>
       </main>
     <% end %>

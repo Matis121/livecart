@@ -49,7 +49,7 @@ Rails.application.routes.draw do
       patch :update_shipping_payment_methods
       patch :update_status
       get :status_history
-      get :activate_checkout
+      post :activate_checkout
       delete :cancel_checkout
     end
   end

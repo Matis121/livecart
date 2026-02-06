@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@rails/request.js": "^0.0.13",
+    "@stimulus-components/notification": "^3.0.0",
     "@stimulus-components/sortable": "^5.0.3",
     "daisyui": "^5.5.14",
     "sortablejs": "^1.15.6"

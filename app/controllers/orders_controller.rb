@@ -1,4 +1,5 @@
 class OrdersController < ApplicationController
+  include ActionView::RecordIdentifier
   PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
   DEFAULT_PER_PAGE = 10
 
@@ -72,38 +73,31 @@ class OrdersController < ApplicationController
 
   def update_discount_code
     @order = current_account.orders.find_by!(order_number: params[:id])
+
     if @order.apply_discount_code(discount_code_params[:discount_code])
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "discount_code_section",
-            partial: "orders/discount_code_section",
-            locals: { order: @order }
-          )
-        end
-        format.html { redirect_to @order, notice: "Kod rabatowy został zastosowany" }
-      end
+      flash.now[:notice] = "Kod rabatowy został zastosowany"
     else
-      render :edit_discount_code, status: :unprocessable_entity
+      flash.now[:error] = "Kod rabatowy nie jest prawidłowy"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("discount_code_section", partial: "orders/discount_code_section", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def update_contact_info
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(contact_info_params)
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "contact_info_section",
-            partial: "orders/contact_info_section",
-            locals: { order: @order }
-          )
-        end
-        format.html { redirect_to @order, notice: "Dane kontaktowe zostały zaktualizowane" }
-      end
+      flash.now[:notice] = "Dane kontaktowe zostały zaktualizowane"
     else
-      render :edit_contact_info, status: :unprocessable_entity
+      flash.now[:error] = "Nie udało się zaktualizować danych kontaktowych"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("contact_info_section", partial: "orders/contact_info_section", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def edit_payment
@@ -115,19 +109,15 @@ class OrdersController < ApplicationController
   def update_payment
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(payment_params)
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "payment_section",
-            partial: "orders/payment_section",
-            locals: { order: @order }
-          )
-        end
-        format.html { redirect_to @order, notice: "Płatność została zaktualizowana" }
-      end
+      flash.now[:notice] = "Płatność została zaktualizowana"
     else
-      render :edit_payment, status: :unprocessable_entity
+      flash.now[:error] = "Nie udało się zaktualizować płatności"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("payment_section", partial: "orders/payment_section", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def edit_shipping_payment_methods
@@ -139,37 +129,30 @@ class OrdersController < ApplicationController
   def update_shipping_payment_methods
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(shipping_payment_methods_params)
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace(
-              "shipping_payment_methods_section",
-              partial: "orders/shipping_payment_methods_section",
-              locals: { order: @order }
-            ),
-            turbo_stream.replace(
-              "payment_section",
-              partial: "orders/payment_section",
-              locals: { order: @order }
-            )
-          ]
-        end
-        format.html { redirect_to @order, notice: "Metody wysyłki i płatności zostały zaktualizowane" }
-      end
+      flash.now[:notice] = "Metody wysyłki i płatności zostały zaktualizowane"
     else
-      render :edit_shipping_payment_methods, status: :unprocessable_entity
+      flash.now[:error] = "Nie udało się zaktualizować metod wysyłki i płatności"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("shipping_payment_methods_section", partial: "orders/shipping_payment_methods_section", locals: { order: @order }),
+      turbo_stream.replace("payment_section", partial: "orders/payment_section", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def update_status
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(status: params[:order][:status])
-        render turbo_stream: turbo_stream.replace(
-          "order_status",
-          partial: "orders/status_dropdown",
-          locals: { order: @order }
-        )
+      flash.now[:notice] = "Status został zaktualizowany"
+    else
+      flash.now[:error] = "Nie udało się zaktualizować statusu"
     end
+
+    render turbo_stream: [
+      turbo_stream.replace("order_status", partial: "orders/status_dropdown", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def status_history
@@ -250,9 +233,11 @@ class OrdersController < ApplicationController
     checkout = @order.checkout || @order.create_checkout!
     checkout.activate!
 
-    redirect_to @order, notice: "Koszyk aktywowany. Link skopiuj poniżej."
-  rescue => e
-    redirect_to @order, alert: "Błąd: #{e.message}"
+    flash.now[:notice] = "Koszyk aktywowany. Link skopiuj poniżej."
+    render turbo_stream: [
+      turbo_stream.replace(dom_id(@order, :checkout), partial: "orders/order_checkout", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   def cancel_checkout
@@ -261,7 +246,11 @@ class OrdersController < ApplicationController
     checkout = @order.checkout
     checkout.cancel! if checkout.present?
 
-    redirect_to @order, notice: "Koszyk anulowany"
+    flash.now[:notice] = "Koszyk anulowany"
+    render turbo_stream: [
+      turbo_stream.replace(dom_id(@order, :checkout), partial: "orders/order_checkout", locals: { order: @order }),
+      turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
+    ]
   end
 
   private
