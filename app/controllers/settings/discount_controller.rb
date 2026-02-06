@@ -13,7 +13,7 @@ module Settings
     def create
       @discount_code = current_account.discount_codes.build(discount_code_params)
       if @discount_code.save
-        redirect_to settings_discount_index_path, notice: "Kod rabatowy został utworzony"
+        redirect_to settings_discount_index_path, notice: "Utworzono kod rabatowy"
       else
         render :new, status: :unprocessable_entity
       end
@@ -22,15 +22,15 @@ module Settings
     def update
       @discount_code.active = !@discount_code.active
       if @discount_code.save
-        redirect_to settings_discount_index_path, notice: "Kod rabatowy został zaktualizowany"
+        redirect_to settings_discount_index_path, notice: "Zaktualizowano kod rabatowy"
       else
-        redirect_to settings_discount_index_path, alert: "Nie udało się zaktualizować statusu kodu rabatowego"
+        redirect_to settings_discount_index_path, alert: "Nie udało się zaktualizować kodu rabatowego"
       end
     end
 
     def destroy
       @discount_code.destroy
-      redirect_to settings_discount_path, notice: "Kod rabatowy został usunięty"
+      redirect_to settings_discount_path, notice: "Usunięto kod rabatowy"
     end
 
     private

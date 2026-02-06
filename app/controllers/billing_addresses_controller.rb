@@ -8,9 +8,9 @@ class BillingAddressesController < ApplicationController
 
   def update
     if @billing_address.update(billing_address_params)
-      flash.now[:notice] = "Dane do faktury zostały zaktualizowane"
+      flash.now[:notice] = "Zaktualizowano dane faktury"
     else
-      flash.now[:error] = "Nie udało się zaktualizować danych do faktury"
+      flash.now[:error] = "Nie udało się zaktualizować danych faktury"
     end
 
     render turbo_stream: [

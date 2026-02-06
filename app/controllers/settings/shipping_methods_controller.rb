@@ -15,7 +15,7 @@ module Settings
     def create
       @shipping_method = current_account.shipping_methods.build(shipping_method_params)
       if @shipping_method.save
-        redirect_to settings_shipping_methods_path, notice: "Metoda wysyłki została utworzona"
+        redirect_to settings_shipping_methods_path, notice: "Utworzono metodę wysyłki"
       else
         render :new, status: :unprocessable_entity
       end
@@ -26,7 +26,7 @@ module Settings
 
     def update
       if @shipping_method.update(shipping_method_params)
-        redirect_to settings_shipping_methods_path, notice: "Metoda wysyłki została zaktualizowana"
+        redirect_to settings_shipping_methods_path, notice: "Zaktualizowano metodę wysyłki"
       else
         render :edit, status: :unprocessable_entity
       end
@@ -34,7 +34,7 @@ module Settings
 
     def destroy
       @shipping_method.destroy
-      redirect_to settings_shipping_methods_path, notice: "Metoda wysyłki została usunięta"
+      redirect_to settings_shipping_methods_path, notice: "Usunięto metodę wysyłki"
     end
 
     private

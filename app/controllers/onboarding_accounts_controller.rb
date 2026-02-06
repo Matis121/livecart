@@ -11,7 +11,7 @@ class OnboardingAccountsController < ApplicationController
       account = Account.create!(account_params)
       current_user.update!(account: account, role: :admin)
     end
-    redirect_to root_path, notice: "Account created successfully"
+    redirect_to root_path, notice: "Witaj na pokładzie! Konto jest gotowe."
 
   rescue ActiveRecord::RecordInvalid
     @account = Account.new(account_params)

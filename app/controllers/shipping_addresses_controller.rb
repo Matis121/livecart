@@ -8,7 +8,7 @@ class ShippingAddressesController < ApplicationController
 
   def update
     if @shipping_address.update(shipping_address_params)
-      flash.now[:notice] = "Adres dostawy został zaktualizowany"
+      flash.now[:notice] = "Zaktualizowano adres dostawy"
     else
       flash.now[:error] = "Nie udało się zaktualizować adresu dostawy"
     end

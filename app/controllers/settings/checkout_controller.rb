@@ -20,7 +20,7 @@ module Settings
       end
 
       if @account.update(checkout_settings_params.except(:logo, :remove_logo))
-        redirect_to settings_checkout_path, notice: "Ustawienia zostały zaktualizowane"
+        redirect_to settings_checkout_path, notice: "Zaktualizowano ustawienia koszyka"
       else
         @checkout_settings = @account.checkout_settings || {}
         render :edit

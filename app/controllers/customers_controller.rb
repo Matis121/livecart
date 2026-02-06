@@ -14,7 +14,7 @@ class CustomersController < ApplicationController
   def create
     @customer = current_account.customers.build(customer_params)
     if @customer.save
-      redirect_to customers_path, notice: "Klient został utworzony"
+      redirect_to customers_path, notice: "Utworzono klienta"
     else
       render :new
     end
@@ -22,7 +22,7 @@ class CustomersController < ApplicationController
 
   def update
     if @customer.update(customer_params)
-      redirect_to customers_path, notice: "Klient został zaktualizowany"
+      redirect_to customers_path, notice: "Zaktualizowano klienta"
     else
       render :edit
     end
@@ -30,7 +30,7 @@ class CustomersController < ApplicationController
 
   def destroy
     @customer.destroy
-    redirect_to customers_path, notice: "Klient został usunięty"
+    redirect_to customers_path, notice: "Usunięto klienta"
   end
 
   private
