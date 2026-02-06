@@ -3,6 +3,10 @@
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
     <h1 class="text-2xl sm:text-3xl font-bold">Rezerwacje</h1>
   </div>
+  <div role="tablist" class="tabs tabs-box mb-8">
+    <%= link_to "Produkty", products_path, class: "tab", role: "tab" %>
+    <%= link_to "Rezerwacje", product_reservations_path, class: "tab tab-active", role: "tab" %>
+  </div>
   <% if @product_reservations.any? %>
     <%= render "product_reservations/table" %>
   <% else %>

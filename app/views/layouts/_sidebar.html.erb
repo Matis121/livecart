@@ -21,21 +21,15 @@
         </a>
       </li>
       <li>
-        <%= link_to products_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
-          <%= lucide_icon('package', class: 'w-4 h-4') %>
-          <span>Produkty</span>
-        <% end %>
-      </li>
-      <li>
-        <%= link_to product_reservations_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
-          <%= lucide_icon('calendar-check', class: 'w-4 h-4') %>
-          <span>Rezerwacje</span>
-        <% end %>
-      </li>
-      <li>
         <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
           <%= lucide_icon('shopping-bag', class: 'w-4 h-4') %>
           <span>Zamówienia</span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to products_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
+          <%= lucide_icon('package', class: 'w-4 h-4') %>
+          <span>Produkty</span>
         <% end %>
       </li>
       <li>
@@ -80,7 +74,7 @@
           </div>
           <%= lucide_icon('chevrons-up-down', class: 'w-4 h-4 text-base-content/40') %>
         </div>
-        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-lg z-[1] w-full p-1 shadow-lg border border-base-200 mb-1">
+        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-lg z-1 w-full p-1 shadow-lg border border-base-200 mb-1">
           <li>
             <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-md" do %>
               <%= lucide_icon('user', class: 'w-4 h-4') %>
