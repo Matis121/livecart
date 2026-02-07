@@ -1,6 +1,6 @@
 class ProductStockMovement < ApplicationRecord
   belongs_to :product
-  belongs_to :order_item
+  belongs_to :order_item, optional: true
 
   enum :movement_type, {
     restock: 0,

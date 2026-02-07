@@ -2,6 +2,9 @@ class Order < ApplicationRecord
   belongs_to :account
   belongs_to :customer, optional: true
   belongs_to :discount_code, optional: true
+
+  before_destroy :restore_stock_for_deleted_order, if: :stock_finalized?
+
   has_many :order_items, dependent: :destroy
   has_one :shipping_address, dependent: :destroy
   has_one :billing_address, dependent: :destroy
@@ -149,15 +152,15 @@ class Order < ApplicationRecord
         reservation = item.product_reservation
         next unless reservation&.pending?
 
-        # 1. Zmniejsz fizyczny stan
         item.product.product_stock.decrease_for_order!(
           item.quantity,
           order_item: item
         )
 
-        # 2. Oznacz rezerwację jako fulfilled
         reservation.completed!
       end
+
+      update_column(:stock_finalized, true)
     end
   end
 
@@ -170,5 +173,15 @@ class Order < ApplicationRecord
     order_status_histories.create!(
       status: status
     )
+  end
+
+  def restore_stock_for_deleted_order
+    return unless stock_finalized?
+
+    order_items.includes(product: :product_stock).each do |item|
+      next unless item.product&.product_stock
+
+      item.product.product_stock.increase_for_deleted_order!(item.quantity)
+    end
   end
 end

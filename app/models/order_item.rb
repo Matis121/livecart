@@ -2,6 +2,7 @@ class OrderItem < ApplicationRecord
   belongs_to :order
   belongs_to :product, optional: true
   has_one :product_reservation, dependent: :destroy
+  has_many :product_stock_movements, dependent: :nullify
 
   validates :name, presence: true
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }

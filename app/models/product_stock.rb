@@ -51,6 +51,24 @@ class ProductStock < ApplicationRecord
     end
   end
 
+  def increase_for_deleted_order!(amount)
+    transaction do
+      old_qty = quantity
+      new_qty = quantity + amount
+
+      update!(quantity: new_qty)
+
+      product.product_stock_movements.create!(
+        order_item: nil,
+        quantity_change: amount,
+        quantity_before: old_qty,
+        quantity_after: new_qty,
+        movement_type: "restock"
+      )
+    end
+  end
+
+
   # Ransack configuration
   def self.ransackable_attributes(auth_object = nil)
     [ "quantity", "available_quantity", "reserved_quantity" ]
