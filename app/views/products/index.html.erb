@@ -7,7 +7,6 @@
   <% if @all_products.any? %>
     <div role="tablist" class="tabs tabs-box mb-8">
       <%= link_to "Produkty", products_path, class: "tab tab-active", role: "tab" %>
-      <%= link_to "Rezerwacje", product_reservations_path, class: "tab", role: "tab" %>
     </div>
     <div class="flex-1 min-w-0" data-controller="checkbox-select-all">
       <%= render "products/products_toolbar" %>
@@ -19,6 +18,5 @@
 </div>
 <!-- Modale dla wszystkich produktów -->
 <% @products.each do |product| %>
-  <%= render "products/reservations_modal", product: product %>
   <%= render "products/stock_history_modal", product: product %>
 <% end %>

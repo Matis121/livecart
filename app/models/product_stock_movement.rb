@@ -4,12 +4,18 @@ class ProductStockMovement < ApplicationRecord
 
   enum :movement_type, {
     restock: 0,
-    sale: 1
+    sale: 1,
+    adjustment: 2,
+    deleted: 3,
+    manual_update: 4
   }
 
   MOVEMENT_TYPES = {
     restock: "Przyjęcie",
-    sale: "Sprzedaż"
+    sale: "Sprzedaż",
+    adjustment: "Korekta stanu",
+    deleted: "Usunięcie",
+    manual_update: "Aktualizacja ręczna"
   }.freeze
 
 

@@ -24,10 +24,17 @@
                 <td><%= movement.created_at.strftime("%d.%m.%Y %H:%M") %></td>
                 <td>
                   <% if movement.restock? %>
-                    <span class="badge badge-success"><%= movement.movement_type_name %></span>
-                  <% elsif movement.sale? %>
                     <span class="badge badge-info"><%= movement.movement_type_name %></span>
+                  <% elsif movement.sale? %>
+                    <span class="badge badge-success"><%= movement.movement_type_name %></span>
+                  <% elsif movement.adjustment? %>
+                    <span class="badge badge-warning"><%= movement.movement_type_name %></span>
+                  <% elsif movement.deleted? %>
+                    <span class="badge badge-error"><%= movement.movement_type_name %></span>
+                  <% elsif movement.manual_update? %>
+                    <span class="badge badge-primary"><%= movement.movement_type_name %></span>
                   <% end %>
+
                 </td>
                 <td>
                   <% if movement.order_item %>

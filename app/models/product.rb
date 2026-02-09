@@ -3,14 +3,13 @@ class Product < ApplicationRecord
   has_many_attached :images
 
   has_one :product_stock, dependent: :destroy
-  has_many :product_reservations, dependent: :destroy
   has_many :product_stock_movements, dependent: :destroy
   has_many :order_items, dependent: :nullify
 
   accepts_nested_attributes_for :product_stock
 
 
-  delegate :quantity, :available_quantity, :reserved_quantity,
+  delegate :quantity,
            to: :product_stock, prefix: false, allow_nil: true
 
   validates :name, presence: true

@@ -45,24 +45,40 @@ class ProductsController < ApplicationController
   end
 
   def update
-    if params[:product][:images_to_delete].present?
-      @product.images.where(id: params[:product][:images_to_delete]).each(&:purge)
+    Product.transaction do
+      # 1. Usuwanie zdjęć (bezpieczniej w transakcji)
+      if params[:product][:images_to_delete].present?
+        @product.images.where(id: params[:product][:images_to_delete]).purge
+      end
+
+      # 2. Korekta stanu
+      if params[:product][:stock_quantity].present?
+        @product.product_stock.adjust_quantity!(params[:product][:stock_quantity].to_i)
+      end
+
+      # 3. Aktualizacja reszty (w tym nowych obrazów, jeśli używasz attach)
+      if @product.update(product_params.except(:images_to_delete, :stock_quantity))
+        redirect_to products_path, notice: "Zaktualizowano produkt"
+      else
+        raise ActiveRecord::Rollback
+      end
     end
 
-    if params[:product][:images].present?
-      @product.images.attach(params[:product][:images])
-    end
-
-    if @product.update(product_params.except(:images_to_delete, :images))
-      redirect_to products_path, notice: "Zaktualizowano produkt"
-    else
-      render :edit
-    end
+    render :edit unless performed?
   end
 
   def edit
     @product.build_product_stock unless @product.product_stock
-    @product.product_stock.quantity = @product.product_stock.quantity - @product.product_stock.reserved_quantity
+  end
+
+  def destroy
+    @product = current_account.products.find(params[:id])
+
+    if @product.destroy
+      redirect_to products_path, notice: "Usunięto produkt"
+    else
+      redirect_to products_path, alert: "Nie udało się usunąć produktu"
+    end
   end
 
 

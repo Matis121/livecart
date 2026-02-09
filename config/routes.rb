@@ -21,7 +21,6 @@ Rails.application.routes.draw do
     resources :discount, only: [ :index, :new, :create, :update, :destroy ], controller: "discount"
     resources :shipping_methods, only: [ :index, :new, :create, :edit, :update, :destroy ], controller: "shipping_methods"
   end
-  resources :product_reservations, only: [ :index ]
   resources :customers, controller: "customers"
   resources :employees, controller: "users"
   resources :orders, controller: "orders" do

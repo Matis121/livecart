@@ -1,7 +1,6 @@
 class OrderItem < ApplicationRecord
   belongs_to :order
   belongs_to :product, optional: true
-  has_one :product_reservation, dependent: :destroy
   has_many :product_stock_movements, dependent: :nullify
 
   validates :name, presence: true
@@ -16,9 +15,11 @@ class OrderItem < ApplicationRecord
   after_save :recalculate_order_total
   after_destroy :recalculate_order_total
 
-  # Rezerwacje (TYLKO dla draft orders)
-  after_create :create_reservation, if: :should_reserve?
-  after_update :update_reservation_quantity, if: :quantity_changed_and_draft?
+
+  # Zarządzanie stanem magazynowym
+  after_create :decrease_stock
+  after_update :adjust_stock
+  before_destroy :restore_stock
 
   # Ransack - dozwolone atrybuty do wyszukiwania
   def self.ransackable_attributes(auth_object = nil)
@@ -38,42 +39,26 @@ class OrderItem < ApplicationRecord
     order.update_column(:total_amount, items_total + (order.shipping_cost || 0))
   end
 
-  # === WARUNKI ===
 
-  def should_reserve?
-    product.present? && order.draft_status?
+  # === ZARZĄDZANIE STANEM MAGAZYNOWYM ===
+
+  def decrease_stock
+    product.product_stock.decrease_for_order!(quantity, order_item: self, movement_type: "sale")
   end
 
-  def quantity_changed_and_draft?
-    saved_change_to_quantity? && product.present? && order.draft_status?
+  def adjust_stock
+    return unless saved_change_to_quantity?
+    old_quantity, new_quantity = saved_change_to_quantity
+    difference = new_quantity - old_quantity
+
+    if difference > 0
+      product.product_stock.decrease_for_order!(difference, order_item: self, movement_type: "adjustment")
+    elsif difference < 0
+      product.product_stock.increase_for_order!(difference.abs, order_item: self, movement_type: "adjustment")
+    end
   end
 
-
-  # === REZERWACJE ===
-
-  def create_reservation
-    ProductReservation.create!(
-      product: product,
-      order: order,
-      order_item: self,
-      quantity: quantity,
-      status: "pending"
-    )
-  rescue StandardError => e
-    errors.add(:base, "Nie można zarezerwować: #{e.message}")
-    raise ActiveRecord::Rollback
-  end
-
-  def update_reservation_quantity
-    return unless product_reservation&.pending?
-
-    product_reservation.update!(quantity: quantity)
-  rescue StandardError => e
-    errors.add(:base, "Nie można zaktualizować rezerwacji: #{e.message}")
-    raise ActiveRecord::Rollback
-  end
-
-  def cancel_reservation_if_exists
-    product_reservation&.cancel! if product_reservation&.pending?
+  def restore_stock
+    product.product_stock.increase_for_order!(quantity, order_item: nil, movement_type: "deleted")
   end
 end

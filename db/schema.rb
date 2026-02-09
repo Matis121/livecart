@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_07_003045) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_09_191004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -182,23 +182,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_07_003045) do
     t.bigint "discount_code_id"
     t.decimal "discount_amount", precision: 8, scale: 2, default: "0.0", null: false
     t.string "discount_name"
-    t.boolean "stock_finalized", default: false, null: false
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
-  end
-
-  create_table "product_reservations", force: :cascade do |t|
-    t.bigint "product_id", null: false
-    t.bigint "order_id", null: false
-    t.bigint "order_item_id", null: false
-    t.integer "quantity", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "status", default: 0, null: false
-    t.index ["order_id"], name: "index_product_reservations_on_order_id"
-    t.index ["order_item_id"], name: "index_product_reservations_on_order_item_id"
-    t.index ["product_id"], name: "index_product_reservations_on_product_id"
   end
 
   create_table "product_stock_movements", force: :cascade do |t|
@@ -294,9 +280,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_07_003045) do
   add_foreign_key "orders", "accounts"
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "discount_codes"
-  add_foreign_key "product_reservations", "order_items"
-  add_foreign_key "product_reservations", "orders"
-  add_foreign_key "product_reservations", "products"
   add_foreign_key "product_stock_movements", "order_items"
   add_foreign_key "product_stock_movements", "products"
   add_foreign_key "product_stocks", "products"
