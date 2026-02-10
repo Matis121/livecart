@@ -19,8 +19,20 @@
       </div>
     </div>
   <% else %>
+    <div class="max-w-3xl mx-auto py-12 mb-4">
+      <div class="bg-base-100 border border-base-300 rounded-xl p-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left">
+        <% if @account_logo.present? %>
+          <div class="shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-base-200 flex items-center justify-center">
+            <%= image_tag @account_logo, alt: "logo", class: "w-full h-full object-contain p-2" %>
+          </div>
+        <% end %>
+        <div>
+          <p class="text-base-content/50 text-sm mt-0.5">Sklep</p>
+          <h4 class="text-xl font-bold tracking-tight"><%= @account_name %></h4>
+        </div>
+      </div>
+    </div>
     <!-- Formularz zamówienia -->
-    <h1 class="text-3xl font-bold mb-6">Finalizacja zamówienia</h1>
     <div class="xl:grid xl:grid-cols-3 gap-6 flex flex-col-reverse">
       <!-- Lewa kolumna - Formularz -->
       <div class="lg:col-span-2 space-y-6">
