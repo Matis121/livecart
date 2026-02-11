@@ -258,7 +258,7 @@
               <div class="space-y-4 mb-6">
                 <% @order.order_items.includes(:product).each do |item| %>
                   <div class="flex gap-4">
-                    <% if item.product&.images.attached? %>
+                    <% if item.product&.images&.attached? %>
                       <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
                         <%= image_tag item.product.images.first, class: "object-cover w-full h-full" %>
                       </div>
