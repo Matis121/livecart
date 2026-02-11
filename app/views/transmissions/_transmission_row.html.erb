@@ -1,0 +1,55 @@
+<tr class="hover">
+  <td class="font-mono text-sm text-base-content/70"><%= transmission.id %></td>
+  <td>
+    <%= link_to transmission_path(transmission) do %>
+      <span class="font-medium"><%= transmission.name %></span>
+    <% end %>
+  </td>
+  <td>
+    <% expected = @expected_orders_counts[transmission.id] || 0 %>
+    <% created = @created_orders_counts[transmission.id] || 0 %>
+    <% if expected > 0 %>
+      <div class="flex items-center gap-2">
+        <progress class="progress progress-primary w-36" value="<%= created %>" max="<%= expected %>"></progress>
+        <span class="text-xs text-base-content/70 tabular-nums"><%= created %>/<%= expected %></span>
+      </div>
+    <% else %>
+      <span class="text-xs text-base-content/50">—</span>
+    <% end %>
+  </td>
+  <td>
+    <span class="badge badge-sm <%= transmission.active? ? 'badge-success' : transmission.processing? ? 'badge-warning' : transmission.completed? ? 'badge-success' : 'badge-error' %>">
+      <%= transmission.active? ? 'Aktywna' : (transmission.processing? ? 'Przetwarzanie' : (transmission.completed? ? 'Zakończona' : 'Anulowana')) %>
+    </span>
+  </td>
+  <td class="text-base-content/70">
+    <%= l(transmission.created_at, format: :short) %>
+  </td>
+  <td class="text-end">
+    <div class="dropdown dropdown-end">
+      <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+        <%= lucide_icon("more-vertical", class: "w-4 h-4") %>
+      </div>
+      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+        <li>
+          <%= link_to transmission_path(transmission) do %>
+            <%= lucide_icon('eye', class: 'w-4 h-4') %>
+            Pokaż
+          <% end %>
+        </li>
+        <li>
+          <%= link_to edit_transmission_path(transmission) do %>
+            <%= lucide_icon('edit', class: 'w-4 h-4') %>
+            Edytuj
+          <% end %>
+        </li>
+        <li>
+          <%= link_to transmission_path(transmission), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tę transmisję?" }, class: "text-error" do %>
+            <%= lucide_icon('trash', class: 'w-4 h-4') %>
+            Usuń
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </td>
+</tr>

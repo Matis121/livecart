@@ -1,0 +1,92 @@
+<% is_manual = product_or_key.is_a?(Array) %>
+<% display_name = is_manual ? product_or_key[0] : product_or_key.name %>
+<% display_sku = is_manual ? product_or_key[1] : product_or_key.sku %>
+<% has_product_images = !is_manual && product_or_key.images.attached? %>
+<% delete_path = is_manual ? destroy_by_manual_transmission_transmission_items_path(transmission, name: product_or_key[0], sku: product_or_key[1].to_s) : destroy_by_product_transmission_transmission_items_path(transmission, product_id: product_or_key.id) %>
+<div class="rounded-xl border border-base-200/80 bg-base-200/20">
+  <details class="group">
+    <summary class="flex items-center gap-3 p-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden hover:bg-base-200/40 transition-colors min-h-0">
+      <% if has_product_images %>
+        <div class="avatar flex-shrink-0">
+          <div class="w-12 h-12 rounded-lg ring-1 ring-base-200/60">
+            <%= image_tag product_or_key.images.first, alt: display_name, class: "object-cover w-full h-full" %>
+          </div>
+        </div>
+      <% else %>
+        <div class="w-12 h-12 rounded-lg bg-base-200/80 flex items-center justify-center flex-shrink-0 ring-1 ring-base-200/60">
+          <%= lucide_icon("package", class: "w-6 h-6 text-base-content/50") %>
+        </div>
+      <% end %>
+      <div class="flex-1 min-w-0">
+        <span class="font-semibold text-base"><%= display_name %></span>
+        <% if display_sku.present? %>
+          <span class="text-base-content/60 text-sm ml-2">SKU: <%= display_sku %></span>
+        <% end %>
+        <% if is_manual %>
+          <span class="badge badge-ghost badge-sm ml-2">Ręczny</span>
+        <% end %>
+      </div>
+      <span class="badge badge-ghost badge-md">
+        <%= items.size %> <%= items.size == 1 ? 'klient' : 'klientów' %>
+      </span>
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <% if transmission.active? %>
+          <%= button_to delete_path,
+                method: :delete,
+                form: { data: { turbo_confirm: "Usunąć wszystkie pozycje dla tego produktu?", turbo_frame: "_top" } },
+                class: "btn btn-ghost btn-sm text-error hover:bg-error/10",
+                title: "Usuń wszystkie pozycje" do %>
+            <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+          <% end %>
+        <% end %>
+        <span class="collapse-icon transition-transform group-open:rotate-180 inline-flex">
+          <%= lucide_icon("chevron-down", class: "w-5 h-5 text-base-content/50") %>
+        </span>
+      </div>
+    </summary>
+    <div class="border-t border-base-200/60">
+      <div>
+        <table class="table table-sm">
+          <thead>
+            <tr class="bg-base-200/40">
+              <th class="font-medium rounded-none">Klient</th>
+              <th class="text-right w-20">Ilość</th>
+              <th class="text-right w-28">Cena jedn.</th>
+              <th class="text-right w-28">Suma</th>
+              <% if transmission.active? %>
+                <th class="text-right w-32">Akcje</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.each do |ti| %>
+              <%= render "transmission_items/transmission_item_row", transmission: transmission, transmission_item: ti %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <% if transmission.active? %>
+        <div class="p-3 border-t border-base-200/60">
+          <%= form_with url: transmission_transmission_items_path(transmission), method: :post, class: "flex flex-wrap items-center gap-2" do %>
+            <input type="hidden" name="transmission_item[product_id]" value="<%= is_manual ? '' : product_or_key.id %>">
+            <input type="hidden" name="transmission_item[name]" value="<%= display_name %>">
+            <input type="hidden" name="transmission_item[sku]" value="<%= display_sku %>">
+            <input type="hidden" name="transmission_item[ean]" value="<%= is_manual ? items.first.ean : product_or_key.ean %>">
+            <select name="transmission_item[customer_id]" class="select select-sm select-bordered flex-1 min-w-[160px]" required>
+              <option value="">— Dodaj klienta —</option>
+              <% @customers.each do |c| %>
+                <option value="<%= c.id %>"><%= c.name %></option>
+              <% end %>
+            </select>
+            <input name="transmission_item[quantity]" type="number" value="1" min="1" class="input input-bordered input-sm w-20 text-right" required>
+            <input name="transmission_item[unit_price]" type="number" step="0.01" min="0" value="<%= items.first.unit_price %>" class="input input-bordered input-sm w-24 text-right" required>
+            <button type="submit" class="btn btn-sm btn-ghost gap-1">
+              <%= lucide_icon("plus", class: "w-4 h-4") %>
+              Dodaj
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </details>
+</div>

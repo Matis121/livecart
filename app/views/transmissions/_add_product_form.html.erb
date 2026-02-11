@@ -1,0 +1,141 @@
+<div class="card bg-base-100 shadow-md border border-base-200/60 mb-6 overflow-hidden" data-controller="transmission-items-form">
+  <div class="card-body p-6 sm:p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div>
+        <h2 class="card-title text-xl m-0">Dodaj produkt do transmisji</h2>
+        <p class="text-sm text-base-content/60 mt-0.5">Wybierz produkt z magazynu lub utwórz nowy, a następnie przypisz klientów</p>
+      </div>
+    </div>
+    <%= form_with url: bulk_create_transmission_transmission_items_path(transmission),
+                method: :post,
+                data: { turbo_frame: "_top" },
+                class: "space-y-6" do |f| %>
+      <!-- Przełącznik źródła produktu -->
+      <div class="form-control">
+        <div class="join join-horizontal w-full sm:w-auto shadow-sm" role="group">
+          <label class="join-item btn btn-sm sm:btn-md btn-primary gap-2 cursor-pointer" data-transmission-items-form-target="sourceLabel">
+            <input type="radio" name="product_source" value="warehouse" class="sr-only" checked
+                   data-action="change->transmission-items-form#toggleSource">
+            <%= lucide_icon("package", class: "w-4 h-4 shrink-0") %>
+            <span>Z magazynu</span>
+          </label>
+          <label class="join-item btn btn-sm sm:btn-md btn-ghost gap-2 cursor-pointer" data-transmission-items-form-target="sourceLabel">
+            <input type="radio" name="product_source" value="manual" class="sr-only"
+                   data-action="change->transmission-items-form#toggleSource">
+            <%= lucide_icon("pencil", class: "w-4 h-4 shrink-0") %>
+            <span>Nowy produkt</span>
+          </label>
+        </div>
+      </div>
+      <!-- Sekcja: produkt -->
+      <div class="rounded-xl border border-base-200/80 bg-base-200/30 p-5 space-y-4">
+        <div data-transmission-items-form-target="warehouseSection">
+          <div class="flex items-center gap-2 mb-4">
+            <%= lucide_icon("package", class: "w-5 h-5 text-base-content/60") %>
+            <span class="font-semibold">Produkt</span>
+          </div>
+          <select name="product_id" class="select select-bordered select-md w-full bg-base-100" data-transmission-items-form-target="productSelect">
+            <option value="">— Wybierz produkt —</option>
+            <% products.each do |p| %>
+              <option value="<%= p.id %>"><%= p.name %> — <%= p.sku.presence || '-' %> (<%= p.quantity.to_i %> szt.)</option>
+            <% end %>
+          </select>
+        </div>
+        <div data-transmission-items-form-target="manualSection" class="hidden space-y-4">
+          <div class="form-control">
+            <label class="label py-1">
+              <span class="label-text font-semibold">Nazwa produktu</span>
+            </label>
+            <input type="text" name="manual_product[name]" class="input input-bordered input-md w-full bg-base-100" placeholder="np. Koszulka męska" data-transmission-items-form-target="manualName">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label py-1">
+                <span class="label-text font-medium">Cena brutto (zł)</span>
+              </label>
+              <input type="number" name="manual_product[gross_price]" class="input input-bordered input-md w-full bg-base-100" step="0.01" min="0" placeholder="99.99" data-transmission-items-form-target="manualPrice">
+            </div>
+            <div class="form-control">
+              <label class="label py-1">
+                <span class="label-text font-medium">VAT</span>
+              </label>
+              <select name="manual_product[tax_rate]" class="select select-bordered select-md w-full bg-base-100">
+                <option value="23" selected>23%</option>
+                <option value="8">8%</option>
+                <option value="5">5%</option>
+                <option value="0">0%</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-control">
+              <label class="label py-1">
+                <span class="label-text font-medium">SKU (opcjonalnie)</span>
+              </label>
+              <input type="text" name="manual_product[sku]" class="input input-bordered input-md w-full bg-base-100" placeholder="np. KOSZ-001" data-transmission-items-form-target="manualSku">
+            </div>
+            <div class="form-control">
+              <label class="label py-1">
+                <span class="label-text font-medium">EAN (opcjonalnie)</span>
+              </label>
+              <input type="text" name="manual_product[ean]" class="input input-bordered input-md w-full bg-base-100" placeholder="np. 5901234123457" data-transmission-items-form-target="manualEan">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Sekcja: klienci -->
+      <div class="rounded-xl border border-base-200/80 bg-base-200/30 p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <%= lucide_icon("users", class: "w-5 h-5 text-base-content/60") %>
+          <span class="font-semibold">Klienci</span>
+        </div>
+        <div data-transmission-items-form-target="rows" class="space-y-3">
+          <template data-transmission-items-form-target="template">
+            <div class="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-base-100 border border-base-200/60" data-transmission-items-form-target="row">
+              <div class="flex-1 min-w-[180px]">
+                <select name="items[][customer_id]" class="select select-bordered select-sm w-full">
+                  <option value="">— Wybierz klienta —</option>
+                  <% customers.each do |c| %>
+                    <option value="<%= c.id %>"><%= c.name %></option>
+                  <% end %>
+                </select>
+              </div>
+              <div class="w-20">
+                <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered input-sm w-full" placeholder="Ilość">
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm btn-square text-error/80 hover:text-error hover:bg-error/10" data-action="click->transmission-items-form#removeRow" title="Usuń wiersz">
+                <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+              </button>
+            </div>
+          </template>
+          <div class="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-base-100 border border-base-200/60" data-transmission-items-form-target="row">
+            <div class="flex-1 min-w-[180px]">
+              <select name="items[][customer_id]" class="select select-bordered select-sm w-full">
+                <option value="">— Wybierz klienta —</option>
+                <% customers.each do |c| %>
+                  <option value="<%= c.id %>"><%= c.name %></option>
+                <% end %>
+              </select>
+            </div>
+            <div class="w-20">
+              <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered input-sm w-full" placeholder="Ilość">
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm btn-square text-error/80 hover:text-error hover:bg-error/10" data-action="click->transmission-items-form#removeRow" title="Usuń wiersz">
+              <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm mt-3 gap-2" data-action="click->transmission-items-form#addRow">
+          <%= lucide_icon("plus", class: "w-4 h-4") %>
+          Dodaj klienta
+        </button>
+      </div>
+      <div class="pt-1">
+        <%= button_tag type: "submit", class: "btn btn-primary gap-2" do %>
+          <%= lucide_icon("check", class: "w-4 h-4") %>
+          Zapisz produkt
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

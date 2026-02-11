@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  transmission: one
+  customer: one
+  product: one
+  name: MyString
+  ean: MyString
+  sku: MyString
+  unit_price: 9.99
+  quantity: 1
+
+two:
+  transmission: two
+  customer: two
+  product: two
+  name: MyString
+  ean: MyString
+  sku: MyString
+  unit_price: 9.99
+  quantity: 1

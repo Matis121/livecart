@@ -2,6 +2,7 @@ class Order < ApplicationRecord
   belongs_to :account
   belongs_to :customer, optional: true
   belongs_to :discount_code, optional: true
+  belongs_to :transmission, optional: true
 
   has_many :order_items, dependent: :destroy
   has_one :shipping_address, dependent: :destroy
@@ -45,6 +46,9 @@ class Order < ApplicationRecord
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
   validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
 
+  # Generowanie numeru zamówienia
+  before_validation :generate_order_number, on: :create, if: -> { order_number.blank? }
+
   # Adresy
   after_initialize :build_blank_addresses
   after_update :recalculate_total_if_shipping_changed, if: :saved_change_to_shipping_cost?
@@ -53,6 +57,7 @@ class Order < ApplicationRecord
   # Historia statusów
   after_create :log_status_change
   after_update :log_status_change, if: :saved_change_to_status?
+
 
   def status_name
     STATUS_NAMES[status.to_sym] || status
@@ -140,5 +145,20 @@ class Order < ApplicationRecord
     order_status_histories.create!(
       status: status
     )
+  end
+
+  def generate_order_number
+    10.times do
+      day_of_year = Time.now.strftime("%j")
+      random_part = (10000..99999).to_a.sample
+      number = "#{day_of_year}#{random_part}"
+
+      unless account.orders.exists?(order_number: number)
+        self.order_number = number
+        return
+      end
+    end
+
+    raise "Nie udało się wygenerować unikalnego numeru"
   end
 end

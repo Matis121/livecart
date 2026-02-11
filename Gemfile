@@ -71,3 +71,5 @@ gem "active_storage_validations"
 gem "ransack"
 gem "pagy"
 gem "acts_as_list"
+
+gem "sidekiq", "~> 8.1"

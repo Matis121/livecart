@@ -39,10 +39,10 @@
         <% end %>
       </li>
       <li>
-        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
+        <%= link_to transmissions_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(transmissions_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
           <%= lucide_icon('radio', class: 'w-4 h-4') %>
           <span>Transmisje</span>
-        </a>
+        <% end %>
       </li>
       <li>
         <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">

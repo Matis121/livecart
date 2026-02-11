@@ -1,0 +1,24 @@
+<div class="card bg-base-100 shadow-md border border-base-200/60 overflow-hidden">
+  <div class="card-body p-6 sm:p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div>
+        <h2 class="card-title text-xl m-0">Dodane produkty</h2>
+        <p class="text-sm text-base-content/60 mt-0.5">Produkty i przypisani klienci w tej transmisji</p>
+      </div>
+    </div>
+    <% items_by_product = transmission.transmission_items.order(created_at: :desc).group_by { |ti| ti.product_id.nil? ? [ti.name, ti.sku] : ti.product } %>
+    <% if items_by_product.any? %>
+      <div class="space-y-3">
+        <% items_by_product.each do |product_or_key, items| %>
+          <%= render "transmissions/product_group", transmission: transmission, product_or_key: product_or_key, items: items %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="rounded-xl border border-dashed border-base-200/80 bg-base-200/20 p-8 text-center">
+        <%= lucide_icon("package-open", class: "w-12 h-12 text-base-content/30 mx-auto mb-3") %>
+        <p class="text-base-content/70 font-medium">Brak dodanych produktów</p>
+        <p class="text-base-content/50 text-sm mt-1">Użyj formularza powyżej, aby dodać produkt i przypisać klientów.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

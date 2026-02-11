@@ -1,4 +1,8 @@
+require "sidekiq/web"
 Rails.application.routes.draw do
+  mount Sidekiq::Web => "/sidekiq"
+
+
   devise_for :users
   get "up" => "rails/health#show", as: :rails_health_check
 
@@ -50,6 +54,19 @@ Rails.application.routes.draw do
       get :status_history
       post :activate_checkout
       delete :cancel_checkout
+    end
+  end
+
+  resources :transmissions, controller: "transmissions" do
+    member do
+      post :convert_to_orders
+    end
+    resources :transmission_items, only: [ :new, :create, :show, :edit, :update, :destroy ] do
+      collection do
+        post :bulk_create
+        delete :destroy_by_product
+        delete :destroy_by_manual
+      end
     end
   end
 

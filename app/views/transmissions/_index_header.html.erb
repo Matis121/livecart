@@ -1,0 +1,7 @@
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-bold mb-1">Transmisje</h1>
+    <p class="text-base-content/70 text-sm sm:text-base">Zarządzaj transmisjami na żywo</p>
+  </div>
+  <%= link_to "Nowa transmisja", new_transmission_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "transmission_modal" } %>
+</div>

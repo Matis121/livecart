@@ -1,0 +1,14 @@
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <%= render "transmissions/header", transmission: @transmission %>
+  <%= render "transmissions/status_card", transmission: @transmission %>
+  <% if @transmission.active? %>
+    <div>
+      <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+    </div>
+  <% end %>
+  <%= turbo_frame_tag "product_items_list" do %>
+    <%= render "transmissions/product_items_list", transmission: @transmission %>
+  <% end %>
+</div>
+<%= turbo_frame_tag "transmission_modal" %>
+<%= turbo_frame_tag "transmission_item_modal" %>

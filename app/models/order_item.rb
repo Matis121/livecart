@@ -43,10 +43,13 @@ class OrderItem < ApplicationRecord
   # === ZARZĄDZANIE STANEM MAGAZYNOWYM ===
 
   def decrease_stock
+    return unless product_id
+
     product.product_stock.decrease_for_order!(quantity, order_item: self, movement_type: "sale")
   end
 
   def adjust_stock
+    return unless product_id
     return unless saved_change_to_quantity?
     old_quantity, new_quantity = saved_change_to_quantity
     difference = new_quantity - old_quantity
@@ -59,6 +62,8 @@ class OrderItem < ApplicationRecord
   end
 
   def restore_stock
+    return unless product_id
+
     product.product_stock.increase_for_order!(quantity, order_item: nil, movement_type: "deleted")
   end
 end

@@ -1,0 +1,16 @@
+<div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card-body">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <span class="font-medium text-base-content/70">Status:</span>
+        <span class="badge badge-lg <%= transmission.active? ? 'badge-success' : transmission.processing? ? 'badge-warning' : transmission.completed? ? 'badge-success' : 'badge-error' %>">
+          <%= transmission.active? ? 'Aktywna' : (transmission.processing? ? 'Przetwarzanie' : (transmission.completed? ? 'Zakończona' : 'Anulowana')) %>
+        </span>
+      </div>
+      <%= button_to convert_to_orders_transmission_path(transmission), method: :post, class: "btn btn-primary" do %>
+        <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+        Zakończ transmisję
+      <% end %>
+    </div>
+  </div>
+</div>

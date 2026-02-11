@@ -1,0 +1,22 @@
+<%= form_with model: @transmission, data: { turbo_frame: "_top" } do |f| %>
+  <% if @transmission.errors.any? %>
+    <div class="alert alert-error mb-4">
+      <ul class="list-disc list-inside">
+        <% @transmission.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="form-control w-full max-w-md">
+    <%= f.label :name, "Nazwa", class: "label" %>
+    <%= f.text_field :name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Transmisja produktu X" %>
+  </div>
+  <div class="modal-action">
+    <%= button_tag type: "button", class: "btn btn-ghost",
+        onclick: "document.getElementById('transmission_modal').innerHTML = ''" do %>
+      Anuluj
+    <% end %>
+    <%= f.submit @transmission.persisted? ? "Zapisz" : "Utwórz transmisję", class: "btn btn-primary" %>
+  </div>
+<% end %>

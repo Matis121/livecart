@@ -5,6 +5,7 @@ class Product < ApplicationRecord
   has_one :product_stock, dependent: :destroy
   has_many :product_stock_movements, dependent: :destroy
   has_many :order_items, dependent: :nullify
+  has_many :transmission_items, dependent: :nullify
 
   accepts_nested_attributes_for :product_stock
 

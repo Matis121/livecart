@@ -1,0 +1,31 @@
+<tr class="border-b border-base-200/40 last:border-0 hover:bg-base-200/20">
+  <td class="font-medium"><%= transmission_item.customer.name %></td>
+  <td class="text-right"><%= transmission_item.quantity %></td>
+  <td class="text-right tabular-nums"><%= number_to_currency(transmission_item.unit_price, unit: "zł", format: "%n %u") %></td>
+  <td class="text-right font-medium tabular-nums"><%= number_to_currency(transmission_item.unit_price * transmission_item.quantity, unit: "zł", format: "%n %u") %></td>
+  <% if transmission.active? %>
+    <td class="text-right">
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-sm btn-square">
+          <%= lucide_icon("ellipsis-vertical", class: "w-4 h-4") %>
+        </label>
+        <ul tabindex="0" class="dropdown-content menu z-10 mt-1 w-40 rounded-box bg-base-100 p-1 shadow-lg border border-base-200/60">
+          <li>
+            <%= link_to edit_transmission_transmission_item_path(transmission, transmission_item), class: "gap-2", data: { turbo_frame: "transmission_item_modal" } do %>
+              <%= lucide_icon("pencil", class: "w-4 h-4") %>
+              Edytuj
+            <% end %>
+          </li>
+          <li>
+            <%= link_to transmission_transmission_item_path(transmission, transmission_item),
+                data: { turbo_method: :delete, turbo_confirm: "Usunąć pozycję dla #{transmission_item.customer.name}?", turbo_frame: "_top" },
+                class: "gap-2 text-error hover:bg-error/10 hover:text-error" do %>
+              <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+              Usuń
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </td>
+  <% end %>
+</tr>
