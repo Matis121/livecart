@@ -38,12 +38,6 @@
           <% end %>
         </li>
         <li>
-          <%= link_to edit_transmission_path(transmission) do %>
-            <%= lucide_icon('edit', class: 'w-4 h-4') %>
-            Edytuj
-          <% end %>
-        </li>
-        <li>
           <%= link_to transmission_path(transmission), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tę transmisję?" }, class: "text-error" do %>
             <%= lucide_icon('trash', class: 'w-4 h-4') %>
             Usuń
