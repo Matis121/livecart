@@ -21,13 +21,13 @@
         </a>
       </li>
       <li>
-        <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
+        <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(orders_path) || request.path.start_with?('/orders') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
           <%= lucide_icon('shopping-bag', class: 'w-4 h-4') %>
           <span>Zamówienia</span>
         <% end %>
       </li>
       <li>
-        <%= link_to transmissions_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(transmissions_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+        <%= link_to transmissions_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(transmissions_path) || request.path.start_with?('/transmissions') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
           <%= lucide_icon('radio', class: 'w-4 h-4') %>
           <span>Transmisje</span>
         <% end %>
@@ -60,7 +60,7 @@
         </details>
       </li>
       <li>
-        <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
+        <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(customers_path) || request.path.start_with?('/customers') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
           <%= lucide_icon('users', class: 'w-4 h-4') %>
           <span>Klienci</span>
         <% end %>
@@ -75,7 +75,7 @@
     <div class="my-4 mx-3 border-t border-base-200"></div>
     <ul class="space-y-1">
       <li>
-        <%= link_to settings_root_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
+        <%= link_to settings_root_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{request.path.start_with?('/settings') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
           <%= lucide_icon('settings', class: 'w-4 h-4') %>
           <span>Ustawienia</span>
         <% end %>
