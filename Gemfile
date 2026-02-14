@@ -73,3 +73,4 @@ gem "pagy"
 gem "acts_as_list"
 
 gem "sidekiq", "~> 8.1"
+gem "image_processing", "~> 1.2"

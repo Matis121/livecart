@@ -260,7 +260,7 @@
                   <div class="flex gap-4">
                     <% if item.product&.images&.attached? %>
                       <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
-                        <%= image_tag item.product.images.first, class: "object-cover w-full h-full" %>
+                        <%= image_tag item.product.images.first.variant(:thumb), class: "object-cover w-full h-full" %>
                       </div>
                     <% else %>
                       <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 flex items-center justify-center">

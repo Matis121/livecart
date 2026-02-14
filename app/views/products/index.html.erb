@@ -5,9 +5,6 @@
     <%= link_to "Nowy produkt", new_product_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
   <% if @all_products.any? %>
-    <div role="tablist" class="tabs tabs-box mb-8">
-      <%= link_to "Produkty", products_path, class: "tab tab-active", role: "tab" %>
-    </div>
     <div class="flex-1 min-w-0" data-controller="checkbox-select-all">
       <%= render "products/products_toolbar" %>
       <%= render "products/products_table" %>

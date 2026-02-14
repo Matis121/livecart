@@ -7,6 +7,7 @@ class Account < ApplicationRecord
   has_many :discount_codes
   has_many :shipping_methods
   has_many :transmissions
+  has_many :product_imports
 
   has_one_attached :logo
 

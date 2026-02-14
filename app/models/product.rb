@@ -1,6 +1,8 @@
 class Product < ApplicationRecord
   belongs_to :account
-  has_many_attached :images
+  has_many_attached :images do |attachable|
+    attachable.variant :thumb, resize_to_limit: [ 100, 100 ]
+  end
 
   has_one :product_stock, dependent: :destroy
   has_many :product_stock_movements, dependent: :destroy

@@ -1,0 +1,77 @@
+<div class="container mx-auto px-4 py-8 flex flex-col gap-10">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-2">Importuj produkty z CSV</h1>
+    <p class="text-gray-600 mb-8">Zaimportuj produkty z pliku CSV.</p>
+    <%= form_with url: import_products_path, method: :post, local: true, html: { multipart: true, class: "space-y-6" } do |f| %>
+      <%# ===== SEKCJA: PLIK CSV ===== %>
+      <section class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="card-title">1. Wybierz plik CSV</h3>
+          <div class="form-control w-full">
+            <%= file_field_tag :csv_file, accept: ".csv", class: "file-input file-input-bordered w-full focus:file-input-primary", required: true %>
+            <label class="label">
+              <span class="label-text-alt text-gray-500">Tylko pliki .csv</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <%# ===== SEKCJA: STRATEGIA DUPLIKATÓW ===== %>
+      <section class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="card-title">2. Wybierz strategię obsługi duplikatów</h3>
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-4">
+              <%= radio_button_tag :duplicate_strategy, "import_all", true, class: "radio radio-primary" %>
+              <div>
+                <span class="label-text font-semibold">Importuj wszystko jako nowe produkty</span>
+                <p class="text-sm text-gray-500">Wszystkie wiersze z CSV zostaną dodane jako nowe produkty</p>
+              </div>
+            </label>
+          </div>
+          <div class="divider my-2"></div>
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-4">
+              <%= radio_button_tag :duplicate_strategy, "skip_duplicate_sku", false, class: "radio radio-primary" %>
+              <div>
+                <span class="label-text font-semibold">Pomiń produkty z istniejącym SKU</span>
+                <p class="text-sm text-gray-500">Jeśli SKU z CSV już istnieje w bazie, wiersz zostanie pominięty</p>
+              </div>
+            </label>
+          </div>
+          <div class="divider my-2"></div>
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-4">
+              <%= radio_button_tag :duplicate_strategy, "skip_duplicate_ean", false, class: "radio radio-primary" %>
+              <div>
+                <span class="label-text font-semibold">Pomiń produkty z istniejącym EAN</span>
+                <p class="text-sm text-gray-500">Jeśli EAN z CSV już istnieje w bazie, wiersz zostanie pominięty</p>
+              </div>
+            </label>
+          </div>
+          <div class="divider my-2"></div>
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-4">
+              <%= radio_button_tag :duplicate_strategy, "skip_duplicate_name", false, class: "radio radio-primary" %>
+              <div>
+                <span class="label-text font-semibold">Pomiń produkty z istniejącą nazwą</span>
+                <p class="text-sm text-gray-500">Jeśli nazwa produktu z CSV już istnieje w bazie, wiersz zostanie pominięty</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </section>
+      <%# ===== PRZYCISKI ===== %>
+      <div class="flex gap-2">
+        <%= f.submit "Importuj produkty", class: "btn btn-primary", data: { turbo: false } %>
+        <%= link_to "Anuluj", products_path, class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+    <%# ===== PRZYKŁADOWY FORMAT ===== %>
+    <div class="mt-8  bg-base-200">
+      <h4 class="font-semibold mb-2">Przykładowy format CSV:</h4>
+      <pre class="text-xs bg-base-300 p-3 rounded overflow-x-auto"><code>sku,ean,name,gross_price,tax_rate,currency,stock_quantity,image_urls
+PROD-001,5901234123457,Koszulka męska,99.99,23,PLN,50,https://example.com/image1.jpg|https://example.com/image2.jpg
+PROD-002,5901234123464,Spodnie damskie,149.99,23,PLN,30,https://example.com/image3.jpg</code></pre>
+    </div>
+  </div>
+</div>

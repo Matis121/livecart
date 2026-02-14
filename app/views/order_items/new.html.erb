@@ -60,7 +60,7 @@
                     <div class="avatar flex-shrink-0">
                       <div class="w-12 h-12 rounded">
                         <% if product.images.attached? %>
-                          <%= image_tag product.images.first, alt: product.name, class: "object-cover w-full h-full" %>
+                          <%= image_tag product.images.first.variant(:thumb), alt: product.name, class: "object-cover w-full h-full" %>
                         <% else %>
                           <div class="w-full h-full bg-base-200 flex items-center justify-center">
                             <%= lucide_icon("image", class: "w-6 h-6 opacity-30") %>

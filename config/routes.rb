@@ -14,7 +14,11 @@ Rails.application.routes.draw do
   resources :onboarding_accounts, only: [ :new, :create ]
   resources :products, controller: "products" do
     collection do
+      post :bulk_action
       patch :bulk_action
+      get :import_form
+      post :import
+      get :import_history
     end
   end
   namespace :settings do

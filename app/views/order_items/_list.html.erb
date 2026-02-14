@@ -20,7 +20,7 @@
                   <div class="avatar">
                     <div class="w-16 h-16 rounded">
                       <% if item.product.present? && item.product.images.attached? %>
-                        <%= image_tag item.product.images.first, alt: item.name, class: "object-cover w-full h-full" %>
+                        <%= image_tag item.product.images.first.variant(:thumb), alt: item.name, class: "object-cover w-full h-full" %>
                       <% else %>
                         <div class="w-full h-full bg-base-200 flex items-center justify-center">
                           <%= lucide_icon("image", class: "w-8 h-8 opacity-30") %>

@@ -9,7 +9,7 @@
       <% if has_product_images %>
         <div class="avatar flex-shrink-0">
           <div class="w-12 h-12 rounded-lg ring-1 ring-base-200/60">
-            <%= image_tag product_or_key.images.first, alt: display_name, class: "object-cover w-full h-full" %>
+            <%= image_tag product_or_key.images.first.variant(:thumb), alt: display_name, class: "object-cover w-full h-full" %>
           </div>
         </div>
       <% else %>

@@ -32,11 +32,32 @@
           <span>Transmisje</span>
         <% end %>
       </li>
+      <% products_active = request.path.start_with?('/products') %>
       <li>
-        <%= link_to products_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
-          <%= lucide_icon('package', class: 'w-4 h-4') %>
-          <span>Produkty</span>
-        <% end %>
+        <details class="group" <%= 'open' if products_active %>>
+          <summary class="flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer list-none <%= products_active ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content' %>">
+            <%= lucide_icon('package', class: 'w-4 h-4') %>
+            <span class="flex-1">Produkty</span>
+            <%= lucide_icon('chevron-down', class: 'w-4 h-4 transition-transform group-open:rotate-180') %>
+          </summary>
+          <ul class="mt-1 ml-7 space-y-1">
+            <li>
+              <%= link_to products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+                <span>Lista produktów</span>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to import_form_products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(import_form_products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+                <span>Import</span>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to import_history_products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(import_history_products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+                <span>Historia importów</span>
+              <% end %>
+            </li>
+          </ul>
+        </details>
       </li>
       <li>
         <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>

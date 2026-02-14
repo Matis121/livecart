@@ -1,3 +1,5 @@
+require "csv"
+
 class ProductsController < ApplicationController
   PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
   DEFAULT_PER_PAGE = 10
@@ -46,9 +48,10 @@ class ProductsController < ApplicationController
 
   def update
     Product.transaction do
-      # 1. Usuwanie zdjęć (bezpieczniej w transakcji)
+      # 1. Usuwanie zdjęć
       if params[:product][:images_to_delete].present?
-        @product.images.where(id: params[:product][:images_to_delete]).purge
+        images_to_delete = @product.images.where(id: params[:product][:images_to_delete])
+        images_to_delete.each(&:purge)
       end
 
       # 2. Korekta stanu
@@ -56,15 +59,22 @@ class ProductsController < ApplicationController
         @product.product_stock.adjust_quantity!(params[:product][:stock_quantity].to_i)
       end
 
-      # 3. Aktualizacja reszty (w tym nowych obrazów, jeśli używasz attach)
-      if @product.update(product_params.except(:images_to_delete, :stock_quantity))
+      # 3. Dodaj nowe zdjęcia (zamiast zastępowania)
+      update_params = product_params.except(:images_to_delete, :stock_quantity)
+      if update_params[:images].present?
+        @product.images.attach(update_params[:images])
+        update_params = update_params.except(:images)
+      end
+
+      # 4. Aktualizacja reszty
+      if @product.update(update_params)
         redirect_to products_path, notice: "Zaktualizowano produkt"
       else
         raise ActiveRecord::Rollback
       end
     end
 
-    render :edit unless performed?
+    render :edit, status: :unprocessable_entity unless performed?
   end
 
   def edit
@@ -80,7 +90,6 @@ class ProductsController < ApplicationController
       redirect_to products_path, alert: "Nie udało się usunąć produktu"
     end
   end
-
 
   def bulk_action
     product_ids = params[:product_ids] || []
@@ -99,12 +108,60 @@ class ProductsController < ApplicationController
 
     case action_type
     when "delete"
-      products.destroy_all
-      redirect_to products_path, notice: "Usunięto #{flash_message}"
+      if count <= 10
+        # Sync delete for small batches
+        products.destroy_all
+        redirect_to products_path, notice: "Usunięto #{flash_message}"
+      else
+        # Async delete for larger batches
+        Products::BulkDeleteJob.perform_later(current_account.id, product_ids)
+        redirect_to products_path, notice: "Usuwanie #{flash_message} w toku. Sprawdź logi Sidekiq."
+      end
+    when "export"
+      products.includes(:product_stock, images_attachments: :blob)
 
+      csv_data = Products::CsvExporter.call(products)
+
+      send_data csv_data,
+                filename: "produkty_#{Date.current.strftime('%Y%m%d')}.csv",
+                type: "text/csv; charset=utf-8",
+                disposition: "attachment"
     else
       redirect_to products_path, alert: "Nieznana akcja"
     end
+  end
+
+  def import_form
+  end
+
+  def import_history
+    @q = current_account.product_imports.ransack(params[:q])
+    imports = @q.result.order(created_at: :desc)
+    @pagy, @product_imports = pagy(imports, limit: 10)
+  end
+
+  def import
+    unless params[:csv_file].present?
+      redirect_to import_form_products_path, alert: "Nie wybrano pliku CSV"
+      return
+    end
+
+    unless params[:duplicate_strategy].present?
+      redirect_to import_form_products_path, alert: "Nie wybrano strategii duplikatów"
+      return
+    end
+
+    result = Products::ImportCoordinator.new(
+      account: current_account,
+      csv_file: params[:csv_file],
+      duplicate_strategy: params[:duplicate_strategy]
+    ).call
+
+    redirect_to products_path, notice: result[:message]
+  rescue Products::ImportCoordinator::ValidationError => e
+    redirect_to import_form_products_path, alert: e.message
+  rescue StandardError => e
+    redirect_to import_form_products_path, alert: "Błąd importu: #{e.message}"
   end
 
   private

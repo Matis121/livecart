@@ -26,13 +26,15 @@
             </td>
             <td>
               <div class="flex items-center gap-3">
-                <div>
-                  <% if product.images.attached? %>
-                    <%= image_tag product.images.first, class: "w-14 h-14 object-cover rounded" %>
-                  <% else %>
-                    <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
-                  <% end %>
-                </div>
+                <% unless cookies[:products_per_page].to_i > 50 %>
+                  <div>
+                    <% if product.images.attached? %>
+                      <%= image_tag product.images.first.variant(:thumb), class: "w-14 h-14 object-cover rounded", loading: :lazy %>
+                    <% else %>
+                      <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
+                    <% end %>
+                  </div>
+                <% end %>
                 <div>
                   <div class="font-medium">
                     <%= link_to product.name, edit_product_path(product), class: "hover:underline text-primary" %>

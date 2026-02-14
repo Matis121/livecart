@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_11_141227) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -189,6 +189,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_11_141227) do
     t.index ["transmission_id"], name: "index_orders_on_transmission_id"
   end
 
+  create_table "product_imports", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "import_name", null: false
+    t.integer "status", default: 0, null: false
+    t.string "duplicate_strategy", default: "import_all", null: false
+    t.integer "total_rows", default: 0
+    t.integer "success_count", default: 0
+    t.integer "skipped_count", default: 0
+    t.integer "error_count", default: 0
+    t.text "error_details"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_product_imports_on_account_id_and_created_at"
+    t.index ["account_id"], name: "index_product_imports_on_account_id"
+    t.index ["status"], name: "index_product_imports_on_status"
+  end
+
   create_table "product_stock_movements", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "order_item_id"
@@ -308,6 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_11_141227) do
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "discount_codes"
   add_foreign_key "orders", "transmissions"
+  add_foreign_key "product_imports", "accounts"
   add_foreign_key "product_stock_movements", "order_items"
   add_foreign_key "product_stock_movements", "products"
   add_foreign_key "product_stocks", "products"
