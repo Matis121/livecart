@@ -35,7 +35,7 @@ class TransmissionsController < ApplicationController
 
   def show
     @customers = current_account.customers
-    @products = current_account.products
+    @products = []
   end
 
   def new

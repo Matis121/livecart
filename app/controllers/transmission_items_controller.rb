@@ -8,6 +8,22 @@ class TransmissionItemsController < ApplicationController
     @transmission_item = @transmission.transmission_items.build
   end
 
+  def search_products
+    query = params[:q].to_s.strip
+    
+    @products = if query.length >= 2
+      current_account.products
+        .where("name ILIKE ? OR sku ILIKE ? OR ean ILIKE ?", 
+               "%#{query}%", "%#{query}%", "%#{query}%")
+        .limit(20)
+        .order(:name)
+    else
+      []
+    end
+    
+    render partial: "transmission_items/product_list", locals: { products: @products }
+  end
+
   def create
     @transmission_item = @transmission.transmission_items.build(transmission_item_params)
     if @transmission_item.save

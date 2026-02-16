@@ -73,6 +73,7 @@ Rails.application.routes.draw do
         post :bulk_create
         delete :destroy_by_product
         delete :destroy_by_manual
+        get :search_products
       end
     end
   end

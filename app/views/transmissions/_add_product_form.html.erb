@@ -1,4 +1,6 @@
-<div class="card bg-base-100 shadow-md border border-base-200/60 mb-6 overflow-hidden" data-controller="transmission-items-form">
+<div class="card bg-base-100 shadow-md border border-base-200/60 mb-6 overflow-hidden" 
+     data-controller="transmission-items-form"
+     data-transmission-items-form-transmission-id-value="<%= transmission.id %>">
   <div class="card-body p-6 sm:p-8">
     <div class="flex items-center gap-3 mb-6">
       <div>
@@ -34,12 +36,58 @@
             <%= lucide_icon("package", class: "w-5 h-5 text-base-content/60") %>
             <span class="font-semibold">Produkt</span>
           </div>
-          <select name="product_id" class="select select-bordered select-md w-full bg-base-100" data-transmission-items-form-target="productSelect">
-            <option value="">— Wybierz produkt —</option>
-            <% products.each do |p| %>
-              <option value="<%= p.id %>"><%= p.name %> — <%= p.sku.presence || '-' %> (<%= p.quantity.to_i %> szt.)</option>
-            <% end %>
-          </select>
+          <!-- Search input -->
+          <div class="relative mb-2">
+            <input 
+                type="text" 
+                placeholder="Wpisz minimum 2 znaki aby wyszukać produkt..." 
+                class="input input-bordered w-full"
+                data-action="input->transmission-items-form#filterProducts focus->transmission-items-form#handleFocus"
+            data-transmission-items-form-target="searchInput"
+            autocomplete="off">
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <%= lucide_icon("search", class: "w-5 h-5 opacity-50") %>
+            </div>
+          </div>
+          <!-- Results dropdown -->
+          <div class="hidden border border-base-300 rounded-lg bg-base-100 max-h-64 overflow-y-auto" data-transmission-items-form-target="resultsDropdown">
+            <div data-transmission-items-form-target="productsList" class="p-2">
+              <!-- Produkty będą załadowane przez AJAX -->
+            </div>
+            <div data-transmission-items-form-target="minChars" class="p-8 text-center text-base-content/60">
+              <%= lucide_icon("type", class: "w-12 h-12 mx-auto opacity-30 mb-2") %>
+              <p>Wpisz minimum 2 znaki aby wyszukać produkt</p>
+            </div>
+            <div data-transmission-items-form-target="noResults" class="hidden p-8 text-center text-base-content/60">
+              <%= lucide_icon("search-x", class: "w-12 h-12 mx-auto opacity-30 mb-2") %>
+              <p>Nie znaleziono produktów</p>
+            </div>
+          </div>
+          <!-- Selected product display -->
+          <div data-transmission-items-form-target="selectedProduct" class="hidden mt-3 p-3 bg-base-100 rounded-lg border border-base-300">
+            <div class="flex items-center gap-3">
+              <!-- Zdjęcie -->
+              <div class="avatar flex-shrink-0">
+                <div class="w-16 h-16 rounded">
+                  <img data-transmission-items-form-target="selectedImage" alt="Product" class="object-cover w-full h-full">
+                </div>
+              </div>
+              <!-- Informacje -->
+              <div class="flex-1">
+                <div class="font-semibold" data-transmission-items-form-target="selectedName"></div>
+                <div class="text-sm opacity-60">
+                  <span>SKU: <span data-transmission-items-form-target="selectedSku"></span></span>
+                  <span class="ml-3">EAN: <span data-transmission-items-form-target="selectedEan"></span></span>
+                  <span class="ml-3">Stan: <span data-transmission-items-form-target="selectedQuantity"></span> szt.</span>
+                </div>
+              </div>
+              <!-- Przycisk usuń -->
+              <button type="button" class="btn btn-ghost btn-sm btn-circle" data-action="click->transmission-items-form#clearProduct">
+                ✕
+              </button>
+            </div>
+          </div>
+          <input type="hidden" name="product_id" data-transmission-items-form-target="productIdInput">
         </div>
         <div data-transmission-items-form-target="manualSection" class="hidden space-y-4">
           <div class="form-control">
