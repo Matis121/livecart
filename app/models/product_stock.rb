@@ -10,14 +10,14 @@ class ProductStock < ApplicationRecord
   # Ręczna korekta stanu magazynowego z UI
   def adjust_quantity!(new_qty)
     new_qty = new_qty.to_i
-    
+
     transaction do
       # Zablokuj wiersz i odśwież dane z bazy (zapobiega race condition)
       lock!
       reload
-      
+
       return if new_qty == quantity
-      
+
       old_qty = quantity
       change = new_qty - old_qty
 
@@ -39,7 +39,7 @@ class ProductStock < ApplicationRecord
       # Zablokuj wiersz i odśwież dane z bazy (zapobiega race condition)
       lock!
       reload
-      
+
       old_qty = quantity
       new_qty = quantity - amount
 
@@ -61,7 +61,7 @@ class ProductStock < ApplicationRecord
       # Zablokuj wiersz i odśwież dane z bazy (zapobiega race condition)
       lock!
       reload
-      
+
       old_qty = quantity
       new_qty = quantity + amount
 
