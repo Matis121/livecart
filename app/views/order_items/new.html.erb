@@ -1,5 +1,8 @@
+<!-- filepath: /home/matis/code/livecart/app/views/order_items/new.html.erb -->
 <%= turbo_frame_tag "new_order_item" do %>
-  <div class="mb-4 pt-4 border-t" data-controller="order-item-form">
+  <div class="mb-4 pt-4 border-t" 
+       data-controller="order-item-form"
+       data-order-item-form-order-number-value="<%= @order.order_number %>">
     <!-- Mode Selector -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
       <h3 class="font-semibold text-sm sm:text-base">Dodaj produkt do zamówienia</h3>
@@ -40,56 +43,13 @@
             </div>
           </div>
           <div class="dropdown-content z-10 mt-2 w-full bg-base-100 rounded-lg shadow-2xl border border-base-300 hidden"
-                 data-order-item-form-target="dropdownMenu">
+               data-order-item-form-target="dropdownMenu">
             <div class="max-h-[400px] overflow-y-auto">
               <div class="p-2" data-order-item-form-target="productsList">
-                <% @products.each do |product| %>
-                  <button 
-                      type="button"
-                      class="product-item flex gap-3 items-center p-3 hover:bg-base-200 active:bg-base-300 w-full text-left rounded-lg transition-colors"
-                      data-action="click->order-item-form#addToCart"
-                    data-search-text="<%= "#{product.name} #{product.sku} #{product.ean}".downcase %>"
-                    data-product-id="<%= product.id %>"
-                    data-product-name="<%= product.name %>"
-                    data-product-sku="<%= product.sku %>"
-                    data-product-ean="<%= product.ean %>"
-                    data-product-price="<%= product.gross_price %>"
-                    data-product-currency="<%= product.currency %>"
-                    data-product-image="<%= product.images.attached? ? url_for(product.images.first) : '' %>">
-                    <!-- Zdjęcie -->
-                    <div class="avatar flex-shrink-0">
-                      <div class="w-12 h-12 rounded">
-                        <% if product.images.attached? %>
-                          <%= image_tag product.images.first.variant(:thumb), alt: product.name, class: "object-cover w-full h-full" %>
-                        <% else %>
-                          <div class="w-full h-full bg-base-200 flex items-center justify-center">
-                            <%= lucide_icon("image", class: "w-6 h-6 opacity-30") %>
-                          </div>
-                        <% end %>
-                      </div>
-                    </div>
-                    <!-- Informacje -->
-                    <div class="flex-1 min-w-0">
-                      <div class="font-medium truncate"><%= product.name %></div>
-                      <div class="text-xs opacity-60 flex gap-3 mt-0.5">
-                        <span>SKU: <span class="font-mono"><%= product.sku || "-" %></span></span>
-                        <span>EAN: <span class="font-mono"><%= product.ean || "-" %></span></span>
-                      </div>
-                    </div>
-                    <!-- Cena -->
-                    <div class="flex-shrink-0 text-right">
-                      <div class="font-bold text-primary">
-                        <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
-                      </div>
-                      <div class="text-xs opacity-60">
-                        <%= product.quantity %> szt.
-                      </div>
-                    </div>
-                  </button>
-                <% end %>
+                <!-- Produkty będą załadowane przez AJAX -->
               </div>
             </div>
-            <div data-order-item-form-target="minChars" class="hidden p-8 text-center text-base-content/60">
+            <div data-order-item-form-target="minChars" class="p-8 text-center text-base-content/60">
               <%= lucide_icon("type", class: "w-12 h-12 mx-auto opacity-30 mb-2") %>
               <p>Wpisz minimum 2 znaki aby wyszukać produkt</p>
             </div>
@@ -130,7 +90,7 @@
     <!-- MANUAL MODE - Full Form -->
     <div data-order-item-form-target="manual" class="hidden">
       <%= form_with model: [@order, @order_item], class: "space-y-4", data: { turbo_frame: "_top" } do |f| %>
-        <!-- Nazwa produktu - pełna szerokość -->
+        <!-- ...existing manual form code... -->
         <div class="form-control">
           <%= f.label :name, "Nazwa produktu", class: "label font-semibold" %>
           <%= f.text_field :name, 
@@ -140,7 +100,6 @@
                 data: { order_item_form_target: "name" } 
             %>
         </div>
-        <!-- SKU i EAN w jednej linii -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="form-control">
             <%= f.label :sku, "SKU (opcjonalnie)", class: "label" %>
@@ -159,7 +118,6 @@
               %>
           </div>
         </div>
-        <!-- Cena, ilość i suma w jednej linii -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="form-control">
             <%= f.label :unit_price, "Cena jedn.", class: "label font-semibold" %>

@@ -1,10 +1,26 @@
 class OrderItemsController < ApplicationController
   before_action :set_order
   before_action :set_order_item, only: [ :edit, :update, :destroy ]
-  before_action :load_products, only: [ :new, :edit, :create, :update ]
 
   def new
     @order_item = @order.order_items.build
+    @products = []
+  end
+
+  def search_products
+    query = params[:q].to_s.strip
+
+    @products = if query.length >= 2
+      current_account.products
+        .where("name ILIKE ? OR sku ILIKE ? OR ean ILIKE ?",
+               "%#{query}%", "%#{query}%", "%#{query}%")
+        .limit(20)
+        .order(:name)
+    else
+      []
+    end
+
+    render partial: "order_items/product_list", locals: { products: @products }
   end
 
   def quick_add
@@ -84,10 +100,6 @@ class OrderItemsController < ApplicationController
 
   def set_order_item
     @order_item = @order.order_items.find(params[:id])
-  end
-
-  def load_products
-    @products = current_account.products.order(:name)
   end
 
   def order_item_params

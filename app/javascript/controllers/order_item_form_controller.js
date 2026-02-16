@@ -1,119 +1,111 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["fromStock", "manual", "searchInput", "dropdown", "dropdownMenu", "productsList", "minChars", "noResults", "cartContainer", "cartItems", "cartCount", "cartData", "name", "sku", "ean", "unitPrice", "quantity", "totalPrice"]
-  static values = { minSearchLength: { type: Number, default: 2 } }
+  static targets = [
+    "fromStock",
+    "manual",
+    "searchInput",
+    "dropdown",
+    "dropdownMenu",
+    "productsList",
+    "minChars",
+    "noResults",
+    "cartContainer",
+    "cartItems",
+    "cartCount",
+    "cartData",
+    "name",
+    "sku",
+    "ean",
+    "unitPrice",
+    "quantity",
+    "totalPrice",
+  ];
+
+  static values = {
+    orderNumber: String,
+  };
 
   connect() {
-    this.showFromStock()
-    this.setupClickOutside()
-    this.cart = []
-    
-    // Ustaw focus na pole wyszukiwania
-    if (this.hasSearchInputTarget) {
-      setTimeout(() => {
-        this.searchInputTarget.focus()
-      }, 100)
-    }
+    this.cart = [];
+    this.searchTimeout = null;
+    document.addEventListener(
+      "click",
+      this.closeDropdownOnClickOutside.bind(this),
+    );
   }
 
   disconnect() {
-    this.cleanupClickOutside()
+    document.removeEventListener(
+      "click",
+      this.closeDropdownOnClickOutside.bind(this),
+    );
   }
 
-  setupClickOutside() {
-    this.clickOutsideHandler = (event) => {
-      if (this.hasDropdownTarget && !this.dropdownTarget.contains(event.target)) {
-        this.closeDropdown()
-      }
-    }
-    document.addEventListener('click', this.clickOutsideHandler)
+  showFromStock(event) {
+    event.currentTarget.classList.add("btn-active");
+    event.currentTarget.nextElementSibling.classList.remove("btn-active");
+    this.fromStockTarget.classList.remove("hidden");
+    this.manualTarget.classList.add("hidden");
   }
 
-  cleanupClickOutside() {
-    if (this.clickOutsideHandler) {
-      document.removeEventListener('click', this.clickOutsideHandler)
-    }
-  }
-
-  showFromStock() {
-    this.fromStockTarget.classList.remove("hidden")
-    this.manualTarget.classList.add("hidden")
-    
-    // Ustaw focus na pole wyszukiwania
-    if (this.hasSearchInputTarget) {
-      setTimeout(() => {
-        this.searchInputTarget.focus()
-      }, 100)
-    }
-  }
-
-  showManual() {
-    this.fromStockTarget.classList.add("hidden")
-    this.manualTarget.classList.remove("hidden")
-    this.closeDropdown()
+  showManual(event) {
+    event.currentTarget.classList.add("btn-active");
+    event.currentTarget.previousElementSibling.classList.remove("btn-active");
+    this.manualTarget.classList.remove("hidden");
+    this.fromStockTarget.classList.add("hidden");
   }
 
   handleFocus() {
-    const searchTerm = this.searchInputTarget.value
-    if (searchTerm.length >= this.minSearchLengthValue) {
-      this.openDropdown()
-    }
-  }
-
-  openDropdown() {
-    if (this.hasDropdownMenuTarget) {
-      this.dropdownMenuTarget.classList.remove('hidden')
-    }
-  }
-
-  closeDropdown() {
-    if (this.hasDropdownMenuTarget) {
-      this.dropdownMenuTarget.classList.add('hidden')
-    }
+    this.dropdownMenuTarget.classList.remove("hidden");
   }
 
   filterProducts(event) {
-    const searchTerm = event.target.value.toLowerCase().trim()
-    
-    if (searchTerm.length < this.minSearchLengthValue) {
-      this.closeDropdown()
-      return
+    const query = event.target.value.trim();
+
+    clearTimeout(this.searchTimeout);
+
+    if (query.length < 2) {
+      this.productsListTarget.innerHTML = "";
+      this.minCharsTarget.classList.remove("hidden");
+      this.noResultsTarget.classList.add("hidden");
+      this.dropdownMenuTarget.classList.remove("hidden");
+      return;
     }
 
-    this.openDropdown()
+    this.minCharsTarget.classList.add("hidden");
 
-    const productItems = this.productsListTarget.querySelectorAll('.product-item')
-    let visibleCount = 0
+    this.searchTimeout = setTimeout(() => {
+      fetch(
+        `/orders/${this.orderNumberValue}/order_items/search_products?q=${encodeURIComponent(query)}`,
+      )
+        .then((response) => response.text())
+        .then((html) => {
+          this.productsListTarget.innerHTML = html;
 
-    productItems.forEach(item => {
-      const searchText = item.dataset.searchText || ''
-      if (searchText.includes(searchTerm)) {
-        item.classList.remove('hidden')
-        visibleCount++
-      } else {
-        item.classList.add('hidden')
-      }
-    })
+          if (!html.trim()) {
+            this.noResultsTarget.classList.remove("hidden");
+          } else {
+            this.noResultsTarget.classList.add("hidden");
+          }
 
-    if (this.hasMinCharsTarget) {
-      this.minCharsTarget.classList.add('hidden')
-    }
+          this.dropdownMenuTarget.classList.remove("hidden");
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+        });
+    }, 300);
+  }
 
-    if (this.hasNoResultsTarget && this.hasProductsListTarget) {
-      if (visibleCount === 0) {
-        this.noResultsTarget.classList.remove('hidden')
-        this.productsListTarget.parentElement.classList.add('hidden')
-      } else {
-        this.noResultsTarget.classList.add('hidden')
-        this.productsListTarget.parentElement.classList.remove('hidden')
-      }
+  closeDropdownOnClickOutside(event) {
+    if (!this.dropdownTarget.contains(event.target)) {
+      this.dropdownMenuTarget.classList.add("hidden");
     }
   }
 
   addToCart(event) {
-    const button = event.currentTarget
-    const product = {
+    const button = event.currentTarget;
+    const productData = {
       id: button.dataset.productId,
       name: button.dataset.productName,
       sku: button.dataset.productSku,
@@ -121,165 +113,125 @@ export default class extends Controller {
       unit_price: parseFloat(button.dataset.productPrice),
       currency: button.dataset.productCurrency,
       image: button.dataset.productImage,
-      quantity: 1
-    }
+      quantity: 1,
+    };
 
-    // Sprawdź czy produkt już jest w koszyku
-    const existingIndex = this.cart.findIndex(item => item.id === product.id)
-    if (existingIndex >= 0) {
-      // Zwiększ ilość jeśli już istnieje
-      this.cart[existingIndex].quantity += 1
+    const existingIndex = this.cart.findIndex(
+      (item) => item.id === productData.id,
+    );
+
+    if (existingIndex !== -1) {
+      this.cart[existingIndex].quantity += 1;
     } else {
-      // Dodaj nowy produkt
-      this.cart.push(product)
+      this.cart.push(productData);
     }
 
-    this.renderCart()
-    this.closeDropdown()
-    
-    // Wyczyść wyszukiwanie
-    if (this.hasSearchInputTarget) {
-      this.searchInputTarget.value = ''
-    }
+    this.updateCartUI();
+    this.searchInputTarget.value = "";
+    this.dropdownMenuTarget.classList.add("hidden");
   }
 
-  renderCart() {
+  updateCartUI() {
     if (this.cart.length === 0) {
-      this.cartContainerTarget.classList.add('hidden')
-      return
+      this.cartContainerTarget.classList.add("hidden");
+      return;
     }
 
-    this.cartContainerTarget.classList.remove('hidden')
-    this.cartCountTarget.textContent = this.cart.length
+    this.cartContainerTarget.classList.remove("hidden");
+    this.cartCountTarget.textContent = this.cart.length;
 
-    this.cartItemsTarget.innerHTML = this.cart.map((item, index) => `
-      <div class="flex gap-3 items-center p-3 bg-base-200 rounded-lg">
-        ${item.image ? `
-          <div class="avatar">
+    this.cartItemsTarget.innerHTML = this.cart
+      .map(
+        (item, index) => `
+      <div class="flex gap-3 items-center p-3 bg-base-100 rounded-lg">
+        ${
+          item.image
+            ? `
+          <div class="avatar flex-shrink-0">
             <div class="w-12 h-12 rounded">
-              <img src="${item.image}" alt="${item.name}" class="object-cover w-full h-full">
+              <img src="${item.image}" alt="${item.name}" class="object-cover">
             </div>
           </div>
-        ` : `
-          <div class="w-12 h-12 rounded bg-base-300 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-30"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-          </div>
-        `}
-        
+        `
+            : ""
+        }
         <div class="flex-1 min-w-0">
           <div class="font-medium truncate">${item.name}</div>
-          <div class="text-xs opacity-60">
-            ${item.sku ? `SKU: ${item.sku}` : ''} ${item.ean ? `EAN: ${item.ean}` : ''}
-          </div>
+          <div class="text-xs opacity-60">EAN: ${item.ean || "-"}</div>
+          <div class="text-xs opacity-60">SKU: ${item.sku || "-"}</div>
         </div>
-
         <div class="flex items-center gap-2">
-          <input 
-            type="number" 
-            value="${item.quantity}" 
-            min="1"
-            class="input input-sm input-bordered w-20 text-center"
-            data-action="change->order-item-form#updateQuantity keydown.enter->order-item-form#handleEnterKey"
-            data-index="${index}">
-          <span class="text-sm opacity-60">×</span>
-          <span class="font-semibold min-w-[80px] text-right">${(item.unit_price * item.quantity).toFixed(2)} ${item.currency}</span>
+          <label class="text-xs opacity-60">Ilość:</label>
+          <input type="number" 
+                 min="1" 
+                 value="${item.quantity}"
+                 class="input input-bordered input-sm w-20 text-center font-mono font-semibold"
+                 data-action="change->order-item-form#updateQuantity"
+                 data-index="${index}">
         </div>
-
-        <button 
-          type="button"
-          class="btn btn-ghost btn-sm btn-circle"
-          data-action="click->order-item-form#removeFromCart"
-          data-index="${index}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
+        <div class="text-right">
+          <div class="font-bold">${(item.unit_price * item.quantity).toFixed(2)} ${item.currency}</div>
+        </div>
+        <button type="button" 
+                class="btn btn-ghost btn-sm btn-circle" 
+                data-action="click->order-item-form#removeFromCart"
+                data-index="${index}">✕</button>
       </div>
-    `).join('')
+    `,
+      )
+      .join("");
+
+    this.cartDataTarget.value = JSON.stringify(this.cart);
   }
 
   updateQuantity(event) {
-    const index = parseInt(event.target.dataset.index)
-    const newQuantity = parseInt(event.target.value) || 1
-    
-    if (this.cart[index]) {
-      this.cart[index].quantity = Math.max(1, newQuantity)
-      this.renderCart()
+    const index = parseInt(event.currentTarget.dataset.index);
+    const newQuantity = parseInt(event.currentTarget.value);
+
+    if (newQuantity > 0) {
+      this.cart[index].quantity = newQuantity;
+      this.updateCartUI();
+    } else {
+      event.currentTarget.value = 1;
+      this.cart[index].quantity = 1;
+      this.updateCartUI();
     }
   }
 
-  handleEnterKey(event) {
-    event.preventDefault()
-    
-    // Najpierw zaktualizuj ilość
-    this.updateQuantity(event)
-    
-    // Znajdź formularz i go wyślij
-    const form = this.element.querySelector('form[data-action*="submitCart"]')
-    if (form) {
-      // Wywołaj submitCart bezpośrednio
-      this.submitCart({ 
-        target: form, 
-        preventDefault: () => {} 
-      })
+  increaseQuantity(event) {
+    const index = parseInt(event.currentTarget.dataset.index);
+    this.cart[index].quantity += 1;
+    this.updateCartUI();
+  }
+
+  decreaseQuantity(event) {
+    const index = parseInt(event.currentTarget.dataset.index);
+    if (this.cart[index].quantity > 1) {
+      this.cart[index].quantity -= 1;
+      this.updateCartUI();
     }
   }
 
   removeFromCart(event) {
-    const index = parseInt(event.currentTarget.dataset.index)
-    this.cart.splice(index, 1)
-    this.renderCart()
+    const index = parseInt(event.currentTarget.dataset.index);
+    this.cart.splice(index, 1);
+    this.updateCartUI();
   }
 
-  clearCart() {
-    this.cart = []
-    this.renderCart()
-  }
-
-  async submitCart(event) {
-    event.preventDefault()
-    
-    if (this.cart.length === 0) {
-      alert("Koszyk jest pusty")
-      return
-    }
-
-    const form = event.target
-    const formData = new FormData(form)
-    
-    // Dodaj dane koszyka jako JSON
-    formData.set('cart_items', JSON.stringify(this.cart))
-
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'text/vnd.turbo-stream.html'
-        }
-      })
-
-      if (response.ok) {
-        const turboStream = await response.text()
-        Turbo.renderStreamMessage(turboStream)
-        
-        // Wyczyść koszyk po udanym dodaniu
-        this.clearCart()
-      } else {
-        alert("Wystąpił błąd podczas dodawania produktów")
-      }
-    } catch (error) {
-      console.error("Error submitting cart:", error)
-      alert("Wystąpił błąd podczas dodawania produktów")
-    }
+  submitCart(event) {
+    // Turbo handles the form submission
   }
 
   calculateTotal() {
-    if (!this.hasUnitPriceTarget || !this.hasQuantityTarget || !this.hasTotalPriceTarget) return
-    
-    const unitPrice = parseFloat(this.unitPriceTarget.value) || 0
-    const quantity = parseInt(this.quantityTarget.value) || 0
-    const total = unitPrice * quantity
-    
-    this.totalPriceTarget.value = total.toFixed(2)
-    this.totalPriceTarget.disabled = false
+    if (
+      this.hasUnitPriceTarget &&
+      this.hasQuantityTarget &&
+      this.hasTotalPriceTarget
+    ) {
+      const unitPrice = parseFloat(this.unitPriceTarget.value) || 0;
+      const quantity = parseInt(this.quantityTarget.value) || 0;
+      const total = unitPrice * quantity;
+      this.totalPriceTarget.value = total.toFixed(2);
+    }
   }
 }

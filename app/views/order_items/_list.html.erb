@@ -32,12 +32,12 @@
                 <td>
                   <div>
                     <div class="font-medium"><%= item.name %></div>
-                    <div class="text-xs opacity-60 mt-1 flex gap-3">
-                      <% if item.sku.present? %>
-                        <span>SKU: <span class="font-mono"><%= item.sku %></span></span>
-                      <% end %>
+                    <div class="text-xs opacity-60 mt-1 flex flex-col gap-1">
                       <% if item.ean.present? %>
-                        <span>EAN: <span class="font-mono"><%= item.ean %></span></span>
+                        <span>EAN: <span><%= item.ean %></span></span>
+                      <% end %>
+                      <% if item.sku.present? %>
+                        <span>SKU: <span><%= item.sku %></span></span>
                       <% end %>
                     </div>
                   </div>

@@ -36,7 +36,10 @@ Rails.application.routes.draw do
       patch :bulk_action
     end
     resources :order_items, only: [ :new, :create, :edit, :update, :destroy ] do
-      post :quick_add, on: :collection
+       collection do
+          post :quick_add
+          get :search_products
+       end
     end
     resource :shipping_address, only: [ :edit, :update ] do
       patch :copy_from_billing

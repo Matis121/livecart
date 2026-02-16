@@ -1,0 +1,45 @@
+<!-- filepath: /home/matis/code/livecart/app/views/order_items/_product_list.html.erb -->
+<% products.each do |product| %>
+  <button 
+      type="button"
+      class="product-item flex gap-3 items-center p-3 hover:bg-base-200 active:bg-base-300 w-full text-left rounded-lg transition-colors"
+      data-action="click->order-item-form#addToCart"
+    data-search-text="<%= "#{product.name} #{product.sku} #{product.ean}".downcase %>"
+    data-product-id="<%= product.id %>"
+    data-product-name="<%= product.name %>"
+    data-product-sku="<%= product.sku %>"
+    data-product-ean="<%= product.ean %>"
+    data-product-price="<%= product.gross_price %>"
+    data-product-currency="<%= product.currency %>"
+    data-product-image="<%= product.images.attached? ? url_for(product.images.first) : '' %>">
+    <!-- Zdjęcie -->
+    <div class="avatar flex-shrink-0">
+      <div class="w-12 h-12 rounded">
+        <% if product.images.attached? %>
+          <%= image_tag product.images.first.variant(:thumb), alt: product.name, class: "object-cover w-full h-full", loading: "lazy" %>
+        <% else %>
+          <div class="w-full h-full bg-base-200 flex items-center justify-center">
+            <%= lucide_icon("image", class: "w-6 h-6 opacity-30") %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <!-- Informacje -->
+    <div class="flex-1 min-w-0">
+      <div class="font-medium truncate"><%= product.name %></div>
+      <div class="text-xs opacity-60 flex gap-3 mt-0.5">
+        <span>SKU: <span class="font-mono"><%= product.sku || "-" %></span></span>
+        <span>EAN: <span class="font-mono"><%= product.ean || "-" %></span></span>
+      </div>
+    </div>
+    <!-- Cena -->
+    <div class="flex-shrink-0 text-right">
+      <div class="font-bold text-primary">
+        <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
+      </div>
+      <div class="text-xs opacity-60">
+        <%= product.quantity %> szt.
+      </div>
+    </div>
+  </button>
+<% end %>
