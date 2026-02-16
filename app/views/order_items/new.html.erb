@@ -71,11 +71,7 @@
           </div>
           <div class="divider my-2"></div>
           <div class="flex justify-end gap-2">
-            <%= form_with url: quick_add_order_order_items_path(@order), 
-                  method: :post,
-                  data: { 
-                    action: "submit->order-item-form#submitCart"
-                  } do |f| %>
+            <%= form_with url: quick_add_order_order_items_path(@order), method: :post do |f| %>
               <input type="hidden" name="cart_items" data-order-item-form-target="cartData">
               <%= link_to "Anuluj", order_path(@order), data: { turbo_frame: "_top" }, class: "btn btn-ghost" %>
               <%= button_tag type: "submit", class: "btn btn-primary" do %>

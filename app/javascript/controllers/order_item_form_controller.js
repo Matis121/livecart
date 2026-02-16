@@ -198,28 +198,10 @@ export default class extends Controller {
     }
   }
 
-  increaseQuantity(event) {
-    const index = parseInt(event.currentTarget.dataset.index);
-    this.cart[index].quantity += 1;
-    this.updateCartUI();
-  }
-
-  decreaseQuantity(event) {
-    const index = parseInt(event.currentTarget.dataset.index);
-    if (this.cart[index].quantity > 1) {
-      this.cart[index].quantity -= 1;
-      this.updateCartUI();
-    }
-  }
-
   removeFromCart(event) {
     const index = parseInt(event.currentTarget.dataset.index);
     this.cart.splice(index, 1);
     this.updateCartUI();
-  }
-
-  submitCart(event) {
-    // Turbo handles the form submission
   }
 
   calculateTotal() {
