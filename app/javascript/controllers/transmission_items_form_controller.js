@@ -33,17 +33,11 @@ export default class extends Controller {
     this.toggleSource();
     this.searchTimeout = null;
     this.boundCloseDropdown = this.closeDropdownOnClickOutside.bind(this);
-    document.addEventListener(
-      "mousedown",
-      this.boundCloseDropdown,
-    );
+    document.addEventListener("mousedown", this.boundCloseDropdown);
   }
 
   disconnect() {
-    document.removeEventListener(
-      "mousedown",
-      this.boundCloseDropdown,
-    );
+    document.removeEventListener("mousedown", this.boundCloseDropdown);
   }
 
   toggleSource() {
@@ -112,10 +106,10 @@ export default class extends Controller {
   }
 
   selectProduct(event) {
-    console.log('selectProduct called', event.currentTarget.dataset);
+    console.log("selectProduct called", event.currentTarget.dataset);
     event.stopPropagation();
     event.preventDefault();
-    
+
     const button = event.currentTarget;
     const productId = button.dataset.productId;
     const productName = button.dataset.productName;
@@ -129,19 +123,19 @@ export default class extends Controller {
     this.selectedSkuTarget.textContent = productSku || "-";
     this.selectedEanTarget.textContent = productEan || "-";
     this.selectedQuantityTarget.textContent = productQuantity || "0";
-    
+
     if (productImage) {
       this.selectedImageTarget.src = productImage;
-      this.selectedImageTarget.style.display = 'block';
+      this.selectedImageTarget.style.display = "block";
     } else {
-      this.selectedImageTarget.style.display = 'none';
+      this.selectedImageTarget.style.display = "none";
     }
 
     this.selectedProductTarget.classList.remove("hidden");
     this.resultsDropdownTarget.classList.add("hidden");
     this.searchInputTarget.value = "";
-    
-    console.log('Product selected:', productName);
+
+    console.log("Product selected:", productName);
   }
 
   clearProduct() {
@@ -151,10 +145,7 @@ export default class extends Controller {
   }
 
   closeDropdownOnClickOutside(event) {
-    if (
-      this.hasResultsDropdownTarget &&
-      !this.element.contains(event.target)
-    ) {
+    if (this.hasResultsDropdownTarget && !this.element.contains(event.target)) {
       this.resultsDropdownTarget.classList.add("hidden");
     }
   }
