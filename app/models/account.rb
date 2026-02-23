@@ -18,7 +18,12 @@ class Account < ApplicationRecord
   store_accessor :checkout_settings,
     :name,
     :time_to_pay,
-    :time_to_pay_active
+    :time_to_pay_active,
+    :open_package_enabled
+
+  def open_package_enabled?
+    open_package_enabled == "1"
+  end
 
   store_accessor :terms,
     :terms_content,
@@ -33,7 +38,8 @@ class Account < ApplicationRecord
     self.checkout_settings ||= {
       name: company_name,
       time_to_pay: "0",
-      time_to_pay_active: "0"
+      time_to_pay_active: "0",
+      open_package_enabled: "0"
     }
   end
 

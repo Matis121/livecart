@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_23_155342) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_23_224600) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_155342) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "active", default: false, null: false
+    t.boolean "open_package", default: false, null: false
+    t.datetime "open_package_at"
     t.index ["expires_at"], name: "index_checkouts_on_expires_at"
     t.index ["order_id"], name: "index_checkouts_on_order_id"
     t.index ["token"], name: "index_checkouts_on_token", unique: true

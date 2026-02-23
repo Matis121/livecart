@@ -29,6 +29,21 @@ class Checkout < ApplicationRecord
     active && !expired? && !completed?
   end
 
+  def open_package_pending?
+    open_package && completed_at.blank?
+  end
+
+  def open_package!
+    update!(
+      open_package: true,
+      open_package_at: Time.current
+    )
+  end
+
+  def close_package!
+    complete!
+  end
+
   def complete!
     update!(
       active: false,

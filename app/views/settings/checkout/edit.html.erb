@@ -1,61 +1,120 @@
 <!-- app/views/settings/checkout/edit.html.erb -->
 <div class="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
   <!-- Header -->
-  <div class="mb-6">
+  <div class="mb-8">
     <h1 class="text-2xl sm:text-3xl font-bold mb-2">Ustawienia koszyka</h1>
-    <p class="text-base-content/70">Edytuj podstawowe informacje o sklepie</p>
+    <p class="text-base-content/70">Dostosuj wygląd i zachowanie koszyka dla swoich klientów</p>
   </div>
-  <!-- Form -->
+
   <%= form_with model: current_account, url: settings_checkout_path, method: :patch, local: true, html: { multipart: true } do |f| %>
-    <div class="card bg-base-100 shadow-sm">
-      <div class="card-body space-y-6">
-        <!-- Logo -->
-        <div class="form-control">
-          <%= f.label :logo, "Logo", class: "label" %>
-          <% if current_account.logo.attached? %>
-            <div class="mb-3">
-              <%= image_tag current_account.logo, class: "w-32 h-32 object-contain rounded-lg border" %>
-              <label class="label cursor-pointer mt-2">
-                <span class="label-text">Usuń logo</span>
-                <%= check_box_tag "account[remove_logo]", '1', false, class: "checkbox checkbox-sm" %>
+    <div class="space-y-6">
+
+      <!-- Sekcja: Wygląd sklepu -->
+      <div class="card bg-base-100 shadow-sm">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <h2 class="text-lg font-semibold">Wygląd sklepu</h2>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Logo -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium">Logo</span>
               </label>
+              <div class="flex items-start gap-6">
+                <% if current_account.logo.attached? %>
+                  <div class="shrink-0">
+                    <div class="w-24 h-24 rounded-xl border-2 border-base-300 overflow-hidden bg-base-200 flex items-center justify-center">
+                      <%= image_tag current_account.logo, class: "w-full h-full object-contain p-2" %>
+                    </div>
+                    <label class="label cursor-pointer justify-start gap-2 mt-2">
+                      <%= check_box_tag "account[remove_logo]", '1', false, class: "checkbox checkbox-error" %>
+                      <span class="label-text text-xs text-error/70">Usuń</span>
+                    </label>
+                  </div>
+                <% end %>
+                <div class="flex-1">
+                  <%= f.file_field :logo, accept: "image/png,image/jpeg,image/jpg,image/gif", class: "file-input file-input-bordered w-full" %>
+                  <p class="text-xs text-base-content/40 mt-2">PNG, JPEG, GIF • maks. 5MB</p>
+                </div>
+              </div>
             </div>
-          <% end %>
-          <%= f.file_field :logo, accept: "image/png,image/jpeg,image/jpg,image/gif", class: "file-input file-input-bordered w-full" %>
-          <label class="label">
-            <span class="label-text-alt text-base-content/50">PNG, JPEG, GIF • maks. 5MB</span>
-          </label>
-        </div>
-        <!-- Nazwa sklepu -->
-        <div class="form-control">
-          <%= f.label :name, "Nazwa sklepu", class: "label" %>
-          <%= f.text_field :name, 
-              value: @checkout_settings['name'] || current_account.company_name,
-              class: "input input-bordered w-full" %>
-        </div>
-        <!-- Czas na płatność -->
-        <div class="form-control">
-          <%= f.label :time_to_pay, "Czas na płatność (godziny)", class: "label" %>
-          <%= f.number_field :time_to_pay, 
-              value: @checkout_settings['time_to_pay'] || '0',
-              class: "input input-bordered w-full",
-              min: 0 %>
-        </div>
-        <!-- Aktywuj czas na płatność -->
-        <div class="form-control">
-          <label class="label cursor-pointer">
-            <span class="label-text">Aktywuj limit czasu na płatność</span>
-            <%= f.check_box :time_to_pay_active, 
-                { checked: @checkout_settings['time_to_pay_active'] == '1' },
-                '1', '0' %>
-          </label>
+
+            <div class="divider my-4"></div>
+
+            <!-- Nazwa sklepu -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Nazwa sklepu</span>
+              </label>
+              <%= f.text_field :name,
+                  value: @checkout_settings['name'] || current_account.company_name,
+                  class: "input input-bordered w-full",
+                  placeholder: "Nazwa widoczna dla klientów" %>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Sekcja: Płatności -->
+      <div class="card bg-base-100 shadow-sm">
+        <div class="card-body">
+          <div class="flex items-center gap-3 mb-6">
+            <h2 class="text-lg font-semibold">Czas na płatność</h2>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 rounded-xl border border-base-300 bg-base-200/30">
+              <div>
+                <p class="font-medium text-sm">Aktywuj limit czasu na płatność</p>
+                <p class="text-xs text-base-content/50 mt-0.5">Po upływie czasu checkout zostanie automatycznie zamknięty</p>
+              </div>
+              <%= f.check_box :time_to_pay_active,
+                  { checked: @checkout_settings['time_to_pay_active'] == '1', class: "toggle toggle-primary" },
+                  '1', '0' %>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text">Limit czasu (godziny)</span>
+              </label>
+              <%= f.number_field :time_to_pay,
+                  value: @checkout_settings['time_to_pay'] || '0',
+                  class: "input input-bordered w-full",
+                  min: 0,
+                  placeholder: "0" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sekcja: Otwarta paczka -->
+      <div class="card bg-base-100 shadow-sm">
+        <div class="card-body">
+          <div class="flex items-center gap-3">
+            <h2 class="text-lg font-semibold">Otwarta paczka</h2>
+          </div>
+          <p class="text-sm text-base-content/50 mb-6">Pozwala klientom zbierać produkty z wielu transmisji i zapłacić za wszystko jednym zamówieniem</p>
+
+          <div class="flex items-center justify-between p-4 rounded-xl border border-base-300 bg-base-200/30">
+            <div>
+              <p class="font-medium text-sm">Włącz opcję "Otwarta paczka"</p>
+              <p class="text-xs text-base-content/50 mt-0.5">Klienci będą mogli wybrać ten tryb w formularzu zamówienia</p>
+            </div>
+            <%= f.check_box :open_package_enabled,
+                { checked: @checkout_settings['open_package_enabled'] == '1', class: "toggle toggle-primary" },
+                '1', '0' %>
+          </div>
+        </div>
+      </div>
+
     </div>
+
     <!-- Przyciski -->
-    <div class="flex justify-end gap-2 mt-6">
+    <div class="flex justify-end gap-3 mt-8">
       <%= link_to "Anuluj", settings_root_path, class: "btn btn-ghost" %>
-      <%= f.submit "Zapisz", class: "btn btn-primary" %>
+      <%= f.submit "Zapisz zmiany", class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>

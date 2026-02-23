@@ -9,16 +9,27 @@ class CreateOrderFromTransmissionJob < ApplicationJob
 
     Rails.logger.info "📝📝📝 Creating order for Customer ##{customer_id} (#{customer.name}) with #{items.count} items"
 
-    order = create_order(transmission, customer, items)
+    # Sprawdź czy klient ma otwartą paczkę (tylko gdy funkcja jest włączona)
+    existing_order = if transmission.account.open_package_enabled?
+      Order.open_package_for_customer(customer, transmission.account).first
+    end
 
-    if order.persisted?
-      Rails.logger.info "✅✅✅ Order ##{order.id} created successfully for #{customer.name}"
+    if existing_order
+      Rails.logger.info "📦 Found open package Order ##{existing_order.id} for #{customer.name} — adding items"
+      existing_order.add_transmission_items!(items, transmission)
+      Rails.logger.info "✅ Added #{items.count} items to existing Order ##{existing_order.id} for #{customer.name}"
     else
-      Rails.logger.error "❌❌❌ Failed to create order for #{customer.name}: #{order.errors.full_messages.join(', ')}"
+      order = create_order(transmission, customer, items)
+
+      if order.persisted?
+        Rails.logger.info "✅ Order ##{order.id} created successfully for #{customer.name}"
+      else
+        Rails.logger.error "❌ Failed to create order for #{customer.name}: #{order.errors.full_messages.join(', ')}"
+      end
     end
 
   rescue StandardError => e
-    Rails.logger.error "❌❌❌ Failed to create order for Customer ##{customer_id}: #{e.message}"
+    Rails.logger.error "❌ Failed to create order for Customer ##{customer_id}: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     raise e # Sidekiq retry
   end

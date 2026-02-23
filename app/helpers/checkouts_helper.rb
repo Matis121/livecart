@@ -1,6 +1,10 @@
 module CheckoutsHelper
   def checkout_status_badge(checkout)
-    if checkout.available?
+    if checkout.open_package_pending?
+      content_tag :span, class: "badge badge-warning gap-1" do
+        lucide_icon("package-open", class: "w-3 h-3") + " Otwarta paczka"
+      end
+    elsif checkout.available?
       content_tag :span, class: "badge badge-success gap-1" do
         lucide_icon("check-circle", class: "w-3 h-3") + " Aktywny"
       end

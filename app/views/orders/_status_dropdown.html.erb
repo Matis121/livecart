@@ -2,6 +2,7 @@
   <%= form_with model: order, url: update_status_order_path(order), method: :patch, class: "inline-block" do |f| %>
     <% status_options = [
       ["Szkic", "draft"],
+      ["Otwarta paczka", "open_package"],
       ["Oferta wysłana", "offer_sent"],
       ["Płatność w trakcie", "payment_processing"],
       ["Opłacone", "paid"],

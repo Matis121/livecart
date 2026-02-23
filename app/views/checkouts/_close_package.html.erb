@@ -1,0 +1,99 @@
+<!-- app/views/checkouts/_close_package.html.erb -->
+<div class="max-w-3xl mx-auto py-12">
+  <!-- Header -->
+  <div class="bg-base-100 border border-base-300 rounded-xl p-8 text-center mb-8">
+    <div class="inline-flex items-center justify-center w-16 h-16 mb-4">
+      <%= lucide_icon "package-open", class: "w-12 h-12 text-warning stroke-[1.5]" %>
+    </div>
+    <h1 class="text-2xl tracking-tight mb-2">Otwarta paczka</h1>
+    <p class="text-base-content/50">Twoja paczka jest otwarta. Zamknij ją, aby sfinalizować zamówienie.</p>
+  </div>
+
+  <div class="xl:grid xl:grid-cols-3 gap-6 flex flex-col-reverse">
+    <!-- Lewa kolumna - Formularz zamknięcia -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
+        <div class="p-8">
+          <!-- Informacja o adresie -->
+          <div class="mb-8">
+            <h2 class="text-xl tracking-tight flex items-center gap-2 mb-4">
+              <%= lucide_icon "map-pin", class: "w-5 h-5" %>
+              Adres dostawy
+            </h2>
+            <div class="bg-base-200/50 rounded-lg p-4 text-sm">
+              <p class="font-medium"><%= order.shipping_address.first_name %> <%= order.shipping_address.last_name %></p>
+              <p class="text-base-content/60"><%= order.shipping_address.address_line1 %></p>
+              <% if order.shipping_address.address_line2.present? %>
+                <p class="text-base-content/60"><%= order.shipping_address.address_line2 %></p>
+              <% end %>
+              <p class="text-base-content/60"><%= order.shipping_address.postal_code %> <%= order.shipping_address.city %></p>
+            </div>
+          </div>
+
+          <div class="border-t border-base-300 mb-8"></div>
+
+          <!-- Formularz zamknięcia paczki -->
+          <%= form_with url: close_package_checkout_path(checkout.token), method: :patch, local: true do |f| %>
+            <!-- Metoda dostawy -->
+            <div class="mb-8">
+              <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
+                <%= lucide_icon "truck", class: "w-5 h-5" %>
+                Metoda dostawy
+              </h2>
+              <div class="space-y-3">
+                <% order.account.shipping_methods.active.order(:position).each_with_index do |method, index| %>
+                  <label class="flex items-center justify-between gap-4 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200/50 hover:border-primary/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <div class="flex items-center gap-4">
+                      <%= f.radio_button "order[shipping_method_id]", method.id, class: "radio radio-primary shrink-0", required: index == 0 %>
+                      <span class="font-medium"><%= method.name %></span>
+                    </div>
+                    <span class="text-base-content/70">
+                      <%= method.free_above.present? ? "Darmowa od #{number_to_currency(method.free_above, unit: 'zł', format: '%n %u')}" : number_to_currency(method.price, unit: 'zł', format: '%n %u') %>
+                    </span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="border-t border-base-300 mb-8"></div>
+
+            <!-- Metoda płatności -->
+            <div class="mb-8">
+              <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
+                <%= lucide_icon "credit-card", class: "w-5 h-5" %>
+                Metoda płatności
+              </h2>
+              <div class="space-y-3">
+                <% payment_options = [
+                    ["Przelew bankowy", "Przelew bankowy"],
+                    ["Płatność online", "Płatność online"],
+                    ["Za pobraniem", "Za pobraniem"],
+                    ["BLIK", "Blik"]
+                  ] %>
+                <% payment_options.each_with_index do |(label, value), index| %>
+                  <label class="flex items-center gap-4 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200/50 hover:border-primary/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <%= f.radio_button "order[payment_method]", value, class: "radio radio-primary shrink-0", required: index == 0 %>
+                    <span class="font-medium"><%= label %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="border-t border-base-300 mb-8"></div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary btn-lg w-full">
+              <%= lucide_icon "package-check", class: "w-5 h-5" %>
+              Zamknij paczkę i zamów
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prawa kolumna - Podsumowanie -->
+    <div class="lg:col-span-1">
+      <%= render partial: "checkouts/order_summary", locals: { order: order } %>
+    </div>
+  </div>
+</div>

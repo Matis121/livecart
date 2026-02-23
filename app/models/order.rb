@@ -23,19 +23,21 @@ class Order < ApplicationRecord
     shipped: 5,
     delivered: 6,
     cancelled: 7,
-    returned: 8
+    returned: 8,
+    open_package: 9
   }, suffix: :status
 
   STATUS_NAMES = {
     draft: "Szkic",
     offer_sent: "Oferta wysłana",
+    open_package: "Otwarta paczka",
     payment_processing: "Płatność w trakcie",
     paid: "Opłacone",
     in_fulfillment: "W realizacji",
     shipped: "Wysłane",
     delivered: "Dostarczone",
     cancelled: "Anulowane",
-    returned: "Zwrócone"
+    returned: "Zwrócone",
   }.freeze
 
   validates :order_number, presence: true, uniqueness: true
@@ -46,6 +48,34 @@ class Order < ApplicationRecord
   validates :currency, presence: true, inclusion: { in: [ "PLN", "EUR", "USD" ] }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, allow_blank: true }
   validates :phone, format: { with: /\A[+]?[\d\s\-()]+\z/, allow_blank: true }
+
+  # Otwarta paczka — szuka aktywnego zamówienia open_package dla danego klienta
+  scope :open_package_for_customer, ->(customer, account) {
+    where(customer: customer, account: account, status: :open_package)
+      .order(created_at: :desc)
+      .limit(1)
+  }
+
+  # Dodaje produkty z transmisji do istniejącego zamówienia (otwarta paczka)
+  def add_transmission_items!(items, transmission = nil)
+    transaction do
+      # Ustaw transmission_id jeśli to pierwsza transmisja
+      update!(transmission: transmission) if transmission && transmission_id.nil?
+
+      items.each do |item|
+        order_items.create!(
+          product_id: item.product_id,
+          name: item.name,
+          ean: item.ean,
+          sku: item.sku,
+          unit_price: item.unit_price || 0,
+          quantity: item.quantity,
+        )
+      end
+
+      recalculate_total!
+    end
+  end
 
   # Generowanie numeru zamówienia
   before_validation :generate_order_number, on: :create, if: -> { order_number.blank? }

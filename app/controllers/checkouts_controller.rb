@@ -1,5 +1,5 @@
 class CheckoutsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :show, :update, :not_found ]
+  skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :not_found ]
 
   before_action :find_checkout, except: [ :not_found ]
   before_action :set_order, except: [ :not_found ]
@@ -10,6 +10,7 @@ class CheckoutsController < ApplicationController
     @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
     @account_name = @account.checkout_settings["name"]
+    @open_package_enabled = @account.open_package_enabled?
 
     # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
     if @checkout.completed?
@@ -21,17 +22,38 @@ class CheckoutsController < ApplicationController
         redirect_to not_found_checkouts_path
       end
     end
+    # Jeśli open_package_pending? — widok sam renderuje stronę zamknięcia paczki
   end
 
   def update
-    if update_order_data
-      @checkout.complete!
-      # Ustaw flagę, że można pokazać stronę sukcesu
-      session[:show_success_for_checkout] = @checkout.id
-      redirect_to checkout_path(@checkout.token)
+    if params[:commit_type] == "open_package" && @order.account.open_package_enabled?
+      update_open_package
     else
-      render :show, status: :unprocessable_entity
+      update_ship_now
     end
+  end
+
+  def close_package
+    ActiveRecord::Base.transaction do
+      # Zapisz metodę dostawy
+      shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
+      @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
+
+      # Zapisz metodę płatności
+      @order.update!(payment_method: params[:order][:payment_method])
+
+      @order.update!(status: :payment_processing)
+      @checkout.close_package!
+    end
+
+    session[:show_success_for_checkout] = @checkout.id
+    redirect_to checkout_path(@checkout.token)
+  rescue => e
+    @account = @order.account
+    @account_logo = @account.logo.attached? ? @account.logo : nil
+    @account_name = @account.checkout_settings["name"]
+    @order.errors.add(:base, e.message)
+    render :show, status: :unprocessable_entity
   end
 
   def not_found
@@ -63,7 +85,31 @@ class CheckoutsController < ApplicationController
     end
   end
 
-  def update_order_data
+  # Ścieżka "Wyślij teraz" — pełny flow z płatnością
+  def update_ship_now
+    if update_order_data(include_payment: true)
+      @checkout.complete!
+      @order.update!(status: :payment_processing)
+      session[:show_success_for_checkout] = @checkout.id
+      redirect_to checkout_path(@checkout.token)
+    else
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+  # Ścieżka "Otwarta paczka" — bez płatności, ustawia status open_package na Order
+  def update_open_package
+    if update_order_data(include_payment: false)
+      @checkout.open_package!
+      @order.update!(status: :open_package)
+      session[:show_success_for_checkout] = @checkout.id
+      redirect_to checkout_path(@checkout.token)
+    else
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+  def update_order_data(include_payment: true)
     ActiveRecord::Base.transaction do
       # Aktualizuj dane kontaktowe
       @order.update!(contact_params)
@@ -76,16 +122,12 @@ class CheckoutsController < ApplicationController
         @order.billing_address.update!(billing_address_params)
       end
 
-      # Aktualizuj metodę płatności i dostawy
-      @order.update!(payment_method: params[:order][:payment_method])
-
-      # Aktualizuj koszt wysyłki
-      shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
-      @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
-
-
-      # Zmień status zamówienia
-      @order.update!(status: :payment_processing)
+      # Aktualizuj metodę dostawy i płatności (tylko dla "wyślij teraz")
+      if include_payment
+        shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
+        @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
+        @order.update!(payment_method: params[:order][:payment_method])
+      end
 
       true
     end

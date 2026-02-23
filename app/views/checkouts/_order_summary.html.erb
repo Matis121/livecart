@@ -1,0 +1,83 @@
+<!-- app/views/checkouts/_order_summary.html.erb -->
+<div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
+  <div class="p-6">
+    <h2 class="text-xl tracking-tight mb-6">Twoje zamówienie</h2>
+    <% if order.order_items.any? %>
+      <!-- Lista produktów -->
+      <div class="space-y-4 mb-6">
+        <% order.order_items.includes(:product).each do |item| %>
+          <div class="flex gap-4">
+            <% if item.product&.images&.attached? %>
+              <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
+                <%= image_tag item.product.images.first.variant(:thumb), class: "object-cover w-full h-full" %>
+              </div>
+            <% else %>
+              <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 flex items-center justify-center">
+                <%= lucide_icon "image", class: "w-8 h-8 text-base-content/20" %>
+              </div>
+            <% end %>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-medium text-sm mb-1 truncate">
+                <%= item.product&.name || "Produkt" %>
+              </h3>
+              <p class="text-xs text-base-content/50 mb-2">
+                Ilość: <%= item.quantity %>
+              </p>
+              <p class="text-sm font-medium">
+                <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <!-- Separator -->
+      <div class="border-t border-base-300 mb-6"></div>
+      <!-- Podsumowanie kosztów -->
+      <div class="space-y-3 mb-6">
+        <div class="flex justify-between text-sm">
+          <span class="text-base-content/60">Produkty</span>
+          <span class="font-medium">
+            <%= number_to_currency(order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %>
+          </span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-base-content/60">Dostawa</span>
+          <span class="font-medium">
+            <% if order.shipping_cost > 0 %>
+              <%= number_to_currency(order.shipping_cost, unit: "zł", format: "%n %u") %>
+            <% else %>
+              <span class="text-success">Darmowa</span>
+            <% end %>
+          </span>
+        </div>
+      </div>
+      <!-- Separator -->
+      <div class="border-t border-base-300 mb-6"></div>
+      <!-- Suma końcowa -->
+      <div class="flex justify-between items-baseline">
+        <span class="text-base text-base-content/80">Do zapłaty</span>
+        <span class="text-3xl tracking-tight">
+          <%= number_to_currency(order.total_amount, unit: "zł", format: "%n %u") %>
+        </span>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-base-200 mb-3">
+          <%= lucide_icon "shopping-bag", class: "w-6 h-6 text-base-content/30" %>
+        </div>
+        <p class="text-sm text-base-content/50">Brak produktów w koszyku</p>
+      </div>
+    <% end %>
+  </div>
+  <!-- Stopka -->
+  <% if order.order_items.any? %>
+    <div class="bg-base-200/50 px-6 py-4 border-t border-base-300">
+      <div class="flex items-start gap-2">
+        <%= lucide_icon "shield-check", class: "w-4 h-4 text-success mt-0.5 flex-shrink-0" %>
+        <p class="text-xs text-base-content/60 leading-relaxed">
+          Twoje dane są bezpieczne. Płatność jest szyfrowana.
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>

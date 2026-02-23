@@ -91,6 +91,9 @@ Rails.application.routes.draw do
 
   # Checkout
   resources :checkouts, only: [ :show, :update ] do
+    member do
+      patch :close_package
+    end
     collection do
       get :not_found
     end
