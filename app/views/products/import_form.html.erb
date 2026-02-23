@@ -67,11 +67,16 @@
       </div>
     <% end %>
     <%# ===== PRZYKŁADOWY FORMAT ===== %>
-    <div class="mt-8  bg-base-200">
+    <div class="mt-8 bg-base-200 p-4 rounded">
       <h4 class="font-semibold mb-2">Przykładowy format CSV:</h4>
-      <pre class="text-xs bg-base-300 p-3 rounded overflow-x-auto"><code>sku,ean,name,gross_price,tax_rate,currency,stock_quantity,image_urls
-PROD-001,5901234123457,Koszulka męska,99.99,23,PLN,50,https://example.com/image1.jpg|https://example.com/image2.jpg
-PROD-002,5901234123464,Spodnie damskie,149.99,23,PLN,30,https://example.com/image3.jpg</code></pre>
+      <div class="text-sm mb-3">
+        <p class="mb-2"><strong>Wymagane kolumny:</strong> name, gross_price</p>
+        <p class="mb-2"><strong>Opcjonalne kolumny:</strong> sku, ean, tax_rate, currency, stock_quantity, image_urls, baselinker_product_id</p>
+        <p class="text-gray-600">Kolumna baselinker_product_id służy do powiązania produktów z katalogiem Baselinker. Magazyn (inventory_id) jest wybierany w konfiguracji integracji.</p>
+      </div>
+      <pre class="text-xs bg-base-300 p-3 rounded overflow-x-auto"><code>sku,ean,name,gross_price,tax_rate,currency,stock_quantity,image_urls,baselinker_product_id
+PROD-001,5901234123457,Koszulka męska,99.99,23,PLN,50,https://example.com/image1.jpg|https://example.com/image2.jpg,12345
+PROD-002,5901234123464,Spodnie damskie,149.99,23,PLN,30,https://example.com/image3.jpg,12346</code></pre>
     </div>
   </div>
 </div>

@@ -1,0 +1,31 @@
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+  <div class="mb-6">
+    <% if params[:provider].present? %>
+      <%= link_to new_integration_path, class: "text-sm text-base-content/60 hover:text-base-content flex items-center gap-1" do %>
+        <%= lucide_icon("arrow-left", class: "w-4 h-4") %>
+        Powrót do wyboru platformy
+      <% end %>
+    <% else %>
+      <%= link_to integrations_path, class: "text-sm text-base-content/60 hover:text-base-content flex items-center gap-1" do %>
+        <%= lucide_icon("arrow-left", class: "w-4 h-4") %>
+        Powrót do integracji
+      <% end %>
+    <% end %>
+  </div>
+  <% if params[:provider].present? %>
+    <!-- Show form for selected provider -->
+    <h1 class="text-2xl sm:text-3xl font-bold mb-6">
+      Dodaj integrację: <%= @integration.provider_name %>
+    </h1>
+    <div class="max-w-2xl">
+      <%= render "form", integration: @integration %>
+    </div>
+  <% else %>
+    <!-- Show provider selection tiles -->
+    <div class="mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold mb-2">Wybierz platformę</h1>
+      <p class="text-base-content/60">Wybierz system, z którym chcesz zintegrować LiveCart</p>
+    </div>
+    <%= render "provider_tiles" %>
+  <% end %>
+</div>

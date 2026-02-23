@@ -73,4 +73,10 @@ gem "pagy"
 gem "acts_as_list"
 
 gem "sidekiq", "~> 8.1"
+gem "sidekiq-cron", "~> 2.0"
 gem "image_processing", "~> 1.2"
+
+# HTTP client for external API integrations
+gem "faraday", "~> 2.9"
+gem "faraday-retry", "~> 2.2"
+gem "faraday-multipart", "~> 1.0"

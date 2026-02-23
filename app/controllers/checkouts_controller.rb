@@ -7,7 +7,7 @@ class CheckoutsController < ApplicationController
   before_action :set_shipping_methods, except: [ :not_found ]
 
   def show
-    @account = current_account
+    @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
     @account_name = @account.checkout_settings["name"]
 

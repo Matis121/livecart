@@ -171,6 +171,11 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:name, :sku, :ean, :gross_price, :tax_rate, :quantity, :currency, images: [], product_stock_attributes: [ :id, :quantity ])
+    params.require(:product).permit(
+      :name, :sku, :ean, :gross_price, :tax_rate, :quantity, :currency,
+      :baselinker_product_id,
+      images: [],
+      product_stock_attributes: [ :id, :quantity ]
+    )
   end
 end

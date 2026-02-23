@@ -4,7 +4,7 @@ module Products
   class CsvImporter
     STRATEGIES = %w[import_all skip_duplicate_sku skip_duplicate_ean skip_duplicate_name].freeze
     REQUIRED_HEADERS = %w[name gross_price].freeze
-    OPTIONAL_HEADERS = %w[sku ean tax_rate currency stock_quantity image_urls].freeze
+    OPTIONAL_HEADERS = %w[sku ean tax_rate currency stock_quantity image_urls baselinker_product_id].freeze
 
     Result = Struct.new(:success_count, :skipped_count, :error_count, :skipped_rows, :errors, keyword_init: true) do
       def success?
@@ -145,7 +145,8 @@ module Products
         name: row[:name],
         gross_price: row[:gross_price],
         tax_rate: row[:tax_rate] || 23,
-        currency: row[:currency] || "PLN"
+        currency: row[:currency] || "PLN",
+        baselinker_product_id: row[:baselinker_product_id]
       }
     end
   end

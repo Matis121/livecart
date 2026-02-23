@@ -21,6 +21,7 @@ class Product < ApplicationRecord
   validates :images, content_type: [ "image/png", "image/jpeg" ],
                    size: { less_than: 5.megabytes }
   validates :currency, presence: true, inclusion: { in: [ "PLN", "EUR", "USD" ] }
+  validates :baselinker_product_id, uniqueness: { allow_nil: true }
 
   # Ransack configuration
   def self.ransackable_attributes(auth_object = nil)
@@ -29,5 +30,10 @@ class Product < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     [ "product_stock" ]
+  end
+
+  # Baselinker integration
+  def baselinker_linked?
+    baselinker_product_id.present?
   end
 end

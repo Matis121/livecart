@@ -1,0 +1,15 @@
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-2xl">
+  <div class="mb-6">
+    <%= link_to integrations_path, class: "text-sm text-base-content/60 hover:text-base-content flex items-center gap-1" do %>
+      <%= lucide_icon("arrow-left", class: "w-4 h-4") %>
+      Powrót do integracji
+    <% end %>
+  </div>
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3">
+    Edytuj integrację: <%= @integration.provider_name %>
+    <span class="badge badge-sm <%= @integration.status_badge_class %>">
+      <%= @integration.status_name %>
+    </span>
+  </h1>
+  <%= render "form", integration: @integration %>
+</div>

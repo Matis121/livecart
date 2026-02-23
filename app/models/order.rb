@@ -9,6 +9,7 @@ class Order < ApplicationRecord
   has_one :billing_address, dependent: :destroy
   has_many :order_status_histories, dependent: :destroy
   has_one :checkout, dependent: :destroy
+  has_many :integration_exports, dependent: :destroy
 
   accepts_nested_attributes_for :shipping_address
   accepts_nested_attributes_for :billing_address
@@ -57,6 +58,7 @@ class Order < ApplicationRecord
   # Historia statusów
   after_create :log_status_change
   after_update :log_status_change, if: :saved_change_to_status?
+  after_update :export_to_marketplace_integrations, if: :saved_change_to_status?
 
 
   def status_name
@@ -145,6 +147,42 @@ class Order < ApplicationRecord
     order_status_histories.create!(
       status: status
     )
+  end
+
+  def export_to_marketplace_integrations
+    # Find all active marketplace integrations for this account
+    integrations = account.integrations
+                         .active
+                         .type_marketplace
+
+    return if integrations.empty?
+
+    existing_exports = integration_exports.where(integration: integrations).index_by(&:integration_id)
+
+    integrations.each do |integration|
+      # Only export if order status matches configured export status
+      next unless status == integration.export_order_status
+
+      # Check if already successfully exported (idempotency)
+      existing_export = existing_exports[integration.id]
+
+      if existing_export&.status_success?
+        Rails.logger.info("Order #{order_number} already exported to #{integration.provider_name} (external_id: #{existing_export.external_id}) - skipping")
+        next
+      end
+
+      if existing_export&.status_pending?
+        Rails.logger.info("Order #{order_number} export to #{integration.provider_name} already in progress - skipping")
+        next
+      end
+
+      # Allow retry if failed or no export record exists
+      Rails.logger.info("Queuing order #{order_number} for export to #{integration.provider_name}")
+      Integrations::ExportOrderJob.perform_later(id, integration.id)
+    end
+  rescue StandardError => e
+    Rails.logger.error("❌ Failed to queue order export: #{e.message}")
+    # Don't raise - this shouldn't fail the order status update
   end
 
   def generate_order_number

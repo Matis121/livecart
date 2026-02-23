@@ -70,6 +70,24 @@
         </label>
       </div>
     </section>
+    <%# ===== SEKCJA: INTEGRACJE ===== %>
+    <section>
+      <h3 class="text-lg font-semibold mb-4">Integracje</h3>
+      <div class="alert alert-info mb-4">
+        <%= lucide_icon("info", class: "w-5 h-5") %>
+        <div class="text-sm">
+          Powiązanie produktu z Baselinker pozwala na automatyczną synchronizację stanów magazynowych przy eksporcie zamówień. Magazyn (inventory_id) jest wybierany w konfiguracji integracji.
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="form-control">
+          <%= f.label :baselinker_product_id, "Baselinker - ID produktu", class: "label" %>
+          <%= f.text_field :baselinker_product_id, 
+              class: "input input-bordered w-full focus:input-primary font-mono text-sm", 
+              placeholder: "np. 12345" %>
+        </div>
+      </div>
+    </section>
   </div>
   <%# ===== PRZYCISKI ===== %>
   <div class="flex gap-2 pt-6">

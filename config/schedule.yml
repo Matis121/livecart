@@ -1,0 +1,36 @@
+# Sidekiq-cron scheduled jobs configuration
+# Format: https://github.com/sidekiq-cron/sidekiq-cron
+
+production:
+  baselinker_sync_stock:
+    cron: "*/15 * * * *" # Every 15 minutes
+    class: "Integrations::BaselinkerStockSyncWorker"
+    queue: default
+    description: "Sync Baselinker stock levels"
+  baselinker_sync_prices:
+    cron: "*/30 * * * *" # Every 30 minutes
+    class: "Integrations::BaselinkerPriceSyncWorker"
+    queue: default
+    description: "Sync Baselinker prices"
+  baselinker_sync_statuses:
+    cron: "*/5 * * * *" # Every 5 minutes
+    class: "Integrations::BaselinkerStatusSyncWorker"
+    queue: default
+    description: "Sync Baselinker order statuses"
+
+development:
+  baselinker_sync_stock:
+    cron: "*/15 * * * *" # Every 15 minutes
+    class: "Integrations::BaselinkerStockSyncWorker"
+    queue: default
+    description: "Sync Baselinker stock levels"
+  baselinker_sync_prices:
+    cron: "*/30 * * * *" # Every 30 minutes
+    class: "Integrations::BaselinkerPriceSyncWorker"
+    queue: default
+    description: "Sync Baselinker prices"
+  baselinker_sync_statuses:
+    cron: "*/5 * * * *" # Every 5 minutes
+    class: "Integrations::BaselinkerStatusSyncWorker"
+    queue: default
+    description: "Sync Baselinker order statuses"

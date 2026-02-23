@@ -66,10 +66,10 @@
         <% end %>
       </li>
       <li>
-        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
-          <%= lucide_icon('blocks', class: 'w-4 h-4') %>
+        <%= link_to integrations_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(integrations_path) || request.path.start_with?('/integrations') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
+          <%= lucide_icon('plug', class: 'w-4 h-4') %>
           <span>Integracje</span>
-        </a>
+        <% end %>
       </li>
     </ul>
     <div class="my-4 mx-3 border-t border-base-200"></div>

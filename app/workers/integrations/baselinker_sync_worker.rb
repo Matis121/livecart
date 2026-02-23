@@ -1,0 +1,22 @@
+module Integrations
+  class BaselinkerSyncWorker
+    include Sidekiq::Worker
+
+    sidekiq_options queue: :default, retry: 3
+
+    def perform
+      Rails.logger.info "[CRON] Starting scheduled Baselinker sync..."
+
+      # Find all active Baselinker integrations and sync them
+      Integration.active.for_provider("baselinker").find_each do |integration|
+        Rails.logger.info "[CRON] Queuing sync for Baselinker integration ##{integration.id}"
+        Integrations::BaselinkerSyncJob.perform_later(integration.id)
+      end
+
+      Rails.logger.info "✅ [CRON] Scheduled Baselinker sync completed"
+    rescue StandardError => e
+      Rails.logger.error "❌ [CRON] Failed to schedule Baselinker sync: #{e.message}"
+      raise
+    end
+  end
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_23_155342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
     t.index ["code"], name: "index_discount_codes_on_code"
   end
 
+  create_table "integration_exports", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "integration_id", null: false
+    t.string "external_id"
+    t.datetime "exported_at"
+    t.integer "status", default: 0, null: false
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["integration_id"], name: "index_integration_exports_on_integration_id"
+    t.index ["order_id", "integration_id"], name: "index_integration_exports_on_order_id_and_integration_id", unique: true
+    t.index ["order_id"], name: "index_integration_exports_on_order_id"
+  end
+
   create_table "integrations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider", null: false
@@ -132,10 +146,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
     t.text "last_error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "account_id", null: false
+    t.integer "integration_type", default: 0, null: false
+    t.index ["account_id", "provider"], name: "index_integrations_on_account_and_provider", unique: true
+    t.index ["account_id"], name: "index_integrations_on_account_id"
+    t.index ["integration_type"], name: "index_integrations_on_integration_type"
     t.index ["provider"], name: "index_integrations_on_provider"
     t.index ["provider_uid"], name: "index_integrations_on_provider_uid"
     t.index ["status"], name: "index_integrations_on_status"
-    t.index ["user_id", "provider"], name: "index_integrations_on_user_and_provider", unique: true
     t.index ["user_id"], name: "index_integrations_on_user_id"
   end
 
@@ -240,7 +258,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
     t.string "currency", default: "PLN"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "baselinker_product_id"
     t.index ["account_id"], name: "index_products_on_account_id"
+    t.index ["baselinker_product_id"], name: "index_products_on_baselinker_product_id"
   end
 
   create_table "shipping_addresses", force: :cascade do |t|
@@ -317,6 +337,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_14_214559) do
   add_foreign_key "checkouts", "orders"
   add_foreign_key "customers", "accounts"
   add_foreign_key "discount_codes", "accounts"
+  add_foreign_key "integration_exports", "integrations"
+  add_foreign_key "integration_exports", "orders"
+  add_foreign_key "integrations", "accounts"
   add_foreign_key "integrations", "users"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
