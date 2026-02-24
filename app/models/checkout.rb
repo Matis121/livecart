@@ -59,7 +59,7 @@ class Checkout < ApplicationRecord
 
   def public_url
     # Dla development
-    "http://localhost:3000/checkouts/#{token}"
+    "http://localhost:3000/shops/#{order.account.slug}/checkouts/#{token}"
   end
 
   private

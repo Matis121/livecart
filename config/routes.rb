@@ -91,12 +91,13 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # Checkout
-  resources :checkouts, only: [ :show, :update ] do
-    member do
-      patch :close_package
-    end
-    collection do
-      get :not_found
+  get "checkouts/not_found", to: "checkouts#not_found", as: :not_found_checkouts
+
+  scope "/shops/:shop_slug" do
+    resources :checkouts, only: [ :show, :update ] do
+      member do
+        patch :close_package
+      end
     end
   end
 end

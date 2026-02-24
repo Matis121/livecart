@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_24_142223) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_24_165618) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_24_142223) do
     t.datetime "updated_at", null: false
     t.jsonb "checkout_settings"
     t.jsonb "terms"
+    t.string "slug", null: false
+    t.index ["company_name"], name: "index_accounts_on_company_name", unique: true
+    t.index ["slug"], name: "index_accounts_on_slug", unique: true
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -204,9 +207,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_24_142223) do
     t.string "discount_name"
     t.bigint "transmission_id"
     t.boolean "cash_on_delivery", default: false, null: false
+    t.string "payu_order_id"
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
+    t.index ["payu_order_id"], name: "index_orders_on_payu_order_id"
     t.index ["transmission_id"], name: "index_orders_on_transmission_id"
   end
 

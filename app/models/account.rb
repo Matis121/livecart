@@ -13,8 +13,11 @@ class Account < ApplicationRecord
 
   has_one_attached :logo
 
-  validates :company_name, presence: true
+  validates :company_name, presence: true, length: { maximum: 30 }, uniqueness: true
   validates :nip, presence: true, uniqueness: true
+  validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9\-]+\z/ }
+
+  before_validation :generate_slug
 
   store_accessor :checkout_settings,
     :name,
@@ -34,6 +37,22 @@ class Account < ApplicationRecord
   after_initialize :set_default_terms, if: :new_record?
 
   private
+
+  def generate_slug
+    source_name = name.presence || company_name
+    return if source_name.blank?
+
+    # Regenerate slug on create or when shop name changes
+    if new_record? || checkout_settings_changed?
+      base_slug = source_name.parameterize
+      self.slug = base_slug
+      counter = 1
+      while Account.where(slug: self.slug).where.not(id: id).exists?
+        self.slug = "#{base_slug}-#{counter}"
+        counter += 1
+      end
+    end
+  end
 
   def set_default_checkout_settings
     self.checkout_settings ||= {

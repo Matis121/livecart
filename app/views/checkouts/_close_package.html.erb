@@ -8,7 +8,6 @@
     <h1 class="text-2xl tracking-tight mb-2">Otwarta paczka</h1>
     <p class="text-base-content/50">Twoja paczka jest otwarta. Zamknij ją, aby sfinalizować zamówienie.</p>
   </div>
-
   <div class="xl:grid xl:grid-cols-3 gap-6 flex flex-col-reverse">
     <!-- Lewa kolumna - Formularz zamknięcia -->
     <div class="lg:col-span-2 space-y-6">
@@ -29,11 +28,9 @@
               <p class="text-base-content/60"><%= order.shipping_address.postal_code %> <%= order.shipping_address.city %></p>
             </div>
           </div>
-
           <div class="border-t border-base-300 mb-8"></div>
-
           <!-- Formularz zamknięcia paczki -->
-          <%= form_with url: close_package_checkout_path(checkout.token), method: :patch, local: true do |f| %>
+          <%= form_with url: close_package_checkout_path(order.account.slug, checkout.token), method: :patch, local: true do |f| %>
             <!-- Metoda dostawy -->
             <div class="mb-8">
               <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
@@ -54,9 +51,7 @@
                 <% end %>
               </div>
             </div>
-
             <div class="border-t border-base-300 mb-8"></div>
-
             <!-- Metoda płatności -->
             <div class="mb-8">
               <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
@@ -78,9 +73,7 @@
                 <% end %>
               </div>
             </div>
-
             <div class="border-t border-base-300 mb-8"></div>
-
             <!-- Submit -->
             <button type="submit" class="btn btn-primary btn-lg w-full">
               <%= lucide_icon "package-check", class: "w-5 h-5" %>
@@ -90,7 +83,6 @@
         </div>
       </div>
     </div>
-
     <!-- Prawa kolumna - Podsumowanie -->
     <div class="lg:col-span-1">
       <%= render partial: "checkouts/order_summary", locals: { order: order } %>

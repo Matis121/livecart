@@ -11,12 +11,11 @@
     </div>
   </div>
 </div>
-
 <!-- Formularz zamówienia -->
 <div class="xl:grid xl:grid-cols-3 gap-6 flex flex-col-reverse">
   <!-- Lewa kolumna - Formularz -->
   <div class="lg:col-span-2 space-y-6">
-    <%= form_with model: order, url: checkout_path(checkout.token), method: :patch, local: true, data: { controller: "checkout-form" } do |f| %>
+    <%= form_with model: order, url: checkout_path(order.account.slug, checkout.token), method: :patch, local: true, data: { controller: "checkout-form" } do |f| %>
       <div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
         <div class="p-8">
           <!-- Dane kontaktowe -->
@@ -42,10 +41,8 @@
               </div>
             </div>
           </div>
-
           <!-- Separator -->
           <div class="border-t border-base-300 mb-8"></div>
-
           <!-- Adres dostawy -->
           <div class="mb-8">
             <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
@@ -102,10 +99,8 @@
               </div>
             <% end %>
           </div>
-
           <!-- Separator -->
           <div class="border-t border-base-300 mb-8"></div>
-
           <!-- Dane do faktury -->
           <div class="mb-8">
             <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
@@ -170,47 +165,42 @@
               </div>
             <% end %>
           </div>
-
           <!-- Separator -->
           <div class="border-t border-base-300 mb-8"></div>
-
           <!-- Wybór trybu: Otwarta paczka / Wyślij teraz -->
           <% if open_package_enabled %>
-          <div class="mb-8">
-            <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
-              <%= lucide_icon "package", class: "w-5 h-5" %>
-              Sposób realizacji
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Otwarta paczka -->
-              <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-warning/50 transition-all has-[:checked]:border-warning has-[:checked]:bg-warning/5" data-action="change->checkout-form#toggleMode">
-                <input type="radio" name="commit_type" value="open_package" class="radio radio-warning absolute top-4 right-4" data-checkout-form-target="modeRadio" />
-                <div class="flex items-center gap-3 mb-2">
-                  <%= lucide_icon "package-open", class: "w-6 h-6 text-warning" %>
-                  <span class="font-semibold text-lg">Otwarta paczka</span>
-                </div>
-                <p class="text-sm text-base-content/60">Zapisz dane i wróć później, aby zamknąć paczkę i zapłacić.</p>
-              </label>
-
-              <!-- Wyślij teraz -->
-              <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-primary/50 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5" data-action="change->checkout-form#toggleMode">
-                <input type="radio" name="commit_type" value="ship_now" class="radio radio-primary absolute top-4 right-4" data-checkout-form-target="modeRadio" />
-                <div class="flex items-center gap-3 mb-2">
-                  <%= lucide_icon "send", class: "w-6 h-6 text-primary" %>
-                  <span class="font-semibold text-lg">Wyślij teraz</span>
-                </div>
-                <p class="text-sm text-base-content/60">Wybierz dostawę, płatność i złóż zamówienie od razu.</p>
-              </label>
+            <div class="mb-8">
+              <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
+                <%= lucide_icon "package", class: "w-5 h-5" %>
+                Sposób realizacji
+              </h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Otwarta paczka -->
+                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-warning/50 transition-all has-[:checked]:border-warning has-[:checked]:bg-warning/5" data-action="change->checkout-form#toggleMode">
+                  <input type="radio" name="commit_type" value="open_package" class="radio radio-warning absolute top-4 right-4" data-checkout-form-target="modeRadio" />
+                  <div class="flex items-center gap-3 mb-2">
+                    <%= lucide_icon "package-open", class: "w-6 h-6 text-warning" %>
+                    <span class="font-semibold text-lg">Otwarta paczka</span>
+                  </div>
+                  <p class="text-sm text-base-content/60">Zapisz dane i wróć później, aby zamknąć paczkę i zapłacić.</p>
+                </label>
+                <!-- Wyślij teraz -->
+                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-primary/50 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5" data-action="change->checkout-form#toggleMode">
+                  <input type="radio" name="commit_type" value="ship_now" class="radio radio-primary absolute top-4 right-4" data-checkout-form-target="modeRadio" />
+                  <div class="flex items-center gap-3 mb-2">
+                    <%= lucide_icon "send", class: "w-6 h-6 text-primary" %>
+                    <span class="font-semibold text-lg">Wyślij teraz</span>
+                  </div>
+                  <p class="text-sm text-base-content/60">Wybierz dostawę, płatność i złóż zamówienie od razu.</p>
+                </label>
+              </div>
             </div>
-          </div>
           <% else %>
-          <input type="hidden" name="commit_type" value="ship_now" />
+            <input type="hidden" name="commit_type" value="ship_now" />
           <% end %>
-
           <!-- Sekcja dostawy i płatności — widoczna tylko przy "Wyślij teraz" -->
           <div id="shipping-payment-section" class="<%= 'hidden' if open_package_enabled %> mb-8" data-checkout-form-target="paymentSection">
             <div class="border-t border-base-300 mb-8"></div>
-
             <!-- Metoda dostawy -->
             <div class="mb-8">
               <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
@@ -231,9 +221,7 @@
                 <% end %>
               </div>
             </div>
-
             <div class="border-t border-base-300 mb-8"></div>
-
             <!-- Metoda płatności -->
             <h2 class="text-xl tracking-tight flex items-center gap-2 mb-6">
               <%= lucide_icon "credit-card", class: "w-5 h-5" %>
@@ -253,7 +241,6 @@
               <% end %>
             </div>
           </div>
-
           <!-- Regulamin i submit -->
           <div>
             <div class="border-t border-base-300 mb-8"></div>
@@ -263,7 +250,6 @@
                 <span class="label-text">Akceptuję regulamin i politykę prywatności *</span>
               </label>
             </div>
-
             <!-- Przycisk submit — zmienia się w zależności od wybranego trybu -->
             <div data-checkout-form-target="submitArea">
               <button type="submit" class="btn btn-lg w-full btn-disabled" disabled data-checkout-form-target="submitButton">
@@ -275,7 +261,6 @@
       </div>
     <% end %>
   </div>
-
   <!-- Prawa kolumna - Podsumowanie -->
   <div class="lg:col-span-1">
     <%= render partial: "checkouts/order_summary", locals: { order: order } %>

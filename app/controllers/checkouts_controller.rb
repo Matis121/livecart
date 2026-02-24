@@ -1,8 +1,10 @@
 class CheckoutsController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :not_found ]
 
+  before_action :find_shop, except: [ :not_found ]
   before_action :find_checkout, except: [ :not_found ]
   before_action :set_order, except: [ :not_found ]
+  before_action :validate_shop_ownership, except: [ :not_found ]
   before_action :validate_availability, except: [ :not_found ]
   before_action :set_shipping_methods, except: [ :not_found ]
   before_action :set_payment_methods, except: [ :not_found ]
@@ -53,7 +55,7 @@ class CheckoutsController < ApplicationController
     end
 
     session[:show_success_for_checkout] = @checkout.id
-    redirect_to checkout_path(@checkout.token)
+    redirect_to checkout_path(@shop.slug, @checkout.token)
   rescue => e
     @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
@@ -80,10 +82,22 @@ class CheckoutsController < ApplicationController
     @order = @checkout.order
   end
 
+  def find_shop
+    @shop = Account.find_by!(slug: params[:shop_slug])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to not_found_checkouts_path
+  end
+
   def find_checkout
     @checkout = Checkout.find_by!(token: params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to not_found_checkouts_path
+  end
+
+  def validate_shop_ownership
+    unless @order.account_id == @shop.id
+      redirect_to not_found_checkouts_path
+    end
   end
 
   def validate_availability
@@ -101,7 +115,7 @@ class CheckoutsController < ApplicationController
       @checkout.complete!
       @order.update!(status: :payment_processing)
       session[:show_success_for_checkout] = @checkout.id
-      redirect_to checkout_path(@checkout.token)
+      redirect_to checkout_path(@shop.slug, @checkout.token)
     else
       render :show, status: :unprocessable_entity
     end
@@ -113,7 +127,7 @@ class CheckoutsController < ApplicationController
       @checkout.open_package!
       @order.update!(status: :open_package)
       session[:show_success_for_checkout] = @checkout.id
-      redirect_to checkout_path(@checkout.token)
+      redirect_to checkout_path(@shop.slug, @checkout.token)
     else
       render :show, status: :unprocessable_entity
     end
