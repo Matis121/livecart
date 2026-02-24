@@ -15,8 +15,11 @@ class Account < ApplicationRecord
 
   validates :company_name, presence: true, length: { maximum: 30 }, uniqueness: true
   validates :nip, presence: true, uniqueness: true
+  validates :name, presence: true, length: { maximum: 30 }
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9\-]+\z/ }
+  validate :nip_format_and_checksum
 
+  before_validation :normalize_nip
   before_validation :generate_slug
 
   store_accessor :checkout_settings,
@@ -51,6 +54,27 @@ class Account < ApplicationRecord
         self.slug = "#{base_slug}-#{counter}"
         counter += 1
       end
+    end
+  end
+
+  def normalize_nip
+    self.nip = nip.to_s.gsub(/[\s\-]/, "")
+  end
+
+  def nip_format_and_checksum
+    return if nip.blank?
+
+    unless nip.match?(/\A\d{10}\z/)
+      errors.add(:nip, "musi składać się z 10 cyfr")
+      return
+    end
+
+    weights = [ 6, 5, 7, 2, 3, 4, 5, 6, 7 ]
+    digits = nip.chars.map(&:to_i)
+    checksum = weights.each_with_index.sum { |w, i| w * digits[i] }
+
+    unless checksum % 11 == digits[9]
+      errors.add(:nip, "jest nieprawidłowy (błędna suma kontrolna)")
     end
   end
 

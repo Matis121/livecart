@@ -1,13 +1,35 @@
 <%= form_with model: @account, url: onboarding_accounts_path, class: "space-y-4" do |f| %>
+  <% if @account.errors.any? %>
+    <div role="alert" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span>Popraw poniższe błędy, aby kontynuować.</span>
+    </div>
+  <% end %>
   <div class="form-control w-full">
     <%= f.label :company_name, "Nazwa firmy", class: "label" %>
-    <%= f.text_field :company_name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Firma sp. z o.o.", autofocus: true %>
+    <%= f.text_field :company_name, class: "input input-bordered w-full focus:input-primary #{'input-error' if @account.errors[:company_name].any?}", placeholder: "np. Firma sp. z o.o.", autofocus: true %>
+    <% @account.errors[:company_name].each do |msg| %>
+      <label class="label"><span class="label-text-alt text-error"><%= msg %></span></label>
+    <% end %>
   </div>
-  
   <div class="form-control w-full">
     <%= f.label :nip, "NIP", class: "label" %>
-    <%= f.text_field :nip, class: "input input-bordered w-full focus:input-primary", placeholder: "np. 1234567890" %>
+    <%= f.text_field :nip, class: "input input-bordered w-full focus:input-primary #{'input-error' if @account.errors[:nip].any?}", placeholder: "np. 1234567890" %>
+    <% @account.errors[:nip].each do |msg| %>
+      <label class="label"><span class="label-text-alt text-error"><%= msg %></span></label>
+    <% end %>
   </div>
-  
+  <div class="form-control w-full">
+    <%= f.label :name, "Nazwa sklepu", class: "label" %>
+    <%= f.text_field :name, class: "input input-bordered w-full focus:input-primary #{'input-error' if @account.errors[:name].any?}", placeholder: "np. Mój Sklep" %>
+    <label class="label mt-1">
+      <span class="label-text-alt text-base-content/60">Nazwa będzie widoczna dla klientów w koszyku.</span>
+    </label>
+    <% @account.errors[:name].each do |msg| %>
+      <label class="label"><span class="label-text-alt text-error"><%= msg %></span></label>
+    <% end %>
+  </div>
   <%= f.submit "Utwórz konto", class: "btn btn-primary w-full mt-6" %>
 <% end %>
