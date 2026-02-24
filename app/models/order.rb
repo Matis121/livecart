@@ -37,7 +37,7 @@ class Order < ApplicationRecord
     shipped: "Wysłane",
     delivered: "Dostarczone",
     cancelled: "Anulowane",
-    returned: "Zwrócone",
+    returned: "Zwrócone"
   }.freeze
 
   validates :order_number, presence: true, uniqueness: true
