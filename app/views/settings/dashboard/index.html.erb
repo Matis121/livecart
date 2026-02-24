@@ -1,4 +1,3 @@
-<%# app/views/settings/settings/index.html.erb %>
 <div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
   <!-- Header -->
   <div class="mb-8">
@@ -81,19 +80,36 @@
     <div>
       <h2 class="text-xl font-semibold mb-4">Płatności i wysyłki</h2>
     </div>
-    <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-      <div class="card-body">
-        <div class="flex items-start justify-between mb-3">
-          <h3 class="font-semibold">Wysyłki</h3>
-          <%= lucide_icon('truck', class: 'w-5 h-5 text-primary') %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-semibold">Wysyłki</h3>
+            <%= lucide_icon('truck', class: 'w-5 h-5 text-primary') %>
+          </div>
+          <p class="text-sm text-base-content/70 mb-4">
+            Uzupełnij metody wysyłki dla swojego sklepu
+          </p>
+          <%= link_to settings_shipping_methods_path, class: "btn btn-sm btn-ghost w-full justify-start" do %>
+            Przejdź
+            <%= lucide_icon('chevron-right', class: 'w-4 h-4 ml-auto') %>
+          <% end %>
         </div>
-        <p class="text-sm text-base-content/70 mb-4">
-          Uzupełnij metody wysyłki dla swojego sklepu
-        </p>
-        <%= link_to settings_shipping_methods_path, class: "btn btn-sm btn-ghost w-full justify-start" do %>
-          Przejdź
-          <%= lucide_icon('chevron-right', class: 'w-4 h-4 ml-auto') %>
-        <% end %>
+      </div>
+      <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-semibold">Płatności</h3>
+            <%= lucide_icon('credit-card', class: 'w-5 h-5 text-primary') %>
+          </div>
+          <p class="text-sm text-base-content/70 mb-4">
+            Uzupełnij metody płatności dla swojego sklepu
+          </p>
+          <%= link_to settings_payment_methods_path, class: "btn btn-sm btn-ghost w-full justify-start" do %>
+            Przejdź
+            <%= lucide_icon('chevron-right', class: 'w-4 h-4 ml-auto') %>
+          <% end %>
+        </div>
       </div>
     </div>
   <% end %>

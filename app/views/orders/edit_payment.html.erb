@@ -16,6 +16,14 @@
           </label>
         </div>
 
+        <!-- Pobranie -->
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-3">
+            <%= f.check_box :cash_on_delivery, class: "checkbox checkbox-sm" %>
+            <span>Płatność za pobraniem</span>
+          </label>
+        </div>
+
         <!-- Buttons -->
         <div class="flex flex-col sm:flex-row gap-2 justify-end">
           <%= link_to "Anuluj", order_path(@order), 

@@ -17,5 +17,13 @@
         <span class="font-semibold"><%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %></span>
       </div>
     </div>
+    <div class="flex justify-between items-center gap-2">
+      <span class="text-sm text-base-content/60">Pobranie</span>
+      <% if order.cash_on_delivery? %>
+        <span class="badge badge-sm badge-warning">Tak</span>
+      <% else %>
+        <span class="text-sm text-base-content/50">—</span>
+      <% end %>
+    </div>
   </div>
 </turbo-frame>

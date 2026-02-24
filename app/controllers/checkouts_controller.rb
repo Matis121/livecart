@@ -5,6 +5,7 @@ class CheckoutsController < ApplicationController
   before_action :set_order, except: [ :not_found ]
   before_action :validate_availability, except: [ :not_found ]
   before_action :set_shipping_methods, except: [ :not_found ]
+  before_action :set_payment_methods, except: [ :not_found ]
 
   def show
     @account = @order.account
@@ -40,7 +41,12 @@ class CheckoutsController < ApplicationController
       @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
 
       # Zapisz metodę płatności
-      @order.update!(payment_method: params[:order][:payment_method])
+      payment_method_name = params[:order][:payment_method]
+      payment_method_record = @order.account.payment_methods.find_by(name: payment_method_name)
+      @order.update!(
+        payment_method: payment_method_name,
+        cash_on_delivery: payment_method_record&.cash_on_delivery? || false
+      )
 
       @order.update!(status: :payment_processing)
       @checkout.close_package!
@@ -64,6 +70,10 @@ class CheckoutsController < ApplicationController
 
   def set_shipping_methods
     @shipping_methods = @order.account.shipping_methods.active.order(:position)
+  end
+
+  def set_payment_methods
+    @payment_methods = @order.account.payment_methods.active.order(:position)
   end
 
   def set_order
@@ -126,7 +136,13 @@ class CheckoutsController < ApplicationController
       if include_payment
         shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
         @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
-        @order.update!(payment_method: params[:order][:payment_method])
+
+        payment_method_name = params[:order][:payment_method]
+        payment_method_record = @order.account.payment_methods.find_by(name: payment_method_name)
+        @order.update!(
+          payment_method: payment_method_name,
+          cash_on_delivery: payment_method_record&.cash_on_delivery? || false
+        )
       end
 
       true

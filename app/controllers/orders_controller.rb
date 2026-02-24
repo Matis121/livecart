@@ -270,7 +270,7 @@ class OrdersController < ApplicationController
   end
 
   def payment_params
-    params.require(:order).permit(:paid_amount)
+    params.require(:order).permit(:paid_amount, :cash_on_delivery)
   end
 
   def shipping_payment_methods_params

@@ -1,0 +1,41 @@
+<%= form_with model: @payment_method, url: @payment_method.persisted? ? settings_payment_method_path(@payment_method) : settings_payment_methods_path, local: true do |f| %>
+  <div class="card-body">
+    <div class="form-control">
+      <%= f.label :name, "Nazwa", class: "label" %>
+      <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "np. Przelew bankowy, PayU, Za pobraniem" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :description, "Opis (opcjonalny)", class: "label" %>
+      <%= f.text_area :description, class: "textarea textarea-bordered w-full", rows: 2, placeholder: "Krótki opis widoczny dla klienta w checkout" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :integration_id, "Integracja płatnicza", class: "label" %>
+      <%= f.select :integration_id,
+        options_for_select(
+          @payment_integrations.map { |i| [i.provider_name, i.id] },
+          @payment_method.integration_id
+        ),
+        { include_blank: "Bez integracji (manualna)" },
+        class: "select select-bordered w-full" %>
+      <label class="label">
+        <span class="label-text-alt text-base-content/50">Wybierz integrację dla płatności online (np. PayU). Pozostaw puste dla metod manualnych.</span>
+      </label>
+    </div>
+    <div class="form-control">
+      <label class="label cursor-pointer justify-start gap-3">
+        <%= f.check_box :cash_on_delivery, class: "checkbox checkbox-sm" %>
+        <span>Płatność za pobraniem</span>
+      </label>
+    </div>
+    <div class="form-control">
+      <label class="label cursor-pointer justify-start gap-3">
+        <%= f.check_box :active, class: "checkbox checkbox-sm" %>
+        <span>Aktywna</span>
+      </label>
+    </div>
+  </div>
+  <div class="card-actions justify-end p-4">
+    <%= link_to "Anuluj", settings_payment_methods_path, class: "btn btn-ghost" %>
+    <%= f.submit "Zapisz", class: "btn btn-primary" %>
+  </div>
+<% end %>

@@ -1,4 +1,3 @@
-<!-- app/views/checkouts/_checkout_form.html.erb -->
 <div class="max-w-3xl mx-auto py-12 mb-4">
   <div class="bg-base-100 border border-base-300 rounded-xl p-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left">
     <% if account_logo.present? %>
@@ -241,16 +240,15 @@
               Metoda płatności
             </h2>
             <div class="space-y-3">
-              <% payment_options = [
-                  ["Przelew bankowy", "Przelew bankowy"],
-                  ["Płatność online", "Płatność online"],
-                  ["Za pobraniem", "Za pobraniem"],
-                  ["BLIK", "Blik"]
-                ] %>
-              <% payment_options.each do |(label, value)| %>
+              <% payment_methods.each do |method| %>
                 <label class="flex items-center gap-4 p-4 border border-base-300 rounded-lg cursor-pointer hover:bg-base-200/50 hover:border-primary/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <%= f.radio_button :payment_method, value, class: "radio radio-primary shrink-0", data: { checkout_form_target: "paymentRadio" } %>
-                  <span class="font-medium"><%= label %></span>
+                  <%= f.radio_button :payment_method, method.name, class: "radio radio-primary shrink-0", data: { checkout_form_target: "paymentRadio" } %>
+                  <div>
+                    <span class="font-medium"><%= method.name %></span>
+                    <% if method.description.present? %>
+                      <p class="text-sm text-base-content/60 mt-0.5"><%= method.description %></p>
+                    <% end %>
+                  </div>
                 </label>
               <% end %>
             </div>

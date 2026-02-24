@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_23_224600) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_24_142223) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -203,10 +203,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_224600) do
     t.decimal "discount_amount", precision: 8, scale: 2, default: "0.0", null: false
     t.string "discount_name"
     t.bigint "transmission_id"
+    t.boolean "cash_on_delivery", default: false, null: false
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["transmission_id"], name: "index_orders_on_transmission_id"
+  end
+
+  create_table "payment_methods", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "integration_id"
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "active", default: true
+    t.integer "position", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "cash_on_delivery", default: false, null: false
+    t.index ["account_id"], name: "index_payment_methods_on_account_id"
+    t.index ["integration_id"], name: "index_payment_methods_on_integration_id"
   end
 
   create_table "product_imports", force: :cascade do |t|
@@ -350,6 +365,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_23_224600) do
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "discount_codes"
   add_foreign_key "orders", "transmissions"
+  add_foreign_key "payment_methods", "accounts"
+  add_foreign_key "payment_methods", "integrations"
   add_foreign_key "product_imports", "accounts"
   add_foreign_key "product_stock_movements", "order_items"
   add_foreign_key "product_stock_movements", "products"

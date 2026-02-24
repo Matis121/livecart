@@ -86,6 +86,7 @@ module Integrations
 
           # Payment and shipping
           payment_method: order.payment_method,
+          payment_method_cod: order.cash_on_delivery? ? 1 : 0,
           delivery_method: order.shipping_method,
           delivery_price: order.shipping_cost.to_f,
 
