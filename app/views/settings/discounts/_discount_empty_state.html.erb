@@ -1,0 +1,8 @@
+<div class="card bg-base-100 shadow-sm">
+  <div class="card-body items-center text-center py-12">
+    <%= lucide_icon("percent", class: "w-16 h-16 opacity-30") %>
+    <h3 class="text-lg font-semibold mt-2">Brak kodów rabatowych</h3>
+    <p class="text-base-content/70 text-sm mb-4">Dodaj pierwszy kod, aby oferować rabaty klientom.</p>
+    <%= link_to "Nowy kod rabatowy", new_settings_discount_path, class: "btn btn-primary", data: { turbo_frame: "discount_modal" } %>
+  </div>
+</div>

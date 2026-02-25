@@ -1,0 +1,15 @@
+<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold mb-1">Kody rabatowe</h1>
+      <p class="text-base-content/70 text-sm sm:text-base">Zarządzaj kodami rabatowymi swojego sklepu</p>
+    </div>
+    <%= link_to "Dodaj kod rabatowy", new_settings_discount_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "discount_modal" } %>
+  </div>
+  <% if @discount_codes.any? %>
+    <%= render "discounts_table" %>
+  <% else %>
+    <%= render "discount_empty_state" %>
+  <% end %>
+</div>
+<%= turbo_frame_tag "discount_modal" %>

@@ -2,7 +2,7 @@ class DiscountCode < ApplicationRecord
   belongs_to :account
   has_many :orders, dependent: :nullify
 
-  validates :code, presence: true, uniqueness: true
+  validates :code, presence: true, uniqueness: true, length: { maximum: 30 }
   validates :value, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :kind, presence: true, inclusion: { in: [ "percentage", "fixed" ] }
 
@@ -10,6 +10,11 @@ class DiscountCode < ApplicationRecord
     percentage: 0,
     fixed: 1
   }
+
+  KIND_NAMES = {
+    percentage: "Procentowy",
+    fixed: "Kwotowy"
+  }.freeze
 
   def applicable_for?(subtotal)
     return false unless active?
@@ -33,5 +38,9 @@ class DiscountCode < ApplicationRecord
     amount = discount_amount(subtotal)  # rabat od produktów
     amount += order.shipping_cost if free_shipping?
     amount.round(2)
+  end
+
+  def kind_name
+    KIND_NAMES[kind.to_sym] || kind
   end
 end
