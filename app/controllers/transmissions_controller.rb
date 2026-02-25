@@ -50,7 +50,7 @@ class TransmissionsController < ApplicationController
     if @transmission.save
       redirect_to transmission_path(@transmission), notice: "Utworzono transmisję"
     else
-      render :new, status: :unprocessable_entity
+      render turbo_stream: turbo_stream.replace("transmission_modal", template: "transmissions/new")
     end
   end
 
@@ -62,7 +62,7 @@ class TransmissionsController < ApplicationController
     if @transmission.update(transmission_params)
       redirect_to transmission_path(@transmission), notice: "Zaktualizowano transmisję"
     else
-      render :edit, status: :unprocessable_entity
+      render turbo_stream: turbo_stream.replace("transmission_modal", template: "transmissions/edit")
     end
   end
 
