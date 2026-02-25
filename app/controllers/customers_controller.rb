@@ -5,9 +5,12 @@ class CustomersController < ApplicationController
   end
 
   def edit
+    redirect_to customers_path unless turbo_frame_request?
   end
 
   def new
+    redirect_to customers_path unless turbo_frame_request?
+
     @customer = Customer.new
   end
 
@@ -16,7 +19,7 @@ class CustomersController < ApplicationController
     if @customer.save
       redirect_to customers_path, notice: "Utworzono klienta"
     else
-      render :new
+      render turbo_stream: turbo_stream.replace("customer_modal", template: "customers/new")
     end
   end
 
@@ -24,7 +27,7 @@ class CustomersController < ApplicationController
     if @customer.update(customer_params)
       redirect_to customers_path, notice: "Zaktualizowano klienta"
     else
-      render :edit
+      render turbo_stream: turbo_stream.replace("customer_modal", template: "customers/edit")
     end
   end
 

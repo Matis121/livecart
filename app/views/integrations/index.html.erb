@@ -7,19 +7,16 @@
     </div>
     <%= link_to "Dodaj integrację", new_integration_path, class: "btn btn-primary w-full sm:w-auto" %>
   </div>
-
   <% if @integrations.any? %>
     <!-- Integrations by Type -->
     <% Integration.integration_types.keys.each do |type| %>
       <% integrations_of_type = @integrations_by_type[type] || [] %>
       <% next if integrations_of_type.empty? %>
-      
       <div class="mb-8">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
           <%= Integration.integration_type_label(type) %>
           <span class="badge badge-sm"><%= integrations_of_type.count %></span>
         </h2>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <% integrations_of_type.each do |integration| %>
             <div class="card bg-base-100 border border-base-300 shadow-sm">
@@ -34,7 +31,6 @@
                     <%= integration.status_name %>
                   </span>
                 </div>
-
                 <!-- Integration info -->
                 <div class="space-y-2 text-sm">
                   <% if integration.provider_account_name.present? %>
@@ -43,11 +39,10 @@
                       <span><%= integration.provider_account_name %></span>
                     </div>
                   <% end %>
-
                   <% if integration.last_synced_at.present? %>
                     <div class="flex items-center gap-2 text-base-content/70">
                       <%= lucide_icon("refresh-cw", class: "w-4 h-4") %>
-                      <span>Ostatnia sync: <%= time_ago_in_words(integration.last_synced_at) %> temu</span>
+                      <span>Synchronizacja: <%= time_ago_in_words(integration.last_synced_at) %> temu</span>
                     </div>
                   <% else %>
                     <div class="flex items-center gap-2 text-warning">
@@ -55,7 +50,6 @@
                       <span>Nigdy nie synchronizowano</span>
                     </div>
                   <% end %>
-
                   <% if integration.last_error_message.present? %>
                     <div class="alert alert-error py-2 px-3 text-xs mt-2">
                       <%= lucide_icon("alert-triangle", class: "w-4 h-4") %>
@@ -63,7 +57,6 @@
                     </div>
                   <% end %>
                 </div>
-
                 <!-- Actions -->
                 <div class="card-actions justify-end mt-4 pt-4 border-t border-base-300">
                   <% if integration.can_sync? && ["baselinker", "sellasist"].include?(integration.provider) %>
@@ -72,9 +65,7 @@
                         class: "btn btn-sm btn-outline btn-primary",
                         data: { turbo_confirm: "Rozpocząć synchronizację?" } %>
                   <% end %>
-                  
                   <%= link_to "Edytuj", edit_integration_path(integration), class: "btn btn-sm btn-ghost" %>
-                  
                   <%= button_to integration_path(integration), 
                       method: :delete,
                       class: "btn btn-sm btn-ghost btn-error",
@@ -88,7 +79,6 @@
         </div>
       </div>
     <% end %>
-
   <% else %>
     <!-- Empty State -->
     <div class="flex flex-col items-center justify-center py-16 px-4">

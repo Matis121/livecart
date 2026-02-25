@@ -25,7 +25,7 @@
               </div>
               <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                 <li>
-                  <%= link_to edit_customer_path(customer) do %>
+                  <%= link_to edit_customer_path(customer), data: { turbo_frame: "customer_modal" } do %>
                     <%= lucide_icon('edit', class: 'w-4 h-4') %>
                     Edytuj
                   <% end %>

@@ -1,4 +1,11 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold">Edytuj klienta</h1>
-  <%= render "form" %>
-</div>
+<%= turbo_frame_tag "customer_modal" do %>
+  <dialog class="modal modal-open">
+    <div class="modal-box max-w-md max-h-[90vh]">
+      <h3 class="font-bold text-lg mb-4">Edytuj klienta</h3>
+      <%= render "form" %>
+    </div>
+    <div class="modal-backdrop"
+         onclick="document.getElementById('customer_modal').innerHTML = ''">
+    </div>
+  </dialog>
+<% end %>

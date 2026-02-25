@@ -1,11 +1,27 @@
-<%= form_with model: @customer do |f| %>
+<%= form_with model: @customer, data: { turbo_frame: "_top" } do |f| %>
   <div class="form-control w-full">
     <%= f.label :first_name, "Imię", class: "label" %>
-    <%= f.text_field :first_name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Jan" %>
+    <%= f.text_field :first_name, class: "input input-bordered w-full focus:input-primary #{@customer.errors[:first_name].any? ? 'input-error' : ''}", placeholder: "np. Jan", maxlength: 50 %>
+    <% @customer.errors[:first_name].each do |message| %>
+      <label class="label">
+        <span class="text-error text-sm"><%= message %></span>
+      </label>
+    <% end %>
   </div>
   <div class="form-control w-full">
     <%= f.label :last_name, "Nazwisko", class: "label" %>
-    <%= f.text_field :last_name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Kowalski" %>
+    <%= f.text_field :last_name, class: "input input-bordered w-full focus:input-primary #{@customer.errors[:last_name].any? ? 'input-error' : ''}", placeholder: "np. Kowalski", maxlength: 50 %>
+    <% @customer.errors[:last_name].each do |message| %>
+      <label class="label">
+        <span class="text-error text-sm"><%= message %></span>
+      </label>
+    <% end %>
   </div>
-  <%= f.submit "Zapisz", class: "btn btn-primary" %>
+  <div class="modal-action">
+    <%= button_tag type: "button", class: "btn btn-ghost",
+        onclick: "document.getElementById('customer_modal').innerHTML = ''" do %>
+      Anuluj
+    <% end %>
+    <%= f.submit "Zapisz", class: "btn btn-primary" %>
+  </div>
 <% end %>

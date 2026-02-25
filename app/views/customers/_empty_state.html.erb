@@ -4,7 +4,7 @@
     <div>
       <h3 class="text-lg font-semibold mb-1">Brak klientów</h3>
       <p class="text-sm opacity-60 mb-4">Utwórz pierwszego klienta</p>
-      <%= link_to "Nowy klient", new_customer_path, class: "btn btn-primary" %>
+      <%= link_to "Nowy klient", new_customer_path, class: "btn btn-primary", data: { turbo_frame: "customer_modal" } %>
     </div>
   </div>
 </div>
