@@ -1,0 +1,8 @@
+<div class="card bg-base-100 shadow-sm">
+  <div class="card-body items-center text-center py-12">
+    <%= lucide_icon("truck", class: "w-16 h-16 opacity-30") %>
+    <h3 class="text-lg font-semibold mt-2">Brak metod wysyłki</h3>
+    <p class="text-base-content/70 text-sm mb-4">Dodaj pierwszą metodę, aby oferować wysyłkę klientom.</p>
+    <%= link_to "Nowa metoda wysyłki", new_settings_shipping_method_path, class: "btn btn-primary", data: { turbo_frame: "shipping_method_modal" } %>
+  </div>
+</div>

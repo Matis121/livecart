@@ -9,7 +9,7 @@ class ShippingMethod < ApplicationRecord
     poczta_polska: 3
   }, prefix: true  # → pickup_point_provider_inpost?, pickup_point_provider_orlen?
 
-  validates :name, presence: true
+  validates :name, presence: true, length: { maximum: 50 }
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :pickup_point_provider, presence: true, if: :is_pickup_point?
 

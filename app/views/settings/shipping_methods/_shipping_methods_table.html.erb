@@ -1,0 +1,106 @@
+<div class="bg-base-100 rounded-lg shadow-sm">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="font-semibold w-4">
+          <%= lucide_icon("sort-asc", class: "w-4 h-4") %>
+        </th>
+        <th class="font-semibold">Nazwa</th>
+        <th class="font-semibold">Cena</th>
+        <th class="font-semibold">Darmowa od</th>
+        <th class="font-semibold">Punkt odbioru</th>
+        <th class="font-semibold">Status</th>
+        <th class="text-end font-semibold w-24">Akcje</th>
+      </tr>
+    </thead>
+    <tbody data-controller="sortable" data-sortable-resource-name-value="shipping_method" data-sortable-handle-value=".handle">
+      <% @shipping_methods.each do |shipping_method| %>
+        <tr class="hover" data-sortable-update-url="<%= settings_shipping_method_path(shipping_method) %>">
+          <td class="handle cursor-move">
+            <div class="flex items-center justify-center w-8 h-8 text-base-content/40 hover:text-base-content/70 transition-colors">
+              <%= lucide_icon("grip-vertical", class: "w-4 h-4") %>
+            </div>
+          </td>
+          <td>
+            <span class="font-medium"><%= shipping_method.name %></span>
+          </td>
+          <td>
+            <%= number_to_currency(shipping_method.price, unit: "zł", format: "%n %u") %>
+          </td>
+          <td>
+            <%= shipping_method.free_above.present? ? number_to_currency(shipping_method.free_above, unit: "zł", format: "%n %u") : "—" %>
+          </td>
+          <td>
+            <% if shipping_method.is_pickup_point? %>
+              <span class="badge badge-sm badge-info"><%= shipping_method.pickup_point_provider&.humanize %></span>
+            <% else %>
+              <span class="text-base-content/50">—</span>
+            <% end %>
+          </td>
+          <td>
+            <% if shipping_method.active? %>
+              <span class="badge badge-sm badge-success">Aktywna</span>
+            <% else %>
+              <span class="badge badge-sm badge-ghost">Nieaktywna</span>
+            <% end %>
+          </td>
+          <td class="text-end">
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
+                <%= lucide_icon("more-vertical", class: "w-4 h-4") %>
+              </div>
+              <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                <li>
+                  <%= link_to edit_settings_shipping_method_path(shipping_method), data: { turbo_frame: "shipping_method_modal" } do %>
+                    <%= lucide_icon("pencil", class: "w-4 h-4") %>
+                    Edytuj
+                  <% end %>
+                </li>
+                <li>
+                  <%= link_to settings_shipping_method_path(shipping_method), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tę metodę wysyłki?" }, class: "text-error" do %>
+                    <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+                    Usuń
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <div class="flex items-center justify-end gap-4 px-4 py-3 border-t border-base-200">
+    <div class="flex items-center gap-2">
+      <select
+            onchange="window.location.href = this.value"
+            class="select select-sm select-bordered bg-base-100 min-h-0 h-8 pr-8"
+          >
+        <% @per_page_options.each do |option| %>
+          <option
+                value="<%= settings_shipping_methods_path(request.params.merge(per_page: option, page: 1)) %>"
+                <%= 'selected' if @pagy.limit == option %>
+              >
+            <%= option %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+    <div class="flex items-center gap-1">
+      <% if @pagy.page > 1 %>
+        <%= link_to settings_shipping_methods_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
+      <% end %>
+      <span class="px-2 tabular-nums"><%= @pagy.page %> / <%= @pagy.pages %></span>
+      <% if @pagy.page < @pagy.pages %>
+        <%= link_to settings_shipping_methods_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
+      <% end %>
+    </div>
+  </div>
+</div>

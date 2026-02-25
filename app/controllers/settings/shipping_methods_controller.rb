@@ -5,7 +5,9 @@ module Settings
     before_action :set_shipping_method, only: [ :edit, :update, :destroy ]
 
     def index
-      @shipping_methods = current_account.shipping_methods.order(:position)
+      per_page = (params[:per_page] || 10).to_i
+      @per_page_options = [ 10, 25, 50 ]
+      @pagy, @shipping_methods = pagy(current_account.shipping_methods.order(:position), limit: per_page)
     end
 
     def new
@@ -17,7 +19,7 @@ module Settings
       if @shipping_method.save
         redirect_to settings_shipping_methods_path, notice: "Utworzono metodę wysyłki"
       else
-        render :new, status: :unprocessable_entity
+        render turbo_stream: turbo_stream.replace("shipping_method_modal", template: "settings/shipping_methods/new")
       end
     end
 
@@ -28,7 +30,7 @@ module Settings
       if @shipping_method.update(shipping_method_params)
         redirect_to settings_shipping_methods_path, notice: "Zaktualizowano metodę wysyłki"
       else
-        render :edit, status: :unprocessable_entity
+        render turbo_stream: turbo_stream.replace("shipping_method_modal", template: "settings/shipping_methods/edit")
       end
     end
 
