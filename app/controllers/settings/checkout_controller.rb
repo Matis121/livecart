@@ -30,7 +30,7 @@ module Settings
     private
 
     def checkout_settings_params
-      params.require(:account).permit(:name, :time_to_pay, :time_to_pay_active, :open_package_enabled, :logo, :remove_logo)
+      params.require(:account).permit(:shop_name, :time_to_pay, :time_to_pay_active, :open_package_enabled, :logo, :remove_logo)
     end
   end
 end

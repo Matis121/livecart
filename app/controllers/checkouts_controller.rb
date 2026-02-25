@@ -12,7 +12,7 @@ class CheckoutsController < ApplicationController
   def show
     @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
-    @account_name = @account.checkout_settings["name"]
+    @account_name = @account.checkout_settings["shop_name"]
     @open_package_enabled = @account.open_package_enabled?
 
     # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
@@ -59,7 +59,7 @@ class CheckoutsController < ApplicationController
   rescue => e
     @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
-    @account_name = @account.checkout_settings["name"]
+    @account_name = @account.checkout_settings["shop_name"]
     @order.errors.add(:base, e.message)
     render :show, status: :unprocessable_entity
   end

@@ -15,15 +15,15 @@ class Account < ApplicationRecord
 
   validates :company_name, presence: true, length: { maximum: 30 }, uniqueness: true
   validates :nip, presence: true, uniqueness: true
-  validates :name, presence: true, length: { maximum: 30 }
+  validates :shop_name, presence: true, length: { maximum: 30 }
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9\-]+\z/ }
-  validate :nip_format_and_checksum
+  validate :nip_format_and_checksum, if: :will_save_change_to_nip?
 
   before_validation :normalize_nip
   before_validation :generate_slug
 
   store_accessor :checkout_settings,
-    :name,
+    :shop_name,
     :time_to_pay,
     :time_to_pay_active,
     :open_package_enabled
@@ -42,7 +42,7 @@ class Account < ApplicationRecord
   private
 
   def generate_slug
-    source_name = name.presence || company_name
+    source_name = shop_name.presence || company_name
     return if source_name.blank?
 
     # Regenerate slug on create or when shop name changes
@@ -80,7 +80,7 @@ class Account < ApplicationRecord
 
   def set_default_checkout_settings
     self.checkout_settings ||= {
-      name: company_name,
+      shop_name: company_name,
       time_to_pay: "0",
       time_to_pay_active: "0",
       open_package_enabled: "0"
