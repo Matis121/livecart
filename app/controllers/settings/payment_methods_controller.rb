@@ -18,7 +18,7 @@ module Settings
         redirect_to settings_payment_methods_path, notice: "Utworzono metodę płatności"
       else
         @payment_integrations = payment_integrations
-        render :new, status: :unprocessable_entity
+        render turbo_stream: turbo_stream.replace("payment_method_modal", template: "settings/payment_methods/new")
       end
     end
 
@@ -31,7 +31,7 @@ module Settings
         redirect_to settings_payment_methods_path, notice: "Zaktualizowano metodę płatności"
       else
         @payment_integrations = payment_integrations
-        render :edit, status: :unprocessable_entity
+        render turbo_stream: turbo_stream.replace("payment_method_modal", template: "settings/payment_methods/edit")
       end
     end
 

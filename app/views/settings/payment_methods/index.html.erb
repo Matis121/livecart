@@ -4,97 +4,12 @@
       <h1 class="text-2xl sm:text-3xl font-bold mb-1">Metody płatności</h1>
       <p class="text-base-content/70 text-sm sm:text-base">Zarządzaj metodami płatności swojego sklepu</p>
     </div>
-    <%= link_to "Nowa metoda płatności", new_settings_payment_method_path, class: "btn btn-primary w-full sm:w-auto" %>
+    <%= link_to "Nowa metoda płatności", new_settings_payment_method_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "payment_method_modal" } %>
   </div>
   <% if @payment_methods.any? %>
-    <div class="bg-base-100 rounded-lg shadow-sm">
-      <table class="table">
-        <thead>
-          <tr>
-            <th class="font-semibold w-4">
-              <%= lucide_icon("sort-asc", class: "w-4 h-4") %>
-            </th>
-            <th class="font-semibold">Nazwa</th>
-            <th class="font-semibold">Typ</th>
-            <th class="font-semibold">Pobranie</th>
-            <th class="font-semibold">Status</th>
-            <th class="text-end font-semibold w-24">Akcje</th>
-          </tr>
-        </thead>
-        <tbody data-controller="sortable" data-sortable-resource-name-value="payment_method" data-sortable-handle-value=".handle">
-          <% @payment_methods.each do |payment_method| %>
-            <tr class="hover" data-sortable-update-url="<%= settings_payment_method_path(payment_method) %>">
-              <td class="handle cursor-move">
-                <div class="flex items-center justify-center w-8 h-8 text-base-content/40 hover:text-base-content/70 transition-colors">
-                  <%= lucide_icon("grip-vertical", class: "w-4 h-4") %>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <span class="font-medium"><%= payment_method.name %></span>
-                  <% if payment_method.description.present? %>
-                    <p class="text-xs text-base-content/50 mt-0.5"><%= truncate(payment_method.description, length: 60) %></p>
-                  <% end %>
-                </div>
-              </td>
-              <td>
-                <% if payment_method.gateway? %>
-                  <span class="badge badge-sm badge-info"><%= payment_method.gateway_name %></span>
-                  <% unless payment_method.gateway_configured? %>
-                    <span class="badge badge-sm badge-warning ml-1">Nieskonfigurowana</span>
-                  <% end %>
-                <% else %>
-                  <span class="text-base-content/50">Manualna</span>
-                <% end %>
-              </td>
-              <td>
-                <% if payment_method.cash_on_delivery? %>
-                  <span class="badge badge-sm badge-warning">Tak</span>
-                <% else %>
-                  <span class="text-base-content/50">—</span>
-                <% end %>
-              </td>
-              <td>
-                <% if payment_method.active? %>
-                  <span class="badge badge-sm badge-success">Aktywna</span>
-                <% else %>
-                  <span class="badge badge-sm badge-ghost">Nieaktywna</span>
-                <% end %>
-              </td>
-              <td class="text-end">
-                <div class="dropdown dropdown-end">
-                  <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
-                    <%= lucide_icon("more-vertical", class: "w-4 h-4") %>
-                  </div>
-                  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                    <li>
-                      <%= link_to edit_settings_payment_method_path(payment_method) do %>
-                        <%= lucide_icon("pencil", class: "w-4 h-4") %>
-                        Edytuj
-                      <% end %>
-                    </li>
-                    <li>
-                      <%= link_to settings_payment_method_path(payment_method), data: { turbo_method: :delete, turbo_confirm: "Na pewno usunąć tę metodę płatności?" }, class: "text-error" do %>
-                        <%= lucide_icon("trash-2", class: "w-4 h-4") %>
-                        Usuń
-                      <% end %>
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    <%= render "payment_methods_table" %>
   <% else %>
-    <div class="card bg-base-100 shadow-sm">
-      <div class="card-body items-center text-center py-12">
-        <%= lucide_icon("credit-card", class: "w-16 h-16 opacity-30") %>
-        <h3 class="text-lg font-semibold mt-2">Brak metod płatności</h3>
-        <p class="text-base-content/70 text-sm mb-4">Dodaj pierwszą metodę, aby oferować płatności klientom.</p>
-        <%= link_to "Nowa metoda płatności", new_settings_payment_method_path, class: "btn btn-primary" %>
-      </div>
-    </div>
+    <%= render "payment_methods_empty_state" %>
   <% end %>
 </div>
+<%= turbo_frame_tag "payment_method_modal" %>

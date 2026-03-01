@@ -1,8 +1,11 @@
-<%= form_with model: @payment_method, url: @payment_method.persisted? ? settings_payment_method_path(@payment_method) : settings_payment_methods_path, local: true do |f| %>
-  <div class="card-body">
+<%= form_with model: @payment_method, url: @payment_method.persisted? ? settings_payment_method_path(@payment_method) : settings_payment_methods_path, data: { turbo_frame: "_top" } do |f| %>
+  <div class="space-y-3">
     <div class="form-control">
       <%= f.label :name, "Nazwa", class: "label" %>
-      <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "np. Przelew bankowy, PayU, Za pobraniem" %>
+      <%= f.text_field :name, class: "input input-bordered w-full focus:input-primary #{@payment_method.errors[:name].any? ? 'input-error' : ''}", placeholder: "np. Przelew bankowy, PayU, Za pobraniem" %>
+      <% @payment_method.errors[:name].each do |message| %>
+        <label class="label"><span class="text-error text-sm"><%= message %></span></label>
+      <% end %>
     </div>
     <div class="form-control">
       <%= f.label :description, "Opis (opcjonalny)", class: "label" %>
@@ -16,26 +19,23 @@
           @payment_method.integration_id
         ),
         { include_blank: "Bez integracji (manualna)" },
-        class: "select select-bordered w-full" %>
-      <label class="label">
-        <span class="label-text-alt text-base-content/50">Wybierz integrację dla płatności online (np. PayU). Pozostaw puste dla metod manualnych.</span>
+        class: "select select-bordered w-full focus:select-primary" %>
+    </div>
+    <div class="form-control">
+      <label class="label cursor-pointer justify-start gap-3">
+        <%= f.check_box :cash_on_delivery, class: "toggle toggle-primary toggle-sm" %>
+        <span class="label-text">Płatność za pobraniem</span>
       </label>
     </div>
     <div class="form-control">
       <label class="label cursor-pointer justify-start gap-3">
-        <%= f.check_box :cash_on_delivery, class: "checkbox checkbox-sm" %>
-        <span>Płatność za pobraniem</span>
-      </label>
-    </div>
-    <div class="form-control">
-      <label class="label cursor-pointer justify-start gap-3">
-        <%= f.check_box :active, class: "checkbox checkbox-sm" %>
-        <span>Aktywna</span>
+        <%= f.check_box :active, class: "toggle toggle-primary toggle-sm" %>
+        <span class="label-text">Aktywna</span>
       </label>
     </div>
   </div>
-  <div class="card-actions justify-end p-4">
-    <%= link_to "Anuluj", settings_payment_methods_path, class: "btn btn-ghost" %>
+  <div class="modal-action">
+    <button type="button" class="btn btn-ghost" onclick="document.getElementById('payment_method_modal').innerHTML = ''">Anuluj</button>
     <%= f.submit "Zapisz", class: "btn btn-primary" %>
   </div>
 <% end %>
