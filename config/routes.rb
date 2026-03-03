@@ -88,6 +88,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # PayU IPN webhook (public, no auth required)
+  namespace :payments do
+    post "payu/notify", to: "payu#notify", as: :payu_notify
+  end
+
   root "dashboard#index"
 
   # Checkout

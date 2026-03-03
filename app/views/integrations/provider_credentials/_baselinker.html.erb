@@ -1,0 +1,31 @@
+<div class="card bg-base-100 border border-base-300 shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title text-lg mb-4">Dane uwierzytelniające</h2>
+
+    <div class="alert alert-info mb-4">
+      <%= lucide_icon("info", class: "w-5 h-5 shrink-0") %>
+      <span class="text-sm">
+        <strong>Baselinker:</strong> Potrzebujesz tylko API Token.<br>
+        Znajdziesz go w Baselinker → Ustawienia → Integracje → API
+      </span>
+    </div>
+
+    <!-- API Token -->
+    <div class="form-control">
+      <%= f.label :api_key, "API Token *", class: "label" %>
+      <%= f.password_field :api_key,
+          class: "input input-bordered w-full font-mono text-sm",
+          placeholder: integration.api_key.present? ? "••••••••••••••••" : "Wklej API Token",
+          required: integration.api_key.blank?,
+          autocomplete: "off" %>
+      <% if integration.api_key.present? %>
+        <label class="label mt-2">
+          <span class="label-text-alt text-success flex items-center gap-1">
+            <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+            API Token jest już zapisany – pozostaw puste, aby nie zmieniać
+          </span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+</div>

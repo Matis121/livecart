@@ -170,6 +170,19 @@ class Integration < ApplicationRecord
     INTEGRATION_TYPE_NAMES[integration_type.to_sym] || integration_type.humanize
   end
 
+  def payu?
+    provider == "payu"
+  end
+
+  # PayU-specific settings helpers
+  def payu_md5key
+    settings.dig("md5key")
+  end
+
+  def payu_sandbox?
+    ActiveModel::Type::Boolean.new.cast(settings.dig("sandbox"))
+  end
+
   # Baselinker-specific settings helpers
   def stock_sync_enabled?
     return true unless provider == "baselinker"

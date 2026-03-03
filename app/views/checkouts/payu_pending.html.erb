@@ -1,0 +1,15 @@
+<div class="min-h-screen container mx-auto px-4 py-8 max-w-6xl flex flex-col items-center justify-center">
+  <div class="max-w-2xl mx-auto py-16 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 mb-6">
+      <%= lucide_icon "clock", class: "w-16 h-16 text-warning stroke-[1.5]" %>
+    </div>
+    <h1 class="text-3xl mb-3 tracking-tight">Przetwarzamy Twoją płatność</h1>
+    <p class="text-base-content/50 mb-2">
+      Płatność jest weryfikowana przez PayU. Potwierdzenie otrzymasz na
+      <span class="text-base-content/70"><%= @order.email %></span>.
+    </p>
+    <p class="text-sm text-base-content/40">
+      Numer zamówienia: <strong><%= @order.order_number %></strong>
+    </p>
+  </div>
+</div>

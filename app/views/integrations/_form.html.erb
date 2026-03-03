@@ -59,51 +59,15 @@
       </div>
     </div>
   </div>
-  <!-- Credentials Card -->
-  <div class="card bg-base-100 border border-base-300 shadow-sm">
-    <div class="card-body">
-      <h2 class="card-title text-lg mb-4">Dane uwierzytelniające</h2>
-      <div class="alert alert-info mb-4">
-        <%= lucide_icon("info", class: "w-5 h-5") %>
-        <span class="text-sm">
-          <%= render "integrations/credentials_help", integration: integration %>
-        </span>
-      </div>
-      <!-- API Key -->
-      <div class="form-control">
-        <%= f.label :api_key, "API Key *", class: "label" %>
-        <%= f.password_field :api_key, 
-            class: "input input-bordered w-full font-mono text-sm",
-            placeholder: integration.api_key.present? ? "••••••••••••••••" : "Wklej swój API key",
-            required: integration.api_key.blank?,
-            autocomplete: "off" %>
-        <% if integration.api_key.present? %>
-          <label class="label mt-2">
-            <span class="label-text-alt text-success flex items-center gap-1">
-              <%= lucide_icon("check-circle", class: "w-4 h-4") %>
-              API Key jest już zapisany – pozostaw puste, aby nie zmieniać
-            </span>
-          </label>
-        <% end %>
-      </div>
-      <!-- API Secret (only for providers that require it) -->
-      <% if integration.requires_api_secret? %>
-        <div class="form-control">
-          <%= f.label :api_secret, "API Secret *", class: "label" %>
-          <%= f.password_field :api_secret, 
-              class: "input input-bordered w-full font-mono text-sm",
-              placeholder: "Wklej swój API secret",
-              required: true %>
-          <label class="label">
-            <span class="label-text-alt text-base-content/60">Wymagany dla <%= integration.provider_name %></span>
-          </label>
-        </div>
-      <% end %>
-    </div>
-  </div>
-  <!-- Provider-specific configuration (add a partial in views/integrations/provider_settings/_<provider>.html.erb) -->
-  <% if integration.provider.present? && lookup_context.exists?("provider_settings/#{integration.provider}", ["integrations"], true) %>
-    <%= render "integrations/provider_settings/#{integration.provider}", integration: integration %>
+  <%# Convention:
+      - provider_credentials/_provider.html.erb → credentials card (required for each provider)
+      - provider_settings/_provider.html.erb    → additional settings shown AFTER credentials (optional)
+  %>
+  <% if integration.provider.present? %>
+    <%= render "integrations/provider_credentials/#{integration.provider}", integration: integration, f: f %>
+    <% if lookup_context.exists?("provider_settings/#{integration.provider}", ["integrations"], true) %>
+      <%= render "integrations/provider_settings/#{integration.provider}", integration: integration, f: f %>
+    <% end %>
   <% end %>
   <!-- Actions -->
   <div class="flex gap-3">

@@ -1,0 +1,100 @@
+<div class="card bg-base-100 border border-base-300 shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title text-lg mb-4">Dane uwierzytelniające</h2>
+
+    <div class="alert alert-info mb-4">
+      <%= lucide_icon("info", class: "w-5 h-5 shrink-0") %>
+      <span class="text-sm">
+        <%= render "integrations/credentials_help", integration: integration %>
+      </span>
+    </div>
+
+    <!-- POS ID -->
+    <div class="form-control">
+      <%= f.label :api_key, "POS ID (Client ID) *", class: "label" %>
+      <%= f.password_field :api_key,
+          class: "input input-bordered w-full font-mono text-sm",
+          placeholder: integration.api_key.present? ? "••••••••••••••••" : "Wklej POS ID",
+          required: integration.api_key.blank?,
+          autocomplete: "off" %>
+      <% if integration.api_key.present? %>
+        <label class="label mt-2">
+          <span class="label-text-alt text-success flex items-center gap-1">
+            <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+            POS ID jest już zapisany – pozostaw puste, aby nie zmieniać
+          </span>
+        </label>
+      <% end %>
+    </div>
+
+    <!-- Client Secret -->
+    <div class="form-control">
+      <%= f.label :api_secret, "OAuth Protocol (Client Secret) *", class: "label" %>
+      <%= f.password_field :api_secret,
+          class: "input input-bordered w-full font-mono text-sm",
+          placeholder: integration.api_secret.present? ? "••••••••••••••••" : "Wklej Client Secret",
+          required: integration.api_secret.blank?,
+          autocomplete: "off" %>
+      <% if integration.api_secret.present? %>
+        <label class="label mt-2">
+          <span class="label-text-alt text-success flex items-center gap-1">
+            <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+            Client Secret jest już zapisany – pozostaw puste, aby nie zmieniać
+          </span>
+        </label>
+      <% end %>
+    </div>
+
+    <!-- MD5 Key -->
+    <div class="form-control">
+      <%= label_tag "integration[settings][md5key]", "Drugi klucz (MD5 Key) *", class: "label" %>
+      <%= password_field_tag "integration[settings][md5key]",
+          integration.settings&.dig("md5key"),
+          class: "input input-bordered w-full font-mono text-sm",
+          placeholder: integration.settings&.dig("md5key").present? ? "••••••••••••••••" : "Wklej drugi klucz",
+          autocomplete: "off" %>
+      <% if integration.settings&.dig("md5key").present? %>
+        <label class="label mt-2">
+          <span class="label-text-alt text-success flex items-center gap-1">
+            <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+            MD5 Key jest już zapisany – pozostaw puste, aby nie zmieniać
+          </span>
+        </label>
+      <% end %>
+    </div>
+
+    <div class="divider my-2"></div>
+
+    <!-- Sandbox toggle -->
+    <div class="border border-base-300 rounded-lg p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-semibold">Środowisko sandbox</h3>
+          <p class="text-sm text-base-content/60 mt-1">Włącz, aby testować płatności bez prawdziwych transakcji</p>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer gap-3">
+            <span class="label-text">Sandbox</span>
+            <%= hidden_field_tag "integration[settings][sandbox]", "false" %>
+            <%= check_box_tag "integration[settings][sandbox]",
+                "true",
+                ActiveModel::Type::Boolean.new.cast(integration.settings&.dig("sandbox")),
+                class: "toggle toggle-warning" %>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- IPN URL info -->
+    <div class="alert alert-info mt-4">
+      <%= lucide_icon "info", class: "w-5 h-5 shrink-0" %>
+      <div class="text-sm">
+        <strong>URL powiadomień IPN:</strong><br>
+        <code class="font-mono text-xs break-all"><%= payments_payu_notify_url %></code>
+        <p class="text-base-content/60 text-xs mt-1">
+          Wklej ten adres w panelu PayU → Moje sklepy → [sklep] → Powiadomienia
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

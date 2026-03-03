@@ -93,7 +93,8 @@ class IntegrationsController < ApplicationController
       settings: [ :inventory_id, :stock_sync_enabled, :price_sync_enabled,
                   :stock_match_by, :price_match_by, :export_order_status,
                   :baselinker_status_id, :order_status_sync_enabled,
-                  :custom_source_id, { status_mapping: {} } ]
+                  :custom_source_id, { status_mapping: {} },
+                  :md5key, :sandbox ]
     )
   end
 end

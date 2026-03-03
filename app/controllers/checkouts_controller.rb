@@ -10,10 +10,11 @@ class CheckoutsController < ApplicationController
   before_action :set_payment_methods, except: [ :not_found ]
 
   def show
-    @account = @order.account
-    @account_logo = @account.logo.attached? ? @account.logo : nil
-    @account_name = @account.checkout_settings["shop_name"]
+    set_checkout_view_data
     @open_package_enabled = @account.open_package_enabled?
+
+    # Klient wrócił z PayU (IPN jeszcze nie dotarł)
+    return render :payu_pending if params[:payu_return].present? && @order.payment_processing?
 
     # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
     if @checkout.completed?
@@ -37,29 +38,30 @@ class CheckoutsController < ApplicationController
   end
 
   def close_package
+    payment_method_name = params[:order][:payment_method]
+    payment_method_record = @order.account.payment_methods.find_by(name: payment_method_name)
+
     ActiveRecord::Base.transaction do
-      # Zapisz metodę dostawy
       shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
       @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
 
-      # Zapisz metodę płatności
-      payment_method_name = params[:order][:payment_method]
-      payment_method_record = @order.account.payment_methods.find_by(name: payment_method_name)
       @order.update!(
         payment_method: payment_method_name,
         cash_on_delivery: payment_method_record&.cash_on_delivery? || false
       )
 
       @order.update!(status: :payment_processing)
-      @checkout.close_package!
+      @checkout.close_package! unless payu_payment?(payment_method_record)
     end
 
-    session[:show_success_for_checkout] = @checkout.id
-    redirect_to checkout_path(@shop.slug, @checkout.token)
+    if payu_payment?(payment_method_record)
+      redirect_to_payu(payment_method_record.integration)
+    else
+      session[:show_success_for_checkout] = @checkout.id
+      redirect_to checkout_path(@shop.slug, @checkout.token)
+    end
   rescue => e
-    @account = @order.account
-    @account_logo = @account.logo.attached? ? @account.logo : nil
-    @account_name = @account.checkout_settings["shop_name"]
+    set_checkout_view_data
     @order.errors.add(:base, e.message)
     render :show, status: :unprocessable_entity
   end
@@ -112,10 +114,17 @@ class CheckoutsController < ApplicationController
   # Ścieżka "Wyślij teraz" — pełny flow z płatnością
   def update_ship_now
     if update_order_data(include_payment: true)
-      @checkout.complete!
       @order.update!(status: :payment_processing)
-      session[:show_success_for_checkout] = @checkout.id
-      redirect_to checkout_path(@shop.slug, @checkout.token)
+
+      payment_method_record = @order.account.payment_methods.find_by(name: @order.payment_method)
+
+      if payu_payment?(payment_method_record)
+        redirect_to_payu(payment_method_record.integration)
+      else
+        @checkout.complete!
+        session[:show_success_for_checkout] = @checkout.id
+        redirect_to checkout_path(@shop.slug, @checkout.token)
+      end
     else
       render :show, status: :unprocessable_entity
     end
@@ -164,6 +173,33 @@ class CheckoutsController < ApplicationController
   rescue => e
     @order.errors.add(:base, e.message)
     false
+  end
+
+  def payu_payment?(method_record)
+    method_record&.gateway? && method_record.integration&.payu?
+  end
+
+  def set_checkout_view_data
+    @account = @order.account
+    @account_logo = @account.logo.attached? ? @account.logo : nil
+    @account_name = @account.checkout_settings["shop_name"]
+  end
+
+  def redirect_to_payu(integration)
+    result = Integrations::Payu::OrderCreator.new(integration: integration, order: @order)
+      .call(
+        notify_url: payments_payu_notify_url,
+        continue_url: checkout_url(@shop.slug, @checkout.token, payu_return: 1),
+        customer_ip: request.remote_ip
+      )
+
+    if result.success?
+      redirect_to result.data[:redirect_uri], allow_other_host: true
+    else
+      set_checkout_view_data
+      @order.errors.add(:base, "Błąd płatności PayU: #{result.errors.join(', ')}")
+      render :show, status: :unprocessable_entity
+    end
   end
 
   def contact_params
