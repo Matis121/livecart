@@ -66,7 +66,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 
 gem "lucide-rails", "~> 0.7.3"
 gem "active_storage_validations"
