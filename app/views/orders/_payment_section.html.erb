@@ -1,28 +1,28 @@
 <turbo-frame id="payment_section">
   <div class="flex justify-between items-start mb-3">
-    <h3 class="font-semibold text-base">Płatność</h3>
-    <%= link_to edit_payment_order_path(order), 
+    <h3 class="subsection-title">Płatność</h3>
+    <%= link_to edit_payment_order_path(order),
         class: "btn btn-ghost btn-sm btn-square" do %>
       <%= lucide_icon "pencil", class: "w-4 h-4" %>
     <% end %>
   </div>
   <div class="space-y-3">
     <div class="flex justify-between items-center gap-2">
-      <span class="text-sm text-base-content/60">Zapłacono</span>
-      <div class="flex items-center gap-1 text-sm">
+      <span class="label-text">Zapłacono</span>
+      <div class="flex items-center gap-1 body-text">
         <span class="badge <%= order.payment_badge_class %>">
           <%= number_to_currency(order.paid_amount || 0, unit: order.currency, format: "%n %u") %>
         </span>
-        <span class="text-base-content/60">/</span>
+        <span class="text-text-muted">/</span>
         <span class="font-semibold"><%= number_to_currency(order.total_amount, unit: order.currency, format: "%n %u") %></span>
       </div>
     </div>
     <div class="flex justify-between items-center gap-2">
-      <span class="text-sm text-base-content/60">Pobranie</span>
+      <span class="label-text">Pobranie</span>
       <% if order.cash_on_delivery? %>
         <span class="badge badge-sm badge-warning">Tak</span>
       <% else %>
-        <span class="text-sm text-base-content/50">—</span>
+        <span class="body-secondary">—</span>
       <% end %>
     </div>
   </div>

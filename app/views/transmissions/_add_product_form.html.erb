@@ -4,8 +4,8 @@
   <div class="card-body p-6 sm:p-8">
     <div class="flex items-center gap-3 mb-6">
       <div>
-        <h2 class="card-title text-xl m-0">Dodaj produkt do transmisji</h2>
-        <p class="text-sm text-base-content/60 mt-0.5">Wybierz produkt z magazynu lub utwórz nowy, a następnie przypisz klientów</p>
+        <h2 class="section-title">Dodaj produkt do transmisji</h2>
+        <p class="body-secondary mt-0.5">Wybierz produkt z magazynu lub utwórz nowy, a następnie przypisz klientów</p>
       </div>
     </div>
     <%= form_with url: bulk_create_transmission_transmission_items_path(transmission),
@@ -34,7 +34,7 @@
         <div data-transmission-items-form-target="warehouseSection">
           <div class="flex items-center gap-2 mb-4">
             <%= lucide_icon("package", class: "w-5 h-5 text-base-content/60") %>
-            <span class="font-semibold">Produkt</span>
+            <span class="subsection-title">Produkt</span>
           </div>
           <!-- Search input -->
           <div class="relative mb-2">
@@ -67,7 +67,7 @@
           <div data-transmission-items-form-target="selectedProduct" class="hidden mt-3 p-3 bg-base-100 rounded-lg border border-base-300">
             <div class="flex items-center gap-3">
               <!-- Zdjęcie -->
-              <div class="avatar flex-shrink-0">
+              <div class="avatar shrink-0">
                 <div class="w-16 h-16 rounded">
                   <img data-transmission-items-form-target="selectedImage" alt="Product" class="object-cover w-full h-full">
                 </div>
@@ -75,7 +75,7 @@
               <!-- Informacje -->
               <div class="flex-1">
                 <div class="font-semibold" data-transmission-items-form-target="selectedName"></div>
-                <div class="text-sm opacity-60">
+                <div class="body-secondary">
                   <span>SKU: <span data-transmission-items-form-target="selectedSku"></span></span>
                   <span class="ml-3">EAN: <span data-transmission-items-form-target="selectedEan"></span></span>
                   <span class="ml-3">Stan: <span data-transmission-items-form-target="selectedQuantity"></span> szt.</span>
@@ -135,13 +135,13 @@
       <div class="rounded-xl border border-base-200/80 bg-base-200/30 p-5">
         <div class="flex items-center gap-2 mb-4">
           <%= lucide_icon("users", class: "w-5 h-5 text-base-content/60") %>
-          <span class="font-semibold">Klienci</span>
+          <span class="subsection-title">Klienci</span>
         </div>
         <div data-transmission-items-form-target="rows" class="space-y-3">
           <template data-transmission-items-form-target="template">
-            <div class="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-base-100 border border-base-200/60" data-transmission-items-form-target="row">
-              <div class="flex-1 min-w-[180px]">
-                <select name="items[][customer_id]" class="select select-bordered select-sm w-full">
+            <div class="flex flex-wrap items-end gap-3" data-transmission-items-form-target="row">
+              <div class="flex-1 min-w-45">
+                <select name="items[][customer_id]" class="input input-bordered w-full">
                   <option value="">— Wybierz klienta —</option>
                   <% customers.each do |c| %>
                     <option value="<%= c.id %>"><%= c.name %></option>
@@ -149,16 +149,16 @@
                 </select>
               </div>
               <div class="w-20">
-                <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered input-sm w-full" placeholder="Ilość">
+                <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered w-full" placeholder="Ilość">
               </div>
               <button type="button" class="btn btn-ghost btn-sm btn-square text-error/80 hover:text-error hover:bg-error/10" data-action="click->transmission-items-form#removeRow" title="Usuń wiersz">
                 <%= lucide_icon("trash-2", class: "w-4 h-4") %>
               </button>
             </div>
           </template>
-          <div class="flex flex-wrap items-end gap-3 p-3 rounded-lg bg-base-100 border border-base-200/60" data-transmission-items-form-target="row">
-            <div class="flex-1 min-w-[180px]">
-              <select name="items[][customer_id]" class="select select-bordered select-sm w-full">
+          <div class="flex flex-wrap items-center gap-3" data-transmission-items-form-target="row">
+            <div class="flex-1 min-w-45">
+              <select name="items[][customer_id]" class="input input-bordered w-full">
                 <option value="">— Wybierz klienta —</option>
                 <% customers.each do |c| %>
                   <option value="<%= c.id %>"><%= c.name %></option>
@@ -166,7 +166,7 @@
               </select>
             </div>
             <div class="w-20">
-              <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered input-sm w-full" placeholder="Ilość">
+              <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered w-full" placeholder="Ilość">
             </div>
             <button type="button" class="btn btn-ghost btn-sm btn-square text-error/80 hover:text-error hover:bg-error/10" data-action="click->transmission-items-form#removeRow" title="Usuń wiersz">
               <%= lucide_icon("trash-2", class: "w-4 h-4") %>

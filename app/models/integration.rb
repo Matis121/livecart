@@ -20,7 +20,7 @@ class Integration < ApplicationRecord
   }, prefix: :status
 
   INTEGRATION_TYPE_NAMES = {
-    marketplace: "Marketplace",
+    marketplace: "OMS",
     social_media: "Social Media",
     payment: "Płatności",
     shipping: "Przesyłki",

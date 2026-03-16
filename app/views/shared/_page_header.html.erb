@@ -1,0 +1,22 @@
+<%# Lokale:
+  # title      — wymagany
+  # subtitle   — opcjonalny, krótki opis pod tytułem
+  # back_path  — opcjonalny, ścieżka linku "Powrót"
+  # back_label — opcjonalny (domyślnie "Powrót")
+%>
+<% back_path  = local_assigns[:back_path] %>
+<% back_label = local_assigns.fetch(:back_label, "Powrót") %>
+<% subtitle   = local_assigns[:subtitle] %>
+
+<div>
+  <% if back_path.present? %>
+    <%= link_to back_path, class: "caption-text hover:text-base-content flex items-center gap-1 mb-1.5" do %>
+      <%= lucide_icon("arrow-left", class: "w-3.5 h-3.5") %>
+      <%= back_label %>
+    <% end %>
+  <% end %>
+  <h1 class="<%= page_header_class %>"><%= title %></h1>
+  <% if subtitle.present? %>
+    <p class="<%= page_header_paragraph_class %> mt-0.5"><%= subtitle %></p>
+  <% end %>
+</div>

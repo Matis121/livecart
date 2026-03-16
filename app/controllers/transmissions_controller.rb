@@ -5,7 +5,7 @@ class TransmissionsController < ApplicationController
   DEFAULT_PER_PAGE = 10
 
   def index
-    transmissions = current_account.transmissions.order(created_at: :desc)
+    @transmissions = current_account.transmissions.order(created_at: :desc).includes(:orders, transmission_items: [ :customer, { product: { images_attachments: :blob } } ])
 
     per_page = if params[:per_page].present?
       params[:per_page].to_i
@@ -19,18 +19,10 @@ class TransmissionsController < ApplicationController
     cookies[:transmissions_per_page] = { value: per_page, expires: 1.year.from_now }
 
     @per_page_options = PER_PAGE_OPTIONS
-    @pagy, @transmissions = pagy(transmissions, limit: per_page)
-
-    transmission_ids = @transmissions.map(&:id)
-    @expected_orders_counts = TransmissionItem
-      .where(transmission_id: transmission_ids)
-      .group(:transmission_id)
-      .distinct
-      .count(:customer_id)
-    @created_orders_counts = Order
-      .where(transmission_id: transmission_ids)
-      .group(:transmission_id)
-      .count
+    @pagy, @transmissions = pagy(
+      @transmissions,
+      limit: per_page
+    )
   end
 
   def show

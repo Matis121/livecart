@@ -1,36 +1,89 @@
 <tr class="hover">
-  <td class="font-mono text-sm text-base-content/70"><%= transmission.id %></td>
-  <td>
-    <%= link_to transmission_path(transmission) do %>
-      <span class="font-medium"><%= transmission.name %></span>
+  <td class="align-top max-w-0 overflow-hidden">
+    <%= link_to transmission_path(transmission), class: "flex flex-col" do %>
+      <span class="font-medium truncate"><%= transmission.name %></span>
+      <span class="text-xs text-base-content/40">#<%= transmission.id %></span>
     <% end %>
   </td>
-  <td>
-    <% expected = @expected_orders_counts[transmission.id] || 0 %>
-    <% created = @created_orders_counts[transmission.id] || 0 %>
-    <% if expected > 0 %>
-      <div class="flex items-center gap-2">
-        <progress class="progress progress-primary w-36" value="<%= created %>" max="<%= expected %>"></progress>
-        <span class="text-xs text-base-content/70 tabular-nums"><%= created %>/<%= expected %></span>
+  <td class="align-top max-w-0 overflow-hidden">
+    <% customers = transmission.transmission_items.map(&:customer).uniq %>
+    <% if customers.any? %>
+      <div class="flex flex-col gap-1">
+        <% customers.each do |customer| %>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <div class="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center shrink-0">
+              <span class="text-xs font-medium text-base-content/60"><%= customer.name.first %></span>
+            </div>
+            <span class="text-sm truncate"><%= customer.name %></span>
+          </div>
+        <% end %>
       </div>
     <% else %>
-      <span class="text-xs text-base-content/50">—</span>
+      <span class="text-base-content/30">—</span>
     <% end %>
   </td>
-  <td>
-    <span class="badge badge-sm <%= transmission.active? ? 'badge-success' : transmission.processing? ? 'badge-warning' : transmission.completed? ? 'badge-success' : 'badge-error' %>">
+  <td class="align-top max-w-0 overflow-hidden">
+    <% warehouse = transmission.transmission_items.filter_map(&:product).uniq %>
+    <% manual_items = transmission.transmission_items.select { |i| i.product_id.nil? }.uniq(&:name) %>
+    <% if warehouse.any? || manual_items.any? %>
+      <div class="flex flex-col gap-1.5">
+        <% warehouse.each do |product| %>
+          <div class="flex items-center gap-2 min-w-0">
+            <% if product.images.attached? %>
+              <%= image_tag product.images.first.variant(resize_to_fill: [32, 32]), class: "w-8 h-8 rounded object-cover shrink-0 border border-base-200" %>
+            <% else %>
+              <div class="w-8 h-8 rounded bg-base-200 flex items-center justify-center shrink-0 border border-base-200">
+                <%= lucide_icon('image', class: 'w-4 h-4 text-base-content/30') %>
+              </div>
+            <% end %>
+            <div class="min-w-0">
+              <%= link_to product.name, edit_product_path(product), class: "body-text truncate hover:underline" %>
+              <% if product.sku.present? || product.ean.present? %>
+                <div class="caption-text"><%= [ product.sku, product.ean ].compact.join(" · ") %></div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <% manual_items.each do |item| %>
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-8 h-8 rounded bg-base-200 flex items-center justify-center shrink-0 border border-base-200">
+              <%= lucide_icon('image', class: 'w-4 h-4 text-base-content/30') %>
+            </div>
+            <div class="min-w-0">
+              <div class="body-text truncate"><%= item.name %></div>
+              <% if item.sku.present? || item.ean.present? %>
+                <div class="caption-text"><%= [ item.sku, item.ean ].compact.join(" · ") %></div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <span class="text-base-content/30">—</span>
+    <% end %>
+  </td>
+  <td class="align-top">
+    <% created = transmission.orders.size %>
+    <% expected = transmission.transmission_items.map(&:customer_id).uniq.size %>
+    <div class="flex items-center gap-1">
+      <span class="font-medium"><%= created %></span>
+      <span class="text-base-content/40 text-sm">/ <%= expected %></span>
+    </div>
+  </td>
+  <td class="align-top">
+    <span class="badge badge-sm <%= transmission.active? ? 'badge-info' : transmission.processing? ? 'badge-warning' : transmission.completed? ? 'badge-success' : 'badge-error' %>">
       <%= transmission.active? ? 'Aktywna' : (transmission.processing? ? 'Przetwarzanie' : (transmission.completed? ? 'Zakończona' : 'Anulowana')) %>
     </span>
   </td>
-  <td class="text-base-content/70">
+  <td class="align-top caption-text">
     <%= l(transmission.created_at, format: :short) %>
   </td>
-  <td class="text-end">
+  <td class="align-top text-end">
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
         <%= lucide_icon("more-vertical", class: "w-4 h-4") %>
       </div>
-      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+      <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow">
         <li>
           <%= link_to transmission_path(transmission) do %>
             <%= lucide_icon('eye', class: 'w-4 h-4') %>

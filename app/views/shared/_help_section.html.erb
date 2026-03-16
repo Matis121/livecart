@@ -1,0 +1,14 @@
+<div class="mb-6 bg-base-100 rounded-lg shadow-sm overflow-hidden" data-controller="collapse" data-collapse-storage-key-value="<%= storage_key %>" data-collapse-default-open-value="false">
+  <button
+    type="button"
+    data-action="click->collapse#toggle"
+    class="flex items-center gap-2.5 w-full px-4 py-3 transition-colors text-left cursor-pointer"
+    >
+    <%= lucide_icon('circle-help', class: 'w-4 h-4 shrink-0') %>
+    <span class="text-sm font-semibold text-text-secondary"><%= title %></span>
+    <%= lucide_icon('chevron-down', class: 'w-4 h-4 ml-auto text-text-muted transition-transform shrink-0', data: { collapse_target: 'icon' }) %>
+  </button>
+  <div data-collapse-target="content" class="border-t border-base-200 p-5">
+    <%= content %>
+  </div>
+</div>

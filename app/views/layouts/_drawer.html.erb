@@ -6,10 +6,12 @@
     <%= render "layouts/navbar" %>
     <!-- Page content -->
     <main class="flex-1">
-      <%= turbo_frame_tag "flash_messages" do %>
-        <%= render "layouts/flash_messages" %>
-      <% end %>
-      <%= yield %>
+      <div class="px-8 py-6 space-y-8 mx-auto min-h-[calc(100vh-80px)]">
+        <%= turbo_frame_tag "flash_messages" do %>
+          <%= render "layouts/flash_messages" %>
+        <% end %>
+        <%= yield %>
+      </div>
     </main>
   </div>
   <!-- Sidebar -->

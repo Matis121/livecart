@@ -1,0 +1,59 @@
+<div class="relative">
+  <%= link_to edit_integration_path(integration),
+        class: "flex items-center gap-4 px-4 py-3.5 hover:bg-base-200/40 transition-colors pr-12" do %>
+    <div class="w-10 h-10 rounded-xl bg-white border border-base-200 flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+      <img src="<%= integration_logo_url(integration.provider) %>"
+           class="w-full h-full object-contain"
+           onerror="this.outerHTML='<span class=\'text-xs font-bold text-primary\'><%= integration.provider[0..1].upcase %></span>'">
+  </div>
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="font-medium text-sm"><%= integration.provider_name %></span>
+      <span class="badge <%= integration.status_badge_class %> badge-xs"><%= integration.status_name %></span>
+    </div>
+    <div class="text-xs text-base-content/50 mt-0.5">
+      <% if integration.provider_account_name.present? %>
+        <%= integration.provider_account_name %><% if integration.last_synced_at.present? %> · <% end %>
+      <% end %>
+      <% if integration.last_synced_at.present? %>
+        Synchronizacja <%= time_ago_in_words(integration.last_synced_at) %> temu
+      <% elsif integration.last_error_message.blank? %>
+        Nigdy nie synchronizowano
+      <% end %>
+    </div>
+    <% if integration.last_error_message.present? %>
+      <div class="flex items-center gap-1 text-xs text-error mt-1">
+        <%= lucide_icon("alert-circle", class: "w-3 h-3 shrink-0") %>
+        <span class="truncate"><%= truncate(integration.last_error_message, length: 60) %></span>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 dropdown dropdown-end" data-controller="dropdown">
+  <button tabindex="0" class="btn btn-sm btn-ghost btn-square">
+    <%= lucide_icon("ellipsis", class: "w-4 h-4") %>
+  </button>
+  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-xl border border-base-200 shadow-lg z-10 w-44 p-1">
+    <% if integration.can_sync? && ["baselinker", "sellasist"].include?(integration.provider) %>
+      <li>
+        <%= button_to sync_now_integration_path(integration),
+                method: :post,
+                class: "flex items-center gap-2 w-full text-left",
+                data: { turbo_confirm: "Rozpocząć synchronizację?" } do %>
+          <%= lucide_icon("refresh-cw", class: "w-4 h-4") %>
+          Synchronizuj
+        <% end %>
+      </li>
+    <% end %>
+    <li>
+      <%= button_to integration_path(integration),
+              method: :delete,
+              class: "flex items-center gap-2 w-full text-left text-error",
+              data: { turbo_confirm: "Czy na pewno usunąć tę integrację?" } do %>
+        <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+        Usuń
+      <% end %>
+    </li>
+  </ul>
+</div>
+</div>

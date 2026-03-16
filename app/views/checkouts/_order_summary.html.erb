@@ -1,83 +1,70 @@
-<!-- app/views/checkouts/_order_summary.html.erb -->
-<div class="bg-base-100 border border-base-300 rounded-lg overflow-hidden">
-  <div class="p-6">
-    <h2 class="text-xl tracking-tight mb-6">Twoje zamówienie</h2>
-    <% if order.order_items.any? %>
-      <!-- Lista produktów -->
-      <div class="space-y-4 mb-6">
-        <% order.order_items.includes(:product).each do |item| %>
-          <div class="flex gap-4">
-            <% if item.product&.images&.attached? %>
-              <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 overflow-hidden">
+<div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 bg-base-200/40 border-b border-base-300/40">
+    <h2 class="subsection-title tracking-tight">Twoje zamówienie</h2>
+  </div>
+  <% if order.order_items.any? %>
+    <!-- Lista produktów -->
+    <div class="p-6 space-y-4">
+      <% order.order_items.includes(:product).each do |item| %>
+        <div class="flex gap-3">
+          <div class="relative shrink-0">
+            <div class="w-16 h-16 rounded-xl bg-base-200 overflow-hidden border border-base-300/60">
+              <% if item.product&.images&.attached? %>
                 <%= image_tag item.product.images.first.variant(:thumb), class: "object-cover w-full h-full" %>
-              </div>
-            <% else %>
-              <div class="w-20 h-20 flex-shrink-0 rounded-lg bg-base-200 flex items-center justify-center">
-                <%= lucide_icon "image", class: "w-8 h-8 text-base-content/20" %>
-              </div>
-            <% end %>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-medium text-sm mb-1 truncate">
-                <%= item.product&.name || "Produkt" %>
-              </h3>
-              <p class="text-xs text-base-content/50 mb-2">
-                Ilość: <%= item.quantity %>
-              </p>
-              <p class="text-sm font-medium">
-                <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
-              </p>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center">
+                  <%= lucide_icon "image", class: "w-6 h-6 text-base-content/20" %>
+                </div>
+              <% end %>
+            </div>
+            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-content text-base-100 text-xs flex items-center justify-center font-semibold leading-none">
+              <%= item.quantity %>
             </div>
           </div>
+          <div class="flex-1 min-w-0 flex flex-col justify-center">
+            <p class="body-text font-medium truncate leading-snug"><%= item.product&.name || "Produkt" %></p>
+            <p class="body-text font-semibold text-base-content/80 mt-0.5">
+              <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="border-t border-base-200 mx-6"></div>
+    <!-- Koszty -->
+    <div class="px-6 py-4 space-y-2">
+      <div class="flex justify-between">
+        <span class="body-secondary">Produkty</span>
+        <span class="body-text font-medium"><%= number_to_currency(order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="body-secondary">Dostawa</span>
+        <% if order.shipping_cost > 0 %>
+          <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost, unit: "zł", format: "%n %u") %></span>
+        <% else %>
+          <span class="body-text font-medium text-success">Darmowa</span>
         <% end %>
       </div>
-      <!-- Separator -->
-      <div class="border-t border-base-300 mb-6"></div>
-      <!-- Podsumowanie kosztów -->
-      <div class="space-y-3 mb-6">
-        <div class="flex justify-between text-sm">
-          <span class="text-base-content/60">Produkty</span>
-          <span class="font-medium">
-            <%= number_to_currency(order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %>
-          </span>
-        </div>
-        <div class="flex justify-between text-sm">
-          <span class="text-base-content/60">Dostawa</span>
-          <span class="font-medium">
-            <% if order.shipping_cost > 0 %>
-              <%= number_to_currency(order.shipping_cost, unit: "zł", format: "%n %u") %>
-            <% else %>
-              <span class="text-success">Darmowa</span>
-            <% end %>
-          </span>
-        </div>
+    </div>
+    <div class="border-t border-base-200 mx-6"></div>
+    <!-- Suma końcowa -->
+    <div class="px-6 py-5 flex justify-between items-center">
+      <span class="subsection-title">Do zapłaty</span>
+      <span class="text-2xl font-bold tracking-tight">
+        <%= number_to_currency(order.total_amount, unit: "zł", format: "%n %u") %>
+      </span>
+    </div>
+    <!-- Stopka bezpieczeństwa -->
+    <div class="bg-base-200/40 border-t border-base-200 px-6 py-3 flex items-center gap-2">
+      <%= lucide_icon "shield-check", class: "w-4 h-4 text-success shrink-0" %>
+      <p class="caption-text">Twoje dane są bezpieczne. Płatność szyfrowana.</p>
+    </div>
+  <% else %>
+    <div class="p-12 text-center">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-base-200 mb-3">
+        <%= lucide_icon "shopping-bag", class: "w-6 h-6 text-base-content/30" %>
       </div>
-      <!-- Separator -->
-      <div class="border-t border-base-300 mb-6"></div>
-      <!-- Suma końcowa -->
-      <div class="flex justify-between items-baseline">
-        <span class="text-base text-base-content/80">Do zapłaty</span>
-        <span class="text-3xl tracking-tight">
-          <%= number_to_currency(order.total_amount, unit: "zł", format: "%n %u") %>
-        </span>
-      </div>
-    <% else %>
-      <div class="text-center py-8">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-base-200 mb-3">
-          <%= lucide_icon "shopping-bag", class: "w-6 h-6 text-base-content/30" %>
-        </div>
-        <p class="text-sm text-base-content/50">Brak produktów w koszyku</p>
-      </div>
-    <% end %>
-  </div>
-  <!-- Stopka -->
-  <% if order.order_items.any? %>
-    <div class="bg-base-200/50 px-6 py-4 border-t border-base-300">
-      <div class="flex items-start gap-2">
-        <%= lucide_icon "shield-check", class: "w-4 h-4 text-success mt-0.5 flex-shrink-0" %>
-        <p class="text-xs text-base-content/60 leading-relaxed">
-          Twoje dane są bezpieczne. Płatność jest szyfrowana.
-        </p>
-      </div>
+      <p class="body-secondary">Brak produktów w koszyku</p>
     </div>
   <% end %>
 </div>

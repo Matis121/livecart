@@ -1,19 +1,19 @@
-<turbo-frame id="contact_info_section" class="card-body">
+<turbo-frame id="contact_info_section">
   <div class="flex justify-between items-start mb-3">
-    <h3 class="font-semibold text-base">Dane kontaktowe</h3>
-    <%= link_to edit_contact_info_order_path(order), 
+    <h3 class="subsection-title">Dane kontaktowe</h3>
+    <%= link_to edit_contact_info_order_path(order),
         class: "btn btn-ghost btn-sm btn-square" do %>
       <%= lucide_icon "pencil", class: "w-4 h-4" %>
     <% end %>
   </div>
   <div class="space-y-3">
     <div class="flex justify-between items-center">
-      <span class="text-sm text-base-content/60">Email</span>
-      <span class="font-medium text-sm"><%= order.email.presence || "—" %></span>
+      <span class="label-text">Email</span>
+      <span class="body-text font-medium"><%= order.email.presence || "—" %></span>
     </div>
     <div class="flex justify-between items-center">
-      <span class="text-sm text-base-content/60">Telefon</span>
-      <span class="font-medium text-sm"><%= order.phone.presence || "—" %></span>
+      <span class="label-text">Telefon</span>
+      <span class="body-text font-medium"><%= order.phone.presence || "—" %></span>
     </div>
   </div>
 </turbo-frame>

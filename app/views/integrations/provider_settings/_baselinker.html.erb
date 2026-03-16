@@ -22,8 +22,8 @@
     <div class="border border-base-300 rounded-lg p-4 space-y-4">
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="font-semibold">Synchronizacja stanów magazynowych</h3>
-          <p class="text-sm text-base-content/60 mt-1">Import stanów z Baselinker do LiveCart</p>
+          <h3 class="subsection-title">Synchronizacja stanów magazynowych</h3>
+          <p class="body-secondary mt-1">Import stanów z Baselinker do LiveCart</p>
         </div>
         <div class="form-control">
           <label class="label cursor-pointer gap-3">
@@ -55,8 +55,8 @@
     <div class="border border-base-300 rounded-lg p-4 space-y-4 mt-4">
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="font-semibold">Synchronizacja cen</h3>
-          <p class="text-sm text-base-content/60 mt-1">Import cen z Baselinker do LiveCart</p>
+          <h3 class="subsection-title">Synchronizacja cen</h3>
+          <p class="body-secondary mt-1">Import cen z Baselinker do LiveCart</p>
         </div>
         <div class="form-control">
           <label class="label cursor-pointer gap-3">
@@ -84,8 +84,8 @@
     <!-- Order Export Section -->
     <div class="border border-base-300 rounded-lg p-4 space-y-4 mt-4">
       <div>
-        <h3 class="font-semibold">Eksport zamówień do Baselinker</h3>
-        <p class="text-sm text-base-content/60 mt-1">Na jakim statusie zamówienia mają być przekazywane</p>
+        <h3 class="subsection-title">Eksport zamówień do Baselinker</h3>
+        <p class="body-secondary mt-1">Na jakim statusie zamówienia mają być przekazywane</p>
       </div>
       <div class="form-control">
         <%= label_tag "integration[settings][export_order_status]", "Status zamówienia:", class: "label" %>
@@ -133,26 +133,23 @@
     </div>
     <!-- Order Status Sync Section -->
     <div class="border border-base-300 rounded-lg p-4 space-y-4 mt-4">
-      <div>
-        <h3 class="font-semibold">Synchronizacja statusów zamówień z Baselinker</h3>
-        <p class="text-sm text-base-content/60 mt-1">Automatycznie aktualizuj statusy zamówień w LiveCart na podstawie statusów w Baselinker</p>
-      </div>
-      <div class="form-control">
-        <label class="label cursor-pointer justify-start gap-3">
-          <%= hidden_field_tag "integration[settings][order_status_sync_enabled]", "false" %>
-          <%= check_box_tag "integration[settings][order_status_sync_enabled]",
-              "true",
-              ActiveModel::Type::Boolean.new.cast(integration.settings.dig("order_status_sync_enabled")),
-              class: "checkbox checkbox-primary" %>
-          <span class="label-text font-medium">Włącz synchronizację statusów zamówień</span>
-        </label>
-        <label class="label">
-          <span class="label-text-alt">Co 15 minut system będzie sprawdzać zmiany statusów w Baselinker</span>
-        </label>
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="subsection-title">Synchronizacja statusów zamówień z Baselinker</h3>
+          <p class="body-secondary mt-1">Automatycznie aktualizuj statusy zamówień w LiveCart na podstawie statusów w Baselinker</p>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer gap-3">
+            <span class="label-text">Włączona</span>
+            <%= check_box_tag "integration[settings][order_status_sync_enabled]", "1",
+                integration.order_status_sync_enabled?,
+                class: "toggle toggle-primary" %>
+          </label>
+        </div>
       </div>
       <div class="space-y-2">
         <p class="text-sm font-medium">Mapowanie statusów (ID Baselinker → Status w LiveCart):</p>
-        <p class="text-sm text-base-content/60">
+        <p class="body-secondary">
           Wpisz ID statusu z Baselinker oraz odpowiadający mu status w LiveCart.
           <a href="https://panel.baselinker.com/orders_statuses.php" target="_blank" class="link link-primary">
             Sprawdź ID statusów w Baselinker →
@@ -160,7 +157,7 @@
         </p>
         <% Order.statuses.keys.each do |order_status| %>
           <div class="flex items-center gap-3">
-            <div class="form-control flex-1">
+            <div class="form-control flex-1 max-w-64">
               <%= text_field_tag "integration[settings][status_mapping][#{order_status}]",
                   integration.settings.dig("status_mapping", order_status),
                   class: "input input-bordered input-sm w-full",
@@ -172,9 +169,6 @@
             </div>
           </div>
         <% end %>
-        <p class="text-xs text-base-content/50 mt-1">
-          Pozostaw puste, jeśli dany status Baselinker nie ma odpowiednika w LiveCart.
-        </p>
       </div>
     </div>
   </div>

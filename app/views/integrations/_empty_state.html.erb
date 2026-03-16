@@ -1,0 +1,10 @@
+<div class="flex flex-col items-center justify-center py-16 px-4">
+  <div class="w-20 h-20 rounded-full bg-base-200 flex items-center justify-center mb-4">
+    <%= lucide_icon("plug", class: "w-10 h-10 text-base-content/30") %>
+  </div>
+  <h3 class="section-title mb-2">Brak integracji</h3>
+  <p class="body-secondary text-center max-w-md mb-6">
+    Dodaj swoją pierwszą integrację, aby synchronizować dane z zewnętrznymi platformami.
+  </p>
+  <%= link_to "Dodaj integrację", new_integration_path, class: "btn btn-primary" %>
+</div>

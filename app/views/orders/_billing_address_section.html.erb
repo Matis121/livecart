@@ -1,24 +1,24 @@
 <turbo-frame id="billing_address_section">
   <div class="flex justify-between items-start mb-3">
     <div class="flex flex-wrap items-center gap-2">
-      <h3 class="font-semibold text-base">Adres faktury</h3>
+      <h3 class="subsection-title">Adres faktury</h3>
       <% if billing_address&.needs_invoice %>
         <span class="badge badge-info badge-sm whitespace-nowrap">Potrzebna faktura</span>
       <% end %>
     </div>
-    <%= link_to edit_order_billing_address_path(order), 
-        data: { turbo_frame: "billing_address_modal" }, 
+    <%= link_to edit_order_billing_address_path(order),
+        data: { turbo_frame: "billing_address_modal" },
         class: "btn btn-ghost btn-sm btn-square flex-shrink-0" do %>
       <%= lucide_icon "pencil", class: "w-4 h-4" %>
     <% end %>
   </div>
   <% if billing_address&.first_name.present? || billing_address&.company_name.present? || billing_address&.address_line1.present? %>
-    <div class="text-sm space-y-1 mb-3">
+    <div class="body-text space-y-1 mb-3">
       <% if billing_address.company_name.present? %>
         <div class="font-medium"><%= billing_address.company_name %></div>
       <% end %>
       <% if billing_address.nip.present? %>
-        <div class="text-xs">NIP: <%= billing_address.nip %></div>
+        <div class="caption-text">NIP: <%= billing_address.nip %></div>
       <% end %>
       <% if billing_address.first_name.present? || billing_address.last_name.present? %>
         <div class="<%= billing_address.company_name.present? ? '' : 'font-medium' %>"><%= [billing_address.first_name, billing_address.last_name].compact.join(" ") %></div>
@@ -37,14 +37,14 @@
       <% end %>
     </div>
   <% else %>
-    <p class="text-sm text-base-content/50 mb-3">Brak adresu</p>
+    <p class="body-secondary mb-3">Brak adresu</p>
   <% end %>
-  
-  <%= button_to copy_from_shipping_order_billing_address_path(order), 
+
+  <%= button_to copy_from_shipping_order_billing_address_path(order),
       method: :patch,
       class: "btn btn-ghost btn-xs gap-1",
-      data: { 
-        turbo_confirm: "Czy na pewno chcesz skopiować dane z adresu dostawy? Obecne dane zostaną nadpisane." 
+      data: {
+        turbo_confirm: "Czy na pewno chcesz skopiować dane z adresu dostawy? Obecne dane zostaną nadpisane."
       } do %>
     <%= lucide_icon "copy", class: "w-3 h-3" %>
     Skopiuj z dostawy

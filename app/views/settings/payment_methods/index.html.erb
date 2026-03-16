@@ -1,15 +1,13 @@
-<div class="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-bold mb-1">Metody płatności</h1>
-      <p class="text-base-content/70 text-sm sm:text-base">Zarządzaj metodami płatności swojego sklepu</p>
-    </div>
-    <%= link_to "Nowa metoda płatności", new_settings_payment_method_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "payment_method_modal" } %>
-  </div>
-  <% if @payment_methods.any? %>
-    <%= render "payment_methods_table" %>
-  <% else %>
-    <%= render "payment_methods_empty_state" %>
+<div class="<%= header_class %>">
+  <%= render "shared/page_header", title: "Metody płatności", subtitle: "Zarządzaj metodami płatności swojego sklepu" %>
+  <%= link_to new_settings_payment_method_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "payment_method_modal" } do %>
+    <%= lucide_icon('plus', class: 'w-4 h-4') %>
+    Dodaj metodę płatności
   <% end %>
 </div>
+<% if @payment_methods.any? %>
+  <%= render "payment_methods_table" %>
+<% else %>
+  <%= render "payment_methods_empty_state" %>
+<% end %>
 <%= turbo_frame_tag "payment_method_modal" %>

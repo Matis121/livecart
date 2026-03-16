@@ -1,14 +1,14 @@
-<div class="bg-base-100 rounded-lg shadow-sm">
+<div>
   <table class="table">
     <thead>
       <tr>
-        <th class="font-semibold w-4">
+        <th class="label-text w-4">
         </th>
-        <th class="font-semibold">Produkt</th>
-        <th class="font-semibold w-32">Cena brutto</th>
-        <th class="font-semibold w-24">VAT</th>
-        <th class="font-semibold w-32">Stan</th>
-        <th class="text-end font-semibold w-24">Akcje</th>
+        <th class="label-text">Produkt</th>
+        <th class="label-text w-32">Cena brutto</th>
+        <th class="label-text w-24">VAT</th>
+        <th class="label-text w-32">Stan</th>
+        <th class="text-end label-text w-24">Akcje</th>
       </tr>
     </thead>
     <tbody>
@@ -16,9 +16,9 @@
         <% @products.each do |product| %>
           <tr>
             <td class="align-top">
-              <%= check_box_tag "product_ids[]", product.id, nil, { 
-                multiple: true, 
-                form: "bulk_action_form", 
+              <%= check_box_tag "product_ids[]", product.id, nil, {
+                multiple: true,
+                form: "bulk_action_form",
                 data: { checkbox_select_all_target: "child", action: "click->checkbox-select-all#toggleParent" }
               } %>
             </td>
@@ -29,7 +29,7 @@
                     <% if product.images.attached? %>
                       <%= image_tag product.images.first.variant(:thumb), class: "w-14 h-14 object-cover rounded", loading: :lazy %>
                     <% else %>
-                      <span class="text-gray-400"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
+                      <span class="text-text-muted"><%= lucide_icon('image', class: 'w-14 h-14') %></span>
                     <% end %>
                   </div>
                 <% end %>
@@ -38,17 +38,17 @@
                     <div class="mb-1">
                       <%= link_to product.name, edit_product_path(product), class: "hover:underline" %>
                     </div>
-                    <div class="text-sm text-gray-400 flex gap-3 font-normal">
+                    <div class="caption-text flex gap-3 font-normal">
                       <span class="flex items-center gap-1">
-                        <span class="text-gray-400 font-semibold">ID:</span>
+                        <span class="label-text font-semibold">ID:</span>
                         <%= product.id.presence || '-' %>
                       </span>
                       <span class="flex items-center gap-1">
-                        <span class="text-gray-400 font-semibold">EAN:</span>
+                        <span class="label-text font-semibold">EAN:</span>
                         <%= product.ean.presence || '-' %>
                       </span>
                       <span class="flex items-center gap-1">
-                        <span class="text-gray-400 font-semibold">SKU:</span>
+                        <span class="label-text font-semibold">SKU:</span>
                         <%= product.sku.presence || '-' %>
                       </span>
                     </div>
@@ -107,4 +107,38 @@
       <% end %>
     </tbody>
   </table>
+  <div class="flex items-center justify-end gap-4 px-4 py-3 border-t border-base-200">
+    <div class="flex items-center gap-2">
+      <select
+        onchange="window.location.href = this.value"
+        class="select select-sm select-bordered bg-base-100 min-h-0 h-8 pr-8"
+      >
+        <% @per_page_options.each do |option| %>
+          <option
+            value="<%= products_path(request.params.merge(per_page: option, page: 1)) %>"
+            <%= 'selected' if @pagy.limit == option %>
+          >
+            <%= option %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+    <div class="flex items-center gap-1">
+      <% if @pagy.page > 1 %>
+        <%= link_to products_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
+      <% end %>
+      <span class="px-2 tabular-nums"><%= @pagy.page %> / <%= @pagy.pages %></span>
+      <% if @pagy.page < @pagy.pages %>
+        <%= link_to products_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+          <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
+        <% end %>
+      <% else %>
+        <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
+      <% end %>
+    </div>
+  </div>
 </div>

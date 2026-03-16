@@ -1,7 +1,24 @@
 class CustomersController < ApplicationController
   before_action :set_customer, only: [ :edit, :update, :destroy ]
+
+  PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
+  DEFAULT_PER_PAGE = 10
   def index
     @customers = current_account.customers.order(created_at: :asc)
+
+    per_page = if params[:per_page].present?
+      params[:per_page].to_i
+    elsif cookies[:customers_per_page].present?
+      cookies[:customers_per_page].to_i
+    else
+      DEFAULT_PER_PAGE
+    end
+
+    per_page = DEFAULT_PER_PAGE unless PER_PAGE_OPTIONS.include?(per_page)
+    cookies[:customers_per_page] = { value: per_page, expires: 1.year.from_now }
+
+    @per_page_options = PER_PAGE_OPTIONS
+    @pagy, @customers = pagy(@customers, limit: per_page)
   end
 
   def edit

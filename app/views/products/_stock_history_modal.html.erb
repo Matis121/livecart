@@ -3,7 +3,7 @@
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
-    <h3 class="font-bold text-lg mb-4">Historia magazynowa - <%= product.name %></h3>
+    <h3 class="section-title mb-4">Historia magazynowa - <%= product.name %></h3>
     <% stock_movements = product.product_stock_movements.order(created_at: :desc) %>
     <% if stock_movements.any? %>
       <div class="overflow-x-auto">
@@ -40,7 +40,7 @@
                   <% if movement.order_item %>
                     <%= link_to "##{movement.order_item.order.order_number}", order_path(movement.order_item.order), class: "link link-primary" %>
                   <% else %>
-                    <span class="text-gray-400">-</span>
+                    <span class="caption-text">-</span>
                   <% end %>
                 </td>
                 <td><%= movement.quantity_before %></td>

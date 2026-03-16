@@ -1,0 +1,9 @@
+<div class="mb-6">
+  <h2 class="<%= section_header_class("mb-3") %> flex items-center gap-2">
+    <%= Integration.integration_type_label(type) %>
+    <span class="badge badge-sm badge-ghost"><%= integrations.count %></span>
+  </h2>
+  <div class="bg-base-100 rounded-xl border border-base-200 overflow-hidden shadow-sm divide-y divide-base-200">
+    <%= render partial: "integrations/integration_card", collection: integrations, as: :integration %>
+  </div>
+</div>

@@ -1,10 +1,11 @@
-<div class="container mx-auto px-4 py-8 max-w-2xl">
-  <div class="mb-6">
-    <%= link_to employees_path, class: "btn btn-ghost btn-sm gap-2" do %>
-      <%= lucide_icon('arrow-left', class: 'w-4 h-4') %>
-      Powrót
-    <% end %>
-  </div>
-  <h1 class="text-3xl font-bold mb-6">Nowy pracownik</h1>
-  <%= render "form" %>
-</div>
+<%= turbo_frame_tag "user_modal" do %>
+  <dialog class="modal modal-open">
+    <div class="modal-box max-w-md max-h-[90vh]">
+      <h3 class="section-title mb-4">Nowy pracownik</h3>
+      <%= render "form" %>
+    </div>
+    <div class="modal-backdrop"
+         onclick="document.getElementById('user_modal').innerHTML = ''">
+    </div>
+  </dialog>
+<% end %>

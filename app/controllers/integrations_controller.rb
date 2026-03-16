@@ -5,9 +5,6 @@ class IntegrationsController < ApplicationController
     @integrations = current_account.integrations
                                    .includes(:user)
                                    .order(created_at: :desc)
-
-    # Group by integration type for better organization
-    @integrations_by_type = @integrations.group_by(&:integration_type)
   end
 
   def show

@@ -3,7 +3,7 @@
     <div class="alert alert-error">
       <%= lucide_icon("alert-circle", class: "w-5 h-5") %>
       <div>
-        <h3 class="font-bold">Wystąpiły błędy:</h3>
+        <h3 class="subsection-title">Wystąpiły błędy:</h3>
         <ul class="list-disc list-inside text-sm mt-1">
           <% integration.errors.full_messages.each do |message| %>
             <li><%= message %></li>
@@ -24,7 +24,7 @@
             <%= integration.provider_name %>
           </div>
           <label class="label">
-            <span class="label-text-alt text-base-content/60">Wybrana platforma</span>
+            <span class="caption-text">Wybrana platforma</span>
           </label>
         </div>
       <% else %>

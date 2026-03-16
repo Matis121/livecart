@@ -1,121 +1,125 @@
-<aside class="w-56 bg-base-100 min-h-screen flex flex-col">
-  <!-- Logo -->
-  <div class="px-5 py-6">
-    <a href="<%= root_path %>" class="flex items-center gap-2">
-      <span class="text-lg font-semibold tracking-tight">Livecart</span>
-    </a>
-  </div>
-  <!-- Navigation -->
-  <nav class="flex-1 px-3">
-    <ul class="space-y-1">
-      <li>
-        <%= link_to root_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(root_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('layout-dashboard', class: 'w-4 h-4') %>
-          <span>Dashboard</span>
-        <% end %>
-      </li>
-      <li>
-        <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors">
-          <%= lucide_icon('message-circle', class: 'w-4 h-4') %>
-          <span>Chat</span>
-        </a>
-      </li>
-      <li>
-        <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(orders_path) || request.path.start_with?('/orders') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('shopping-bag', class: 'w-4 h-4') %>
-          <span>Zamówienia</span>
-        <% end %>
-      </li>
-      <li>
-        <%= link_to transmissions_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(transmissions_path) || request.path.start_with?('/transmissions') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('radio', class: 'w-4 h-4') %>
-          <span>Transmisje</span>
-        <% end %>
-      </li>
-      <% products_active = request.path.start_with?('/products') %>
-      <li>
-        <details class="group" <%= 'open' if products_active %>>
-          <summary class="flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer list-none <%= products_active ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content' %>">
-            <%= lucide_icon('package', class: 'w-4 h-4') %>
-            <span class="flex-1">Produkty</span>
-            <%= lucide_icon('chevron-down', class: 'w-4 h-4 transition-transform group-open:rotate-180') %>
-          </summary>
-          <ul class="mt-1 ml-7 space-y-1">
+<div class="w-[300px] h-full p-3">
+  <aside class=" bg-base-100 flex flex-col overflow-hidden h-full border border-base-300 rounded-lg">
+    <!-- Logo -->
+    <div class="px-7 py-6">
+      <a href="<%= root_path %>" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shrink-0">
+          <%= lucide_icon("box", class: "w-5 h-5") %>
+        </div>
+        <span class="text-xl font-bold tracking-tight text-base-content">Livecart</span>
+      </a>
+    </div>
+    <!-- Main Navigation -->
+    <nav class="flex-1 px-4 overflow-y-auto">
+      <ul class="space-y-2">
+        <li>
+          <%= link_to orders_path, class: "flex items-center gap-3 px-3 py-2 text-base font-medium rounded-lg transition-colors #{current_page?(orders_path) || request.path.start_with?('/orders') ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content'}" do %>
+            <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+              <%= lucide_icon('shopping-cart', class: 'w-4 h-4') %>
+            </div>
+            <span>Zamówienia</span>
+          <% end %>
+        </li>
+        <% products_active = request.path.start_with?('/products') %>
+        <li>
+          <details class="group" <%= 'open' if products_active %>>
+            <summary class="flex items-center gap-3 px-3 py-2.5 text-base font-medium rounded-lg transition-colors cursor-pointer list-none <%= products_active ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content' %>">
+              <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+                <%= lucide_icon('package', class: 'w-4 h-4') %>
+              </div>
+              <span class="flex-1">Produkty</span>
+              <%= lucide_icon('chevron-right', class: 'w-4 h-4 transition-transform group-open:rotate-90 text-base-content/40') %>
+            </summary>
+            <ul class="mt-1 ml-5 border-l border-base-200 pl-2 space-y-1">
+              <li>
+                <%= link_to products_path, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors #{current_page?(products_path) ? 'bg-base-300 text-base-content' : ' hover:text-base-content hover:bg-base-300/50'}" do %>
+                  <span>Lista produktów</span>
+                <% end %>
+              </li>
+              <li>
+                <%= link_to import_form_products_path, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors #{current_page?(import_form_products_path) ? 'bg-base-300 text-base-content' : ' hover:text-base-content hover:bg-base-300/50'}" do %>
+                  <span>Import produktów</span>
+                <% end %>
+              </li>
+              <li>
+                <%= link_to import_history_products_path, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg transition-colors #{current_page?(import_history_products_path) ? 'bg-base-300 text-base-content' : ' hover:text-base-content hover:bg-base-300/50'}" do %>
+                  <span>Historia importów</span>
+                <% end %>
+              </li>
+            </ul>
+          </details>
+        </li>
+        <li>
+          <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2.5 text-base font-medium rounded-lg transition-colors #{current_page?(customers_path) || request.path.start_with?('/customers') ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content'}" do %>
+            <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+              <%= lucide_icon('users', class: 'w-4 h-4') %>
+            </div>
+            <span>Klienci</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to transmissions_path, class: "flex items-center gap-3 px-3 py-2.5 text-base font-medium rounded-lg transition-colors #{current_page?(transmissions_path) || request.path.start_with?('/transmissions') ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content'}" do %>
+            <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+              <%= lucide_icon('radio', class: 'w-4 h-4') %>
+            </div>
+            <span>Transmisje Live</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to integrations_path, class: "flex items-center gap-3 px-3 py-2.5 text-base font-medium rounded-lg transition-colors #{current_page?(integrations_path) || request.path.start_with?('/integrations') ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content'}" do %>
+            <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+              <%= lucide_icon('blocks', class: 'w-4 h-4') %>
+            </div>
+            <span>Integracje</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to settings_root_path, class: "flex items-center gap-3 px-3 py-2.5 text-base font-medium rounded-lg transition-colors #{request.path.start_with?('/settings') ? 'bg-base-300 text-base-content' : ' hover:bg-base-300/50 hover:text-base-content'}" do %>
+            <div class="p-1.5 bg-base-100 rounded-md border border-base-300 shadow-xs">
+              <%= lucide_icon('sliders', class: 'w-4 h-4 ') %>
+            </div>
+            Ustawienia
+          <% end %>
+        </li>
+      </ul>
+    </nav>
+    <!-- Bottom section (Invite, User Settings) -->
+    <div class="px-4 py-4 mt-auto">
+      <% if user_signed_in? %>
+        <div class="dropdown dropdown-top w-full">
+          <div tabindex="0" role="button" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-base-300/50 transition-colors cursor-pointer border border-base-200/50">
+            <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center border border-base-300">
+              <%= lucide_icon('user', class: 'w-4 h-4 ') %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-base font-medium truncate"><%= current_user.email.split('@').first %></p>
+            </div>
+            <%= lucide_icon('more-horizontal', class: 'w-4 h-4 text-base-content/50') %>
+          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-xl z-[1] w-full p-2 shadow-xl border border-base-200 mb-2 gap-1">
+            <li class="px-2 py-1 text-xs font-semibold text-base-content/50 uppercase tracking-wider">Konto</li>
             <li>
-              <%= link_to products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-                <span>Lista produktów</span>
+              <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg hover:bg-base-300" do %>
+                <%= lucide_icon('settings', class: 'w-4 h-4 ') %>
+                Ustawienia profilu
               <% end %>
             </li>
             <li>
-              <%= link_to import_form_products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(import_form_products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-                <span>Import</span>
+              <%= link_to employees_path, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg hover:bg-base-300" do %>
+                <%= lucide_icon('users-round', class: 'w-4 h-4 ') %>
+                Konta pracownicze
               <% end %>
             </li>
+            <div class="divider my-0"></div>
             <li>
-              <%= link_to import_history_products_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(import_history_products_path) ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-                <span>Historia importów</span>
+              <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 px-3 py-2 text-base rounded-lg text-error hover:bg-error/10 hover:text-error w-full text-left" do %>
+                <%= lucide_icon('log-out', class: 'w-4 h-4') %>
+                Wyloguj się
               <% end %>
             </li>
           </ul>
-        </details>
-      </li>
-      <li>
-        <%= link_to customers_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(customers_path) || request.path.start_with?('/customers') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('users', class: 'w-4 h-4') %>
-          <span>Klienci</span>
-        <% end %>
-      </li>
-      <li>
-        <%= link_to integrations_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{current_page?(integrations_path) || request.path.start_with?('/integrations') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('plug', class: 'w-4 h-4') %>
-          <span>Integracje</span>
-        <% end %>
-      </li>
-    </ul>
-    <div class="my-4 mx-3 border-t border-base-200"></div>
-    <ul class="space-y-1">
-      <li>
-        <%= link_to settings_root_path, class: "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors #{request.path.start_with?('/settings') ? 'bg-base-200 text-base-content font-medium' : 'text-base-content/70 hover:bg-base-200/50 hover:text-base-content'}" do %>
-          <%= lucide_icon('settings', class: 'w-4 h-4') %>
-          <span>Ustawienia</span>
-        <% end %>
-      </li>
-    </ul>
-  </nav>
-  <!-- User section -->
-  <% if user_signed_in? %>
-    <div class="p-3 mt-auto">
-      <div class="dropdown dropdown-top w-full">
-        <div tabindex="0" role="button" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-base-200/50 transition-colors cursor-pointer">
-          <div class="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
-            <span class="text-xs font-medium text-base-content/70"><%= current_user.email[0].upcase %></span>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate"><%= current_user.account&.company_name || 'Mój sklep' %></p>
-          </div>
-          <%= lucide_icon('chevrons-up-down', class: 'w-4 h-4 text-base-content/40') %>
         </div>
-        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-lg z-1 w-full p-1 shadow-lg border border-base-200 mb-1">
-          <li>
-            <%= link_to edit_user_registration_path, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-md" do %>
-              <%= lucide_icon('user', class: 'w-4 h-4') %>
-              Profil
-            <% end %>
-          </li>
-          <li>
-            <%= link_to employees_path, class: "flex items-center gap-3 px-3 py-2 text-sm text-base-content/70 rounded-lg hover:bg-base-200/50 hover:text-base-content transition-colors" do %>
-              <%= lucide_icon('user-cog', class: 'w-4 h-4') %>
-              <span>Konta pracownicze</span>
-            <% end %>
-          </li>
-          <li>
-            <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 px-3 py-2 text-sm rounded-md text-error w-full text-left" do %>
-              <%= lucide_icon('log-out', class: 'w-4 h-4') %>
-              Wyloguj się
-            <% end %>
-          </li>
-        </ul>
-      </div>
+      <% end %>
     </div>
-  <% end %>
-</aside>
+  </aside>
+</div>

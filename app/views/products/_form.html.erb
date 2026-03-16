@@ -1,97 +1,157 @@
 <%= form_with model: @product, local: true, html: { multipart: true } do |f| %>
-  <div class="space-y-8">
-    <%# ===== SEKCJA: INFORMACJE PODSTAWOWE ===== %>
-    <section>
-      <h3 class="text-lg font-semibold mb-2">Informacje podstawowe</h3>
-      <div class="space-y-2">
-        <div class="form-control w-full">
-          <%= f.label :name, "Nazwa produktu", class: "label" %>
-          <%= f.text_field :name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Koszulka męska" %>
+  <%# ===== NAGŁÓWEK Z AKCJAMI ===== %>
+  <div class="<%= header_class("mb-8") %>">
+    <%= render "shared/page_header",
+        title: @product.persisted? ? "Edytuj produkt" : "Nowy produkt",
+        back_path: products_path,
+        back_label: "Powrót do produktów" %>
+    <div class="flex items-center gap-2">
+      <%= link_to "Anuluj", products_path, class: "btn btn-ghost" %>
+      <%= f.submit @product.persisted? ? "Zapisz zmiany" : "Dodaj produkt", class: "btn btn-primary" %>
+    </div>
+  </div>
+  <%# ===== DWUKOLUMNOWY GRID ===== %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# ===== LEWA KOLUMNA (główna treść) ===== %>
+    <div class="lg:col-span-2 space-y-6">
+      <%# KARTA: Informacje podstawowe %>
+      <div class="bg-base-100 border border-base-200 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <%= lucide_icon("tag", class: "w-4 h-4 text-base-content/40") %>
+          <h3 class="section-title">Informacje podstawowe</h3>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-4">
           <div class="form-control w-full">
-            <%= f.label :sku, "SKU", class: "label" %>
-            <%= f.text_field :sku, class: "input input-bordered w-full focus:input-primary", placeholder: "np. KOSZ-001" %>
+            <label class="label pb-1.5">
+              <span class="label-text">Nazwa produktu</span>
+            </label>
+            <%= f.text_field :name, class: "input input-bordered w-full focus:input-primary", placeholder: "np. Koszulka męska" %>
           </div>
-          <div class="form-control w-full">
-            <%= f.label :ean, "EAN", class: "label" %>
-            <%= f.text_field :ean, class: "input input-bordered w-full focus:input-primary", placeholder: "np. 5901234123457" %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+              <label class="label pb-1.5">
+                <span class="label-text">SKU</span>
+              </label>
+              <%= f.text_field :sku, class: "input input-bordered w-full focus:input-primary font-mono", placeholder: "np. KOSZ-001" %>
+            </div>
+            <div class="form-control w-full">
+              <label class="label pb-1.5">
+                <span class="label-text">EAN</span>
+              </label>
+              <%= f.text_field :ean, class: "input input-bordered w-full focus:input-primary font-mono", placeholder: "np. 5901234123457" %>
+            </div>
           </div>
         </div>
       </div>
-    </section>
-    <%# ===== SEKCJA: CENA I MAGAZYN ===== %>
-    <section>
-      <h3 class="text-lg font-semibold mb-4">Cena i magazyn</h3>
-      <div class="space-y-2">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="form-control w-full">
-            <%= f.label :gross_price, "Cena domyślna", class: "label" %>
-            <%= f.number_field :gross_price, class: "input input-bordered w-full focus:input-primary", step: 0.01, min: 0, placeholder: "99.99" %>
-          </div>
-          <div class="form-control w-full">
-            <%= f.label :tax_rate, "VAT", class: "label" %>
-            <%= f.select :tax_rate, [["23%", 23], ["8%", 8], ["5%", 5], ["0%", 0]], {}, class: "select select-bordered w-full focus:select-primary" %>
-          </div>
-          <div class="form-control w-full">
-            <%= f.label :currency, "Waluta", class: "label" %>
-            <%= f.select :currency, [["PLN", "PLN"], ["EUR", "EUR"], ["USD", "USD"]], {}, class: "select select-bordered w-full focus:select-primary" %>
-          </div>
+      <%# KARTA: Zdjęcia %>
+      <div class="bg-base-100 border border-base-200 rounded-xl p-6" data-controller="image-preview">
+        <div class="flex items-center gap-2 mb-4">
+          <%= lucide_icon("image", class: "w-4 h-4 text-base-content/40") %>
+          <h3 class="section-title">Zdjęcia</h3>
         </div>
-        <%= f.fields_for :product_stock do |stock_fields| %>
-          <div class="form-control w-full max-w-xs">
-            <%= stock_fields.label :quantity, "Stan magazynowy", class: "label" %>
-            <%= stock_fields.number_field :quantity, class: "input input-bordered w-full focus:input-primary", placeholder: "0" %>
-          </div>
+        <% if @product.images.attached? %>
+          <p class="caption-text mb-3">Kliknij zdjęcie aby zaznaczyć je do usunięcia</p>
         <% end %>
-      </div>
-    </section>
-    <%# ===== SEKCJA: ZDJĘCIA ===== %>
-    <section>
-      <h3 class="text-lg font-semibold mb-4">Zdjęcia</h3>
-      <% if @product.images.attached? %>
-        <p class="text-sm text-gray-500 mb-3">Zaznacz zdjęcia do usunięcia:</p>
-        <div class="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+        <%# Grid: istniejące zdjęcia + podgląd nowych + kafelek dodawania %>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
           <% @product.images.each do |image| %>
             <div class="relative group">
-              <%= image_tag image, class: "w-full aspect-square object-cover rounded-lg border" %>
-              <label class="absolute top-1 right-1 flex items-center gap-1 bg-error/90 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-error">
-                <%= check_box_tag "product[images_to_delete][]", image.id, false, class: "checkbox checkbox-xs" %>
-                Usuń
+              <%= check_box_tag "product[images_to_delete][]", image.id, false,
+                  class: "peer sr-only",
+                  id: "del_#{image.id}" %>
+              <%= image_tag image, class: "w-full aspect-square object-cover rounded-lg border border-base-200 peer-checked:opacity-50 peer-checked:ring-2 peer-checked:ring-error/80 transition-all" %>
+              <label for="del_<%= image.id %>"
+                     class="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-lg cursor-pointer text-white transition-opacity opacity-0 group-hover:opacity-100 peer-checked:opacity-100 bg-error/70">
+                <%= lucide_icon("trash-2", class: "w-4 h-4") %>
+                <span class="tiny-text text-white">Usuń</span>
               </label>
             </div>
           <% end %>
-        </div>
-      <% end %>
-      <div class="form-control w-full">
-        <%= f.file_field :images, multiple: true, accept: "image/png,image/jpeg", class: "file-input file-input-bordered w-full focus:file-input-primary" %>
-        <label class="label">
-          <span class="label-text-alt text-gray-500">PNG, JPEG • maks. 5MB</span>
-        </label>
-      </div>
-    </section>
-    <%# ===== SEKCJA: INTEGRACJE ===== %>
-    <section>
-      <h3 class="text-lg font-semibold mb-4">Integracje</h3>
-      <div class="alert alert-info mb-4">
-        <%= lucide_icon("info", class: "w-5 h-5") %>
-        <div class="text-sm">
-          Powiązanie produktu z Baselinker pozwala na automatyczną synchronizację stanów magazynowych przy eksporcie zamówień. Magazyn (inventory_id) jest wybierany w konfiguracji integracji.
+          <%# Kafelek "Dodaj zdjęcia" — wbudowany w grid, input nakładka opacity-0 %>
+          <label data-image-preview-target="uploadTile"
+                 class="aspect-square border-2 border-dashed border-base-300 rounded-lg flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors group relative overflow-hidden">
+            <%= lucide_icon("plus", class: "w-5 h-5 text-base-content/40 group-hover:text-primary transition-colors") %>
+            <span class="tiny-text group-hover:text-primary transition-colors">Dodaj</span>
+            <%= f.file_field :images, multiple: true, accept: "image/png,image/jpeg",
+                class: "absolute inset-0 opacity-0 cursor-pointer w-full h-full",
+                data: { "image-preview-target": "input", action: "change->image-preview#preview" } %>
+          </label>
         </div>
       </div>
-      <div class="space-y-4">
-        <div class="form-control">
-          <%= f.label :baselinker_product_id, "Baselinker - ID produktu", class: "label" %>
-          <%= f.text_field :baselinker_product_id, 
-              class: "input input-bordered w-full focus:input-primary font-mono text-sm", 
+    </div>
+    <%# ===== PRAWA KOLUMNA (sidebar) ===== %>
+    <div class="space-y-6">
+      <%# KARTA: Cena %>
+      <div class="bg-base-100 border border-base-200 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <%= lucide_icon("circle-dollar-sign", class: "w-4 h-4 text-base-content/40") %>
+          <h3 class="section-title">Cena</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="form-control w-full">
+            <label class="label pb-1.5">
+              <span class="label-text">Cena brutto</span>
+            </label>
+            <div class="relative">
+              <%= f.number_field :gross_price, class: "input input-bordered w-full focus:input-primary pr-14", step: 0.01, min: 0, placeholder: "0.00" %>
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 caption-text font-mono">PLN</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="form-control w-full">
+              <label class="label pb-1.5">
+                <span class="label-text">VAT</span>
+              </label>
+              <%= f.select :tax_rate, [["23%", 23], ["8%", 8], ["5%", 5], ["0%", 0]], {}, class: "select select-bordered w-full focus:select-primary" %>
+            </div>
+            <div class="form-control w-full">
+              <label class="label pb-1.5">
+                <span class="label-text">Waluta</span>
+              </label>
+              <%= f.select :currency, [["PLN", "PLN"], ["EUR", "EUR"], ["USD", "USD"]], {}, class: "select select-bordered w-full focus:select-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <%# KARTA: Magazyn %>
+      <div class="bg-base-100 border border-base-200 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <%= lucide_icon("warehouse", class: "w-4 h-4 text-base-content/40") %>
+          <h3 class="section-title">Magazyn</h3>
+        </div>
+        <%= f.fields_for :product_stock do |stock_fields| %>
+          <div class="form-control w-full">
+            <label class="label pb-1.5">
+              <span class="label-text">Stan magazynowy</span>
+            </label>
+            <div class="relative">
+              <%= stock_fields.number_field :quantity, class: "input input-bordered w-full focus:input-primary pr-10", placeholder: "0" %>
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 caption-text">szt.</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <%# KARTA: Integracje %>
+      <div class="bg-base-100 border border-base-200 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <%= lucide_icon("blocks", class: "w-4 h-4 text-base-content/40") %>
+          <h3 class="section-title">Integracje</h3>
+        </div>
+        <div class="flex gap-2.5 bg-info/10 border border-info/20 rounded-lg p-3 mb-4">
+          <%= lucide_icon("info", class: "w-4 h-4 text-info shrink-0 mt-0.5") %>
+          <p class="caption-text" style="color: oklch(from var(--color-info) calc(l * 0.8) c h)">
+            Powiązanie z Baselinker umożliwia automatyczną synchronizację stanów magazynowych przy eksporcie zamówień.
+          </p>
+        </div>
+        <div class="form-control w-full">
+          <label class="label pb-1.5">
+            <span class="label-text">Baselinker &mdash; ID produktu</span>
+          </label>
+          <%= f.text_field :baselinker_product_id,
+              class: "input input-bordered w-full focus:input-primary font-mono text-sm",
               placeholder: "np. 12345" %>
         </div>
       </div>
-    </section>
-  </div>
-  <%# ===== PRZYCISKI ===== %>
-  <div class="flex gap-2 pt-6">
-    <%= f.submit @product.persisted? ? "Zapisz zmiany" : "Dodaj produkt", class: "btn btn-primary" %>
-    <%= link_to "Anuluj", products_path, class: "btn btn-ghost" %>
+    </div>
   </div>
 <% end %>

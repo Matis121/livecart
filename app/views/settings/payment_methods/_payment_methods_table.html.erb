@@ -24,7 +24,7 @@
             <div>
               <span class="font-medium"><%= payment_method.name %></span>
               <% if payment_method.description.present? %>
-                <p class="text-xs text-base-content/50 mt-0.5"><%= truncate(payment_method.description, length: 60) %></p>
+                <p class="caption-text mt-0.5"><%= truncate(payment_method.description, length: 60) %></p>
               <% end %>
             </div>
           </td>
@@ -35,14 +35,14 @@
                 <span class="badge badge-sm badge-warning ml-1">Nieskonfigurowana</span>
               <% end %>
             <% else %>
-              <span class="text-base-content/50">Manualna</span>
+              <span class="body-secondary">Manualna</span>
             <% end %>
           </td>
           <td>
             <% if payment_method.cash_on_delivery? %>
               <span class="badge badge-sm badge-warning">Tak</span>
             <% else %>
-              <span class="text-base-content/50">—</span>
+              <span class="body-secondary">—</span>
             <% end %>
           </td>
           <td>

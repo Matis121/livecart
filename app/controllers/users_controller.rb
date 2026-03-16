@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     if @user.save
       redirect_to employees_path, notice: "Pracownik został utworzony"
     else
-      render :new, status: :unprocessable_entity
+      render turbo_stream: turbo_stream.replace("user_modal", template: "users/new")
     end
   end
 
@@ -24,7 +24,7 @@ class UsersController < ApplicationController
     if @user.update(user_params)
       redirect_to employees_path, notice: "Pracownik został zaktualizowany"
     else
-      render :edit, status: :unprocessable_entity
+      render turbo_stream: turbo_stream.replace("user_modal", template: "users/edit")
     end
   end
 

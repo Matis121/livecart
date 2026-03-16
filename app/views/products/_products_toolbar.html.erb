@@ -1,144 +1,110 @@
-<div class="mb-4" data-controller="collapse" data-collapse-storage-key-value="products-filters-open" data-collapse-default-open-value="true">
-  <!-- Formularz wyszukiwania -->
-  <%= search_form_for @q, url: products_path, method: :get, html: { class: "mb-4" } do |f| %>
-    <div class="bg-base-100 rounded-lg shadow-sm">
-      <!-- Header z przyciskiem toggle -->
-      <div class="flex items-center justify-between p-4 border-b border-base-200">
-        <h3 class="text-sm font-semibold flex items-center gap-2">
-          <%= lucide_icon('filter', class: 'w-4 h-4') %>
-          Filtry
-        </h3>
-        <button 
-          type="button"
-          data-action="click->collapse#toggle"
-          class="btn btn-ghost flex gap-2"
-          >
-          <%= lucide_icon('chevron-down', class: 'w-5 h-5 transition-transform', data: { collapse_target: 'icon' }) %>
-        </button>
+<div data-controller="collapse" data-collapse-storage-key-value="products-filters-open" data-collapse-default-open-value="false">
+  <%= search_form_for @q, url: products_path, method: :get do |f| %>
+    <!-- Główny pasek narzędzi -->
+    <div class="flex items-center gap-1.5 bg-base-100 rounded-t-lg shadow-sm px-2 py-4 border-b border-base-200">
+      <!-- Select all -->
+      <div class="dropdown dropdown-start" data-checkbox-select-all-target="parent">
+        <label tabindex="0" class="btn btn-sm btn-ghost flex items-center gap-1.5">
+          <%= lucide_icon('check-square', class: 'w-4 h-4') %>
+          <span class="font-medium tabular-nums text-xs hidden" data-checkbox-select-all-target="counter">
+            0 / <%= @products.count %>
+          </span>
+          <%= lucide_icon('chevron-down', class: 'w-3 h-3 opacity-50') %>
+        </label>
+        <ul tabindex="0" class="dropdown-content menu p-1.5 shadow-lg bg-base-100 rounded-box w-48 border border-base-200">
+          <li><a class="text-sm" data-action="click->checkbox-select-all#toggleChildren" data-value="true">Zaznacz wszystkie</a></li>
+          <li><a class="text-sm" data-action="click->checkbox-select-all#toggleChildren" value="false">Odznacz wszystkie</a></li>
+        </ul>
       </div>
-      <!-- Zawartość filtrów -->
-      <div data-collapse-target="content" class="p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-          <!-- Nazwa -->
-          <div class="form-control">
-            <%= f.label :name_cont, "Nazwa", class: "label label-text text-xs" %>
-            <%= f.search_field :name_cont, 
-                placeholder: "Szukaj po nazwie...",
-                class: "input input-sm input-bordered w-full" %>
+      <!-- Bulk actions -->
+      <div class="flex items-center gap-0.5">
+        <button
+          type="submit"
+          form="bulk_action_form"
+          formaction="<%= bulk_action_products_path(action_type: 'delete') %>"
+          class="btn btn-sm btn-ghost text-error hover:text-error"
+          onclick="return confirm('Czy na pewno chcesz usunąć zaznaczone produkty?')"
+          title="Usuń zaznaczone"
+        >
+          <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
+        </button>
+        <div class="dropdown">
+          <div tabindex="0" role="button" class="btn btn-sm btn-ghost" title="Pobierz">
+            <%= lucide_icon('download', class: 'w-4 h-4') %>
           </div>
-          <!-- EAN -->
-          <div class="form-control">
-            <%= f.label :ean_cont, "EAN", class: "label label-text text-xs" %>
-            <%= f.search_field :ean_cont, 
-                placeholder: "Szukaj po EAN...",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
-          <!-- SKU -->
-          <div class="form-control">
-            <%= f.label :sku_cont, "SKU", class: "label label-text text-xs" %>
-            <%= f.search_field :sku_cont, 
-                placeholder: "Szukaj po SKU...",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
-          <!-- Stan od -->
-          <div class="form-control">
-            <%= f.label :product_stock_quantity_gteq, "Stan od", class: "label label-text text-xs" %>
-            <%= f.number_field :product_stock_quantity_gteq, 
-                placeholder: "Min...",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
-          <!-- Stan do -->
-          <div class="form-control">
-            <%= f.label :product_stock_quantity_lteq, "Stan do", class: "label label-text text-xs" %>
-            <%= f.number_field :product_stock_quantity_lteq, 
-                placeholder: "Max...",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
-          <!-- Cena od -->
-          <div class="form-control">
-            <%= f.label :gross_price_gteq, "Cena od", class: "label label-text text-xs" %>
-            <%= f.number_field :gross_price_gteq, 
-                placeholder: "Min...",
-                step: "0.01",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
-          <!-- Cena do -->
-          <div class="form-control">
-            <%= f.label :gross_price_lteq, "Cena do", class: "label label-text text-xs" %>
-            <%= f.number_field :gross_price_lteq, 
-                placeholder: "Max...",
-                step: "0.01",
-                class: "input input-sm input-bordered w-full" %>
-          </div>
+          <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-lg z-1 w-48 p-1 shadow-lg border border-base-200">
+            <li>
+              <button
+                type="submit"
+                form="bulk_action_form"
+                formmethod="post"
+                formaction="<%= bulk_action_products_path(action_type: 'export') %>"
+                class="text-sm"
+              >
+                <%= lucide_icon('file-text', class: 'w-3.5 h-3.5') %>
+                Produkty [CSV]
+              </button>
+            </li>
+          </ul>
         </div>
-        <!-- Przyciski -->
-        <div class="flex justify-end gap-2 mt-6">
-          <%= link_to "Wyczyść", products_path, class: "btn btn-sm btn-ghost" %>
-          <%= f.submit "Filtruj", class: "btn btn-sm btn-primary" %>
+      </div>
+      <!-- Pole wyszukiwania -->
+      <div class="flex flex-1 justify-center min-w-0">
+        <div class="relative w-full max-w-4xl">
+          <span class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+            <%= lucide_icon('search', class: 'w-3.5 h-3.5') %>
+          </span>
+          <%= f.search_field :name_cont,
+              placeholder: "Szukaj po nazwie produktu...",
+              class: "input input-md input-bordered w-full pl-8 bg-transparent border-base-200 focus:border-primary" %>
         </div>
+      </div>
+      <!-- Filtry toggle -->
+      <button
+        type="button"
+        data-action="click->collapse#toggle"
+        class="btn btn-sm btn-ghost gap-1.5 shrink-0"
+        >
+        <%= lucide_icon('sliders-horizontal', class: 'w-3.5 h-3.5') %>
+        <span class="hidden sm:inline text-xs">Filtry</span>
+        <%= lucide_icon('chevron-down', class: 'w-3 h-3 opacity-50 transition-transform', data: { collapse_target: 'icon' }) %>
+      </button>
+    </div>
+    <!-- Panel filtrów (zwijany) -->
+    <div data-collapse-target="content" class="bg-base-100 shadow-sm px-4 py-3 border-b border-base-200">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="form-control">
+          <%= f.label :ean_cont, "EAN", class: "label label-text text-xs pb-1" %>
+          <%= f.search_field :ean_cont, placeholder: "EAN...", class: "input input-sm input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :sku_cont, "SKU", class: "label label-text text-xs pb-1" %>
+          <%= f.search_field :sku_cont, placeholder: "SKU...", class: "input input-sm input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :product_stock_quantity_gteq, "Stan od", class: "label label-text text-xs pb-1" %>
+          <%= f.number_field :product_stock_quantity_gteq, placeholder: "Min", class: "input input-sm input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :product_stock_quantity_lteq, "Stan do", class: "label label-text text-xs pb-1" %>
+          <%= f.number_field :product_stock_quantity_lteq, placeholder: "Max", class: "input input-sm input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :gross_price_gteq, "Cena od", class: "label label-text text-xs pb-1" %>
+          <%= f.number_field :gross_price_gteq, placeholder: "Min", step: "0.01", class: "input input-sm input-bordered w-full" %>
+        </div>
+        <div class="form-control">
+          <%= f.label :gross_price_lteq, "Cena do", class: "label label-text text-xs pb-1" %>
+          <%= f.number_field :gross_price_lteq, placeholder: "Max", step: "0.01", class: "input input-sm input-bordered w-full" %>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-4">
+        <%= link_to "Wyczyść", products_path, class: "btn btn-sm btn-ghost" %>
+        <%= f.submit "Zastosuj filtry", class: "btn btn-sm btn-primary" %>
       </div>
     </div>
   <% end %>
-  <!-- Pagination controls -->
-  <div class="flex items-center justify-between gap-3 text-sm text-base-content/60 mt-3">
-    <div class="flex items-center gap-2" >
-      <div class="dropdown dropdown-start" data-checkbox-select-all-target="parent">
-        <label tabindex="0" class="btn btn-sm bg-base-100 flex items-center gap-2">
-          <%= lucide_icon('check-square', class: 'w-4 h-4') %>
-          <span 
-                class="font-medium tabular-nums hidden" 
-                data-checkbox-select-all-target="counter"
-            >
-            0 / <%= @products.count %>
-          </span>
-        </label>
-        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a data-action="click->checkbox-select-all#toggleChildren" data-value="true">Zaznacz wszystkie</a></li>
-          <li><a data-action="click->checkbox-select-all#toggleChildren" value="false">Odznacz wszystkie</a></li>
-        </ul>
-      </div>
-      <%= form_with url: bulk_action_products_path, method: :patch, id: "bulk_action_form" do |f| %>
-        <%= render "products/bulk_actions_toolbar" %>
-      <% end %>
-      <%= form_with url: bulk_action_products_path, method: :post, id: "bulk_action_form", data: { turbo: false } do |f| %>
-        <%= render "products/bulk_actions_export" %>
-      <% end %>
-    </div>
-    <div class="flex gap-4">
-      <!-- Per page selector -->
-      <div class="flex items-center gap-2">
-        <select
-        onchange="window.location.href = this.value"
-        class="select select-sm select-bordered bg-base-100 min-h-0 h-8 pr-8"
-      >
-          <% @per_page_options.each do |option| %>
-            <option
-            value="<%= products_path(request.params.merge(per_page: option, page: 1)) %>"
-            <%= 'selected' if @pagy.limit == option %>
-          >
-              <%= option %>
-            </option>
-          <% end %>
-        </select>
-      </div>
-      <!-- Page navigation -->
-      <div class="flex items-center gap-1">
-        <% if @pagy.page > 1 %>
-          <%= link_to products_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
-            <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
-          <% end %>
-        <% else %>
-          <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
-        <% end %>
-        <span class="px-2 tabular-nums"><%= @pagy.page %> / <%= @pagy.pages %></span>
-        <% if @pagy.page < @pagy.pages %>
-          <%= link_to products_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
-            <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
-          <% end %>
-        <% else %>
-          <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
-        <% end %>
-      </div>
-    </div>
-  </div>
+  <!-- Formularz akcji zbiorczych (checkboxy w tabeli go referencjonują przez form="bulk_action_form") -->
+  <%= form_with url: bulk_action_products_path, method: :patch, id: "bulk_action_form" do %>
+  <% end %>
 </div>

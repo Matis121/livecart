@@ -5,9 +5,7 @@ module Settings
     before_action :set_shipping_method, only: [ :edit, :update, :destroy ]
 
     def index
-      per_page = (params[:per_page] || 10).to_i
-      @per_page_options = [ 10, 25, 50 ]
-      @pagy, @shipping_methods = pagy(current_account.shipping_methods.order(:position), limit: per_page)
+      @shipping_methods = current_account.shipping_methods.order(:position)
     end
 
     def new

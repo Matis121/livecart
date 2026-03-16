@@ -1,3 +1,214 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
-@plugin "daisyui"
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(95% 0 0);
+  --color-base-300: oklch(90% 0 0);
+  --color-base-content: #2e2e2e;
+  --color-primary: oklch(51.1% 0.262 276.966);
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: oklch(65% 0.09 261);
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: oklch(74% 0.08 33);
+  --color-accent-content: oklch(20% 0 0);
+  --color-neutral: #2e2e2e;
+  --color-neutral-content: oklch(98.462% 0.001 247.838);
+  --color-info: oklch(58% 0.17 231);
+  --color-info-content: oklch(98% 0 0);
+  --color-success: oklch(45% 0.18 160);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: oklch(62% 0.15 83);
+  --color-warning-content: oklch(98% 0 0);
+  --color-error: oklch(48% 0.22 22);
+  --color-error-content: oklch(98% 0 0);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* ============================================
+   DESIGN SYSTEM — Typography & Colors
+   Zmiana tutaj → zmiana wszędzie w aplikacji
+   ============================================ */
+
+@theme {
+  /* --- Kolory tekstu (bazujące na base-content) --- */
+  --color-text-primary: var(--color-base-content);
+  --color-text-secondary: oklch(from var(--color-base-content) l c h / 70%);
+  --color-text-muted: oklch(from var(--color-base-content) l c h / 50%);
+  --color-text-faint: oklch(from var(--color-base-content) l c h / 30%);
+}
+
+/* --- Nagłówki --- */
+
+/* Główny tytuł strony, np. "Klienci", "Dashboard" */
+@utility page-title {
+  font-size: 1.5rem; /* 24px */
+  line-height: 2rem; /* 32px */
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+}
+
+/* Tytuł sekcji w karcie, np. "Aktywni klienci" */
+@utility section-title {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.75rem; /* 28px */
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+}
+
+/* Mały nagłówek / podsekcja, np. "Szczegóły adresu" */
+@utility subsection-title {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem; /* 20px */
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+/* --- Tekst treści --- */
+
+/* Standardowy tekst body */
+@utility body-text {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.375rem; /* 22px */
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Opis pod nagłówkiem / tekst pomocniczy */
+@utility body-secondary {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.375rem; /* 22px */
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* --- Małe elementy --- */
+
+/* Etykiety formularzy, nagłówki kolumn tabeli */
+@utility label-text {
+  font-size: 0.8125rem; /* 13px */
+  line-height: 1.125rem; /* 18px */
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+/* Podpisy, daty, metadane, tekst w footerze */
+@utility caption-text {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem; /* 16px */
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Badge, tagi, bardzo małe elementy */
+@utility tiny-text {
+  font-size: 0.6875rem; /* 11px */
+  line-height: 0.875rem; /* 14px */
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* --- Liczby / statystyki --- */
+
+/* Duża liczba na dashboardzie, np. "1,234" */
+@utility stat-value {
+  font-size: 1.8rem; /* 30px */
+  line-height: 2.25rem; /* 36px */
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+}
+
+/* Etykieta pod statystyką, np. "Łączna sprzedaż" */
+@utility stat-label {
+  font-size: 0.75rem; /* 12px */
+  line-height: 1rem; /* 16px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+/* --- Kontenery --- */
+
+/* Reużywalny box — zastępuje card + card-body, bez narzutów DaisyUI */
+@utility box {
+  background-color: var(--color-base-100);
+  border-radius: var(--radius-box);
+  box-shadow: var(--shadow-xl);
+  padding: 1.5rem;
+}
+
+/* --- Inline / link --- */
+
+/* Link w tekście */
+@utility text-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* ============================================
+   SOFT BADGES & ALERTS
+   Pastelowe tło + wyrazisty tekst
+   ============================================ */
+
+.badge-error {
+  background-color: oklch(95% 0.04 22);
+  border-color: oklch(88% 0.08 22);
+  color: oklch(42% 0.22 22);
+}
+.badge-warning {
+  background-color: oklch(96% 0.04 83);
+  border-color: oklch(89% 0.08 83);
+  color: oklch(50% 0.16 83);
+}
+.badge-info {
+  background-color: oklch(94% 0.04 231);
+  border-color: oklch(87% 0.08 231);
+  color: oklch(46% 0.2 231);
+}
+.badge-success {
+  background-color: oklch(93% 0.04 160);
+  border-color: oklch(86% 0.08 160);
+  color: oklch(38% 0.18 160);
+}
+
+.alert-error {
+  background-color: oklch(95% 0.04 22);
+  border-color: oklch(88% 0.08 22);
+  color: oklch(42% 0.22 22);
+}
+.alert-warning {
+  background-color: oklch(96% 0.04 83);
+  border-color: oklch(89% 0.08 83);
+  color: oklch(50% 0.16 83);
+}
+.alert-info {
+  background-color: oklch(94% 0.04 231);
+  border-color: oklch(87% 0.08 231);
+  color: oklch(46% 0.2 231);
+}
+.alert-success {
+  background-color: oklch(93% 0.04 160);
+  border-color: oklch(86% 0.08 160);
+  color: oklch(38% 0.18 160);
+}
