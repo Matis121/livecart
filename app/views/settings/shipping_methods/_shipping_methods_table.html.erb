@@ -25,10 +25,10 @@
             <span class="font-medium"><%= shipping_method.name %></span>
           </td>
           <td>
-            <%= number_to_currency(shipping_method.price, unit: "zł", format: "%n %u") %>
+            <%= number_to_currency(shipping_method.price) %>
           </td>
           <td>
-            <%= shipping_method.free_above.present? ? number_to_currency(shipping_method.free_above, unit: "zł", format: "%n %u") : "—" %>
+            <%= shipping_method.free_above.present? ? number_to_currency(shipping_method.free_above) : "—" %>
           </td>
           <td>
             <% if shipping_method.is_pickup_point? %>

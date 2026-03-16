@@ -184,7 +184,7 @@
                     <span class="body-text font-medium"><%= method.name %></span>
                   </div>
                   <span class="body-secondary shrink-0">
-                    <%= method.free_above.present? ? "Darmowa od #{number_to_currency(method.free_above, unit: 'zł', format: '%n %u')}" : number_to_currency(method.price, unit: 'zł', format: '%n %u') %>
+                    <%= method.free_above.present? ? "Darmowa od #{number_to_currency(method.free_above)}" : number_to_currency(method.price) %>
                   </span>
                 </label>
               <% end %>

@@ -12,7 +12,7 @@
             <span class="btn btn-ghost join-item no-animation"><%= @order.currency %></span>
           </div>
           <label class="label">
-            <span class="label-text-alt text-base-content/60">Suma zamówienia: <%= number_to_currency(@order.total_amount, unit: @order.currency, format: "%n %u") %></span>
+            <span class="label-text-alt text-base-content/60">Suma zamówienia: <%= number_to_currency(@order.total_amount, unit: @order.currency) %></span>
           </label>
         </div>
 

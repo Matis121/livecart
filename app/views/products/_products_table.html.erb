@@ -57,7 +57,7 @@
               </div>
             </td>
             <td>
-              <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
+              <%= number_to_currency(product.gross_price, unit: product.currency) %>
             </td>
             <td>
               <%= product.tax_rate %>%

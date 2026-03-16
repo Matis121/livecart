@@ -42,11 +42,11 @@
                     </div>
                   </div>
                 </td>
-                <td class="text-right"><%= number_to_currency(item.unit_price, unit: order.currency, format: "%n %u") %></td>
+                <td class="text-right"><%= number_to_currency(item.unit_price, unit: order.currency) %></td>
                 <td class="text-center">
                   <span class="badge badge-ghost"><%= item.quantity %></span>
                 </td>
-                <td class="text-right font-semibold"><%= number_to_currency(item.total_price, unit: order.currency, format: "%n %u") %></td>
+                <td class="text-right font-semibold"><%= number_to_currency(item.total_price, unit: order.currency) %></td>
                 <td class="text-center">
                   <div class="dropdown dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-sm btn-ghost">

@@ -25,12 +25,12 @@
           </td>
           <td>
             <div class="flex flex-col gap-2">
-              <%= discount_code.percentage? ? "#{discount_code.value}%" : number_to_currency(discount_code.value, unit: "zł", format: "%n %u") %>
+              <%= discount_code.percentage? ? "#{discount_code.value}%" : number_to_currency(discount_code.value) %>
               <%= discount_code.free_shipping? ? "<span class='badge badge-sm badge-success'>Darmowa dostawa</span>".html_safe : "" %>
             </div>
           </td>
           <td>
-            <%= discount_code.minimum_order_amount.present? ? number_to_currency(discount_code.minimum_order_amount, unit: "zł", format: "%n %u") : "—" %>
+            <%= discount_code.minimum_order_amount.present? ? number_to_currency(discount_code.minimum_order_amount) : "—" %>
           </td>
           <td>
             <% if discount_code.usage_limit.present? %>

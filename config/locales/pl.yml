@@ -1,4 +1,17 @@
 pl:
+  number:
+    currency:
+      format:
+        unit: "zł"
+        format: "%n %u"
+        separator: ","
+        delimiter: " "
+        precision: 2
+        strip_insignificant_zeros: false
+    format:
+      separator: ","
+      delimiter: " "
+      precision: 2
   date:
     formats:
       default: "%d.%m.%Y"

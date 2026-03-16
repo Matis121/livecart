@@ -24,7 +24,7 @@
           <div class="flex-1 min-w-0 flex flex-col justify-center">
             <p class="body-text font-medium truncate leading-snug"><%= item.product&.name || "Produkt" %></p>
             <p class="body-text font-semibold text-base-content/80 mt-0.5">
-              <%= number_to_currency(item.total_price, unit: "zł", format: "%n %u") %>
+              <%= number_to_currency(item.total_price) %>
             </p>
           </div>
         </div>
@@ -35,12 +35,12 @@
     <div class="px-6 py-4 space-y-2">
       <div class="flex justify-between">
         <span class="body-secondary">Produkty</span>
-        <span class="body-text font-medium"><%= number_to_currency(order.order_items.sum(&:total_price), unit: "zł", format: "%n %u") %></span>
+        <span class="body-text font-medium"><%= number_to_currency(order.order_items.sum(&:total_price)) %></span>
       </div>
       <div class="flex justify-between">
         <span class="body-secondary">Dostawa</span>
         <% if order.shipping_cost > 0 %>
-          <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost, unit: "zł", format: "%n %u") %></span>
+          <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost) %></span>
         <% else %>
           <span class="body-text font-medium text-success">Darmowa</span>
         <% end %>
@@ -51,7 +51,7 @@
     <div class="px-6 py-5 flex justify-between items-center">
       <span class="subsection-title">Do zapłaty</span>
       <span class="text-2xl font-bold tracking-tight">
-        <%= number_to_currency(order.total_amount, unit: "zł", format: "%n %u") %>
+        <%= number_to_currency(order.total_amount) %>
       </span>
     </div>
     <!-- Stopka bezpieczeństwa -->

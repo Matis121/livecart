@@ -13,7 +13,7 @@
   </div>
   <div class="<%= card_class %>">
     <div class="stat-label mb-2">Przychód (mies.)</div>
-    <div class="stat-value"><%= number_to_currency(@revenue_this_month, unit: "zł", format: "%n %u", delimiter: "\u00a0", separator: ",", precision: 2) %></div>
+    <div class="stat-value"><%= number_to_currency(@revenue_this_month) %></div>
     <div class="caption-text mt-2">opłaconych zamówień</div>
   </div>
   <div class="<%= card_class %>">

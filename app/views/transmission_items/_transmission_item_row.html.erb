@@ -1,8 +1,8 @@
 <tr class="border-b border-base-200/40 last:border-0 hover:bg-base-200/20">
   <td class="font-medium"><%= transmission_item.customer.name %></td>
   <td class="text-right"><%= transmission_item.quantity %></td>
-  <td class="text-right tabular-nums"><%= number_to_currency(transmission_item.unit_price, unit: "zł", format: "%n %u") %></td>
-  <td class="text-right font-medium tabular-nums"><%= number_to_currency(transmission_item.unit_price * transmission_item.quantity, unit: "zł", format: "%n %u") %></td>
+  <td class="text-right tabular-nums"><%= number_to_currency(transmission_item.unit_price) %></td>
+  <td class="text-right font-medium tabular-nums"><%= number_to_currency(transmission_item.unit_price * transmission_item.quantity) %></td>
   <% if transmission.active? %>
     <td class="text-right">
       <div class="dropdown dropdown-end">

@@ -17,7 +17,7 @@
     </div>
     <div class="flex justify-between items-center">
       <span class="label-text">Koszt wysyłki</span>
-      <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost, unit: order.currency, format: "%n %u") %></span>
+      <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost, unit: order.currency) %></span>
     </div>
   </div>
 </turbo-frame>

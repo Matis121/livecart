@@ -35,7 +35,7 @@
     <!-- Cena -->
     <div class="flex-shrink-0 text-right">
       <div class="font-bold text-primary">
-        <%= number_to_currency(product.gross_price, unit: product.currency, format: "%n %u") %>
+        <%= number_to_currency(product.gross_price, unit: product.currency) %>
       </div>
       <div class="text-xs opacity-60">
         <%= product.quantity %> szt.
