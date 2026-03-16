@@ -61,7 +61,7 @@ module Payments
       case payu_status
       when "COMPLETED"
         if order.payment_processing?
-          order.update!(status: :paid, paid_amount: order.total_amount)
+          order.update!(status: :in_fulfillment, paid_amount: order.total_amount)
           checkout = order.checkout
           checkout.complete! if checkout && !checkout.completed?
           Rails.logger.info("[PAYU] Order #{order.order_number} marked as PAID")

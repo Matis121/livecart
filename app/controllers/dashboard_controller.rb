@@ -1,5 +1,5 @@
 class DashboardController < ApplicationController
-  REVENUE_STATUSES = %w[paid in_fulfillment shipped delivered].freeze
+  REVENUE_STATUSES = %w[in_fulfillment shipped delivered].freeze
 
   def index
     beginning_of_month = Time.current.beginning_of_month

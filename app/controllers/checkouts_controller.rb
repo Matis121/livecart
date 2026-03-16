@@ -13,8 +13,15 @@ class CheckoutsController < ApplicationController
     set_checkout_view_data
     @open_package_enabled = @account.open_package_enabled?
 
-    # Klient wrócił z PayU (IPN jeszcze nie dotarł)
-    return render :payu_pending if params[:payu_return].present? && @order.payment_processing?
+    if params[:payu_return].present?
+      # Klient wrócił z PayU
+      if @order.payment_processing?
+        # IPN jeszcze nie dotarł — pokaż stronę oczekiwania
+        return render :payu_pending
+      end
+      # IPN już zadziałał (order nie jest payment_processing) — pokaż sukces
+      return
+    end
 
     # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
     if @checkout.completed?
@@ -50,8 +57,12 @@ class CheckoutsController < ApplicationController
         cash_on_delivery: payment_method_record&.cash_on_delivery? || false
       )
 
-      @order.update!(status: :payment_processing)
-      @checkout.close_package! unless payu_payment?(payment_method_record)
+      if payu_payment?(payment_method_record)
+        @order.update!(status: :payment_processing)
+      else
+        @order.update!(status: :in_fulfillment)
+        @checkout.close_package!
+      end
     end
 
     if payu_payment?(payment_method_record)
@@ -137,13 +148,13 @@ class CheckoutsController < ApplicationController
   # Ścieżka "Wyślij teraz" — pełny flow z płatnością
   def update_ship_now
     if update_order_data(include_payment: true)
-      @order.update!(status: :payment_processing)
-
       payment_method_record = @order.account.payment_methods.find_by(name: @order.payment_method)
 
       if payu_payment?(payment_method_record)
+        @order.update!(status: :payment_processing)
         redirect_to_payu(payment_method_record.integration)
       else
+        @order.update!(status: :in_fulfillment)
         @checkout.complete!
         session[:show_success_for_checkout] = @checkout.id
         redirect_to checkout_path(@shop.slug, @checkout.token)

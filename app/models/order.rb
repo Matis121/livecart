@@ -18,7 +18,6 @@ class Order < ApplicationRecord
     draft: 0,
     offer_sent: 1,
     payment_processing: 2,
-    paid: 3,
     in_fulfillment: 4,
     shipped: 5,
     delivered: 6,
@@ -32,10 +31,9 @@ class Order < ApplicationRecord
     offer_sent: "Oferta wysłana",
     open_package: "Otwarta paczka",
     payment_processing: "Płatność w trakcie",
-    paid: "Opłacone",
-    in_fulfillment: "W realizacji",
+    in_fulfillment: "Do realizacji",
     shipped: "Wysłane",
-    delivered: "Dostarczone",
+    delivered: "Zrealizowane",
     cancelled: "Anulowane",
     returned: "Zwrócone"
   }.freeze

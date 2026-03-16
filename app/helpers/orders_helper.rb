@@ -9,7 +9,6 @@ module OrdersHelper
     draft:              "bg-slate-200 text-slate-700 border-slate-300",
     offer_sent:         "bg-slate-200 text-slate-700 border-slate-300",
     payment_processing: "bg-amber-100 text-amber-800 border-amber-300",
-    paid:               "bg-emerald-100 text-emerald-800 border-emerald-300",
     in_fulfillment:     "bg-orange-100 text-orange-800 border-orange-300",
     shipped:            "bg-blue-100 text-blue-800 border-blue-300",
     delivered:          "bg-emerald-500 text-white border-emerald-600",

@@ -208,7 +208,7 @@ class Integration < ApplicationRecord
   end
 
   def export_order_status
-    settings.dig("export_order_status") || "paid"
+    settings.dig("export_order_status") || "in_fulfillment"
   end
 
   def baselinker_status_id

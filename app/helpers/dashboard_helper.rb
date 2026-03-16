@@ -4,10 +4,9 @@ module DashboardHelper
     "open_package"       => "Otwarta paczka",
     "offer_sent"         => "Oferta wysłana",
     "payment_processing" => "Płatność w trakcie",
-    "paid"               => "Opłacone",
-    "in_fulfillment"     => "W realizacji",
+    "in_fulfillment"     => "Do realizacji",
     "shipped"            => "Wysłane",
-    "delivered"          => "Dostarczone",
+    "delivered"          => "Zrealizowane",
     "cancelled"          => "Anulowane",
     "returned"           => "Zwrócone"
   }.freeze
