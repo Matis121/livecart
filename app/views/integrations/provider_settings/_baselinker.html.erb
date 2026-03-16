@@ -46,9 +46,6 @@
               integration.stock_match_by
             ),
             class: "select select-bordered w-full" %>
-        <label class="label">
-          <span class="label-text-alt">Jeśli dopasowanie nie powiedzie się, system spróbuje innych metod</span>
-        </label>
       </div>
     </div>
     <!-- Price Sync Section -->
@@ -91,12 +88,7 @@
         <%= label_tag "integration[settings][export_order_status]", "Status zamówienia:", class: "label" %>
         <%= select_tag "integration[settings][export_order_status]",
             options_for_select(
-              [
-                ["Do realizacji (in_fulfillment)", "in_fulfillment"],
-                ["Nowe (pending)", "pending"],
-                ["Potwierdzone (confirmed)", "confirmed"],
-                ["W realizacji (processing)", "processing"]
-              ],
+              Order::STATUS_NAMES.map { |key, label| ["#{label}", key.to_s] },
               integration.export_order_status
             ),
             class: "select select-bordered w-full" %>

@@ -1,4 +1,10 @@
 pl:
+  integrations:
+    statuses:
+      active: "Aktywna"
+      inactive: "Nieaktywna"
+      error: "Błąd"
+      pending_auth: "Oczekuje autoryzacji"
   number:
     currency:
       format:
