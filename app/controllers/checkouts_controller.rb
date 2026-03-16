@@ -1,5 +1,5 @@
 class CheckoutsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :not_found ]
+  skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :apply_discount, :not_found ]
 
   before_action :find_shop, except: [ :not_found ]
   before_action :find_checkout, except: [ :not_found ]
@@ -64,6 +64,29 @@ class CheckoutsController < ApplicationController
     set_checkout_view_data
     @order.errors.add(:base, e.message)
     render :show, status: :unprocessable_entity
+  end
+
+  def apply_discount
+    code = params[:discount_code].to_s.strip
+    success = @order.apply_discount_code(code)
+    discount_error = success ? nil : @order.errors.full_messages.to_sentence
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "order_summary",
+          partial: "checkouts/order_summary",
+          locals: { order: @order, discount_error: discount_error }
+        )
+      end
+      format.html do
+        if success
+          redirect_to checkout_path(@shop.slug, @checkout.token), notice: code.blank? ? "Kod rabatowy usunięty." : "Kod rabatowy zastosowany!"
+        else
+          redirect_to checkout_path(@shop.slug, @checkout.token), alert: discount_error
+        end
+      end
+    end
   end
 
   def not_found

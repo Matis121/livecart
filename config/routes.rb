@@ -102,6 +102,7 @@ Rails.application.routes.draw do
     resources :checkouts, only: [ :show, :update ] do
       member do
         patch :close_package
+        patch :apply_discount
       end
     end
   end

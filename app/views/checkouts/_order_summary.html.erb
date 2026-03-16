@@ -1,4 +1,4 @@
-<div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
+<div id="order_summary" class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
   <div class="px-6 py-4 bg-base-200/40 border-b border-base-300/40">
     <h2 class="subsection-title tracking-tight">Twoje zamówienie</h2>
   </div>
@@ -39,20 +39,45 @@
       </div>
       <div class="flex justify-between">
         <span class="body-secondary">Dostawa</span>
-        <% if order.shipping_cost > 0 %>
-          <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost) %></span>
-        <% else %>
-          <span class="body-text font-medium text-success">Darmowa</span>
-        <% end %>
+        <span id="summary-shipping-cost">
+          <% if order.shipping_method.present? && order.shipping_cost > 0 %>
+            <span class="body-text font-medium"><%= number_to_currency(order.shipping_cost) %></span>
+          <% elsif order.shipping_method.present? %>
+            <span class="body-text font-medium text-success">Darmowa</span>
+          <% else %>
+            <span class="body-text font-medium text-base-content/40">—</span>
+          <% end %>
+        </span>
       </div>
+      <% if order.discount_amount.to_f > 0 %>
+        <div class="flex justify-between">
+          <span class="body-secondary text-success">Rabat (<%= order.discount_name %>)</span>
+          <span class="body-text font-medium text-success">−<%= number_to_currency(order.discount_amount) %></span>
+        </div>
+      <% end %>
     </div>
     <div class="border-t border-base-200 mx-6"></div>
     <!-- Suma końcowa -->
     <div class="px-6 py-5 flex justify-between items-center">
       <span class="subsection-title">Do zapłaty</span>
-      <span class="text-2xl font-bold tracking-tight">
+      <span id="summary-total" class="text-2xl font-bold tracking-tight">
         <%= number_to_currency(order.total_amount) %>
       </span>
+    </div>
+    <!-- Kod rabatowy -->
+    <div class="border-t border-base-200 mx-6"></div>
+    <div class="px-6 py-4">
+      <%= form_with url: apply_discount_checkout_path(order.account.slug, order.checkout.token), method: :patch, class: "flex gap-2" do |f| %>
+        <input type="text" name="discount_code" value="<%= order.discount_name %>" placeholder="Kod rabatowy" class="input input-bordered input-sm flex-1 rounded-xl <%= 'input-error' if local_assigns[:discount_error] %>" />
+        <% if order.discount_amount.to_f > 0 %>
+          <button type="submit" name="discount_code" value="" class="btn btn-sm btn-ghost rounded-xl text-error">Usuń</button>
+        <% else %>
+          <button type="submit" class="btn btn-sm btn-outline rounded-xl">Zastosuj</button>
+        <% end %>
+      <% end %>
+      <% if local_assigns[:discount_error] %>
+        <p class="caption-text text-error mt-1.5"><%= discount_error %></p>
+      <% end %>
     </div>
     <!-- Stopka bezpieczeństwa -->
     <div class="bg-base-200/40 border-t border-base-200 px-6 py-3 flex items-center gap-2">
