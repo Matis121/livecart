@@ -14,12 +14,10 @@
       <% end %>
     </div>
   </div>
-
 <% elsif @checkout.open_package_pending? %>
   <div class="container mx-auto px-4 py-8 max-w-6xl">
     <%= render partial: "checkouts/close_package", locals: { checkout: @checkout, order: @order } %>
   </div>
-
 <% else %>
   <div class="container mx-auto px-4 py-8 max-w-6xl">
     <%= render partial: "checkouts/checkout_form", locals: { checkout: @checkout, order: @order, account_logo: @account_logo, account_name: @account_name, shipping_methods: @shipping_methods, payment_methods: @payment_methods, open_package_enabled: @open_package_enabled } %>

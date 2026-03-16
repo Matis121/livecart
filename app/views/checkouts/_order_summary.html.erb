@@ -17,13 +17,13 @@
                 </div>
               <% end %>
             </div>
-            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-content text-base-100 text-xs flex items-center justify-center font-semibold leading-none">
-              <%= item.quantity %>
-            </div>
           </div>
-          <div class="flex-1 min-w-0 flex flex-col justify-center">
-            <p class="body-text font-medium truncate leading-snug"><%= item.product&.name || "Produkt" %></p>
-            <p class="body-text font-semibold text-base-content/80 mt-0.5">
+          <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
+            <p class="body-text font-medium leading-snug line-clamp-2"><%= item.product&.name || "Produkt" %></p>
+            <p class="caption-text text-base-content/50">
+              <%= item.quantity %> szt. &times; <%= number_to_currency(item.unit_price) %>
+            </p>
+            <p class="body-text font-semibold text-base-content/80">
               <%= number_to_currency(item.total_price) %>
             </p>
           </div>
