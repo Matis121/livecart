@@ -193,9 +193,14 @@ class CheckoutsController < ApplicationController
       # Aktualizuj adres dostawy
       @order.shipping_address.update!(shipping_address_params)
 
-      # Aktualizuj adres do faktury (jeśli potrzebny)
+      # Aktualizuj adres do faktury (jeśli potrzebny), w przeciwnym razie skopiuj adres dostawy
       if billing_address_params[:needs_invoice] == "1"
         @order.billing_address.update!(billing_address_params)
+      else
+        @order.billing_address.update!(
+          needs_invoice: false,
+          **shipping_address_params.slice(:first_name, :last_name, :address_line1, :address_line2, :city, :postal_code, :country)
+        )
       end
 
       # Aktualizuj metodę dostawy i płatności (tylko dla "wyślij teraz")
