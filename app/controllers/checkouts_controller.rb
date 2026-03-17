@@ -52,6 +52,15 @@ class CheckoutsController < ApplicationController
       shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
       @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
 
+      if shipping_method.is_pickup_point?
+        attrs = pickup_point_params
+        if @order.pickup_point.present?
+          @order.pickup_point.update!(attrs)
+        else
+          @order.create_pickup_point!(attrs)
+        end
+      end
+
       @order.update!(
         payment_method: payment_method_name,
         cash_on_delivery: payment_method_record&.cash_on_delivery? || false
@@ -194,6 +203,15 @@ class CheckoutsController < ApplicationController
         shipping_method = @order.account.shipping_methods.find(params[:order][:shipping_method_id])
         @order.update!(shipping_method: shipping_method.name, shipping_cost: shipping_method.price)
 
+        if shipping_method.is_pickup_point?
+          attrs = pickup_point_params
+          if @order.pickup_point.present?
+            @order.pickup_point.update!(attrs)
+          else
+            @order.create_pickup_point!(attrs)
+          end
+        end
+
         payment_method_name = params[:order][:payment_method]
         payment_method_record = @order.account.payment_methods.find_by(name: payment_method_name)
         @order.update!(
@@ -217,6 +235,8 @@ class CheckoutsController < ApplicationController
     @account = @order.account
     @account_logo = @account.logo.attached? ? @account.logo : nil
     @account_name = @account.checkout_settings["shop_name"]
+    @inpost_widget_token = ENV["INPOST_WIDGET_TOKEN"]
+    @orlen_widget_token = ENV["ORLEN_WIDGET_TOKEN"]
   end
 
   def redirect_to_payu(integration)
@@ -234,6 +254,11 @@ class CheckoutsController < ApplicationController
       @order.errors.add(:base, "Błąd płatności PayU: #{result.errors.join(', ')}")
       render :show, status: :unprocessable_entity
     end
+  end
+
+  def pickup_point_params
+    params.require(:order).require(:pickup_point_attributes)
+          .permit(:point_id, :name, :address_line1, :postal_code, :city)
   end
 
   def contact_params

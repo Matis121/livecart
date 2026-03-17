@@ -27,12 +27,14 @@
         <span class="label-text">Punkt odbioru</span>
       </label>
     </div>
-    <div class="form-control" data-shipping-method-form-target="pickupProvider" style="<%= 'display: none;' unless @shipping_method.is_pickup_point? %>">
-      <%= f.label :pickup_point_provider, "Dostawca punktów", class: "label" %>
-      <%= f.select :pickup_point_provider, options_for_select(ShippingMethod.pickup_point_providers.keys.map { |k| [k.humanize, k] }, @shipping_method.pickup_point_provider), { include_blank: "Wybierz dostawcę..." }, class: "select select-bordered w-full focus:select-primary #{@shipping_method.errors[:pickup_point_provider].any? ? 'select-error' : ''}" %>
-      <% @shipping_method.errors[:pickup_point_provider].each do |message| %>
-        <label class="label"><span class="text-error text-sm"><%= message %></span></label>
-      <% end %>
+    <div data-shipping-method-form-target="pickupProvider" style="<%= 'display: none;' unless @shipping_method.is_pickup_point? %>" class="space-y-3">
+      <div class="form-control">
+        <%= f.label :pickup_point_provider, "Dostawca punktów", class: "label" %>
+        <%= f.select :pickup_point_provider, options_for_select(ShippingMethod.pickup_point_providers.keys.map { |k| [k.humanize, k] }, @shipping_method.pickup_point_provider), { include_blank: "Wybierz dostawcę..." }, class: "select select-bordered w-full focus:select-primary #{@shipping_method.errors[:pickup_point_provider].any? ? 'select-error' : ''}" %>
+        <% @shipping_method.errors[:pickup_point_provider].each do |message| %>
+          <label class="label"><span class="text-error text-sm"><%= message %></span></label>
+        <% end %>
+      </div>
     </div>
     <div class="form-control">
       <label class="label cursor-pointer justify-start gap-3">

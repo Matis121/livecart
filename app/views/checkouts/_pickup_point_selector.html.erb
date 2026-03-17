@@ -1,0 +1,51 @@
+<div data-checkout-form-target="pickupSection" class="hidden">
+  <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
+    <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
+      <%= lucide_icon "map-pin", class: "w-4 h-4 text-base-content/50" %>
+      <h2 class="subsection-title tracking-tight">Punkt odbioru</h2>
+    </div>
+    <div class="p-6">
+      <!-- Stan: nie wybrano punktu -->
+      <div data-checkout-form-target="pickupEmptyState">
+        <p class="body-secondary mb-3">Nie wybrano punktu odbioru.</p>
+        <button type="button" class="btn btn-outline btn-sm"
+                data-action="click->checkout-form#openPickupWidget">
+          Wybierz punkt na mapie
+        </button>
+      </div>
+      <!-- Stan: punkt wybrany (ukryty dopóki nie wybrano) -->
+      <div data-checkout-form-target="pickupSelectedState" class="hidden">
+        <div class="flex items-start justify-between gap-4 bg-base-200/40 rounded-xl p-4">
+          <div>
+            <p class="body-text font-semibold" data-checkout-form-target="pickupDisplayName"></p>
+            <p class="body-secondary" data-checkout-form-target="pickupDisplayAddress"></p>
+            <p class="body-secondary" data-checkout-form-target="pickupDisplayCity"></p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-xs shrink-0"
+                  data-action="click->checkout-form#openPickupWidget">
+            Zmień
+          </button>
+        </div>
+      </div>
+      <!-- Ukryte pola formularza -->
+      <input type="hidden" name="order[pickup_point_attributes][point_id]"      data-checkout-form-target="pickupPointId">
+      <input type="hidden" name="order[pickup_point_attributes][name]"           data-checkout-form-target="pickupPointName">
+      <input type="hidden" name="order[pickup_point_attributes][address_line1]"  data-checkout-form-target="pickupPointAddress">
+      <input type="hidden" name="order[pickup_point_attributes][postal_code]"    data-checkout-form-target="pickupPointPostalCode">
+      <input type="hidden" name="order[pickup_point_attributes][city]"           data-checkout-form-target="pickupPointCity">
+    </div>
+  </div>
+</div>
+
+<!-- Modal z widgetem punktów odbioru -->
+<dialog id="pickup-point-modal" class="modal">
+  <div class="modal-box w-11/12 max-w-5xl h-[85vh] p-0 overflow-hidden flex flex-col">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-base-300/40 shrink-0">
+      <h3 class="subsection-title">Wybierz punkt odbioru</h3>
+      <button type="button" class="btn btn-ghost btn-sm btn-circle"
+              onclick="document.getElementById('pickup-point-modal').close()">✕</button>
+    </div>
+    <div id="pickup-widget-container" class="flex-1 overflow-hidden"></div>
+  </div>
+  <div class="modal-backdrop" onclick="document.getElementById('pickup-point-modal').close()"></div>
+</dialog>

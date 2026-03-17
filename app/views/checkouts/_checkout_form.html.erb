@@ -19,7 +19,7 @@
   <!-- Left column: Form -->
   <div class="flex-1 min-w-0">
     <% items_subtotal = order.order_items.sum(:total_price) %>
-    <%= form_with model: order, url: checkout_path(order.account.slug, checkout.token), method: :patch, local: true, data: { controller: "checkout-form", checkout_form_items_subtotal_value: items_subtotal.to_f, checkout_form_discount_amount_value: (order.discount_amount || 0).to_f } do |f| %>
+    <%= form_with model: order, url: checkout_path(order.account.slug, checkout.token), method: :patch, local: true, data: { controller: "checkout-form", checkout_form_items_subtotal_value: items_subtotal.to_f, checkout_form_discount_amount_value: (order.discount_amount || 0).to_f, checkout_form_inpost_widget_token_value: @inpost_widget_token, checkout_form_orlen_widget_token_value: @orlen_widget_token } do |f| %>
       <div class="space-y-4">
         <!-- 1. Dane kontaktowe -->
         <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
@@ -181,7 +181,7 @@
               <% shipping_methods.each_with_index do |method, index| %>
                 <label class="flex items-center justify-between gap-4 p-4 border border-base-200 rounded-xl cursor-pointer hover:bg-base-200/30 hover:border-primary/30 transition-colors has-checked:border-primary has-checked:bg-primary/5">
                   <div class="flex items-center gap-3">
-                    <%= f.radio_button :shipping_method_id, method.id, class: "radio radio-primary shrink-0", data: { checkout_form_target: "shippingRadio", action: "change->checkout-form#updateShipping", price: method.price_for(items_subtotal).to_f } %>
+                    <%= f.radio_button :shipping_method_id, method.id, class: "radio radio-primary shrink-0", data: { checkout_form_target: "shippingRadio", action: "change->checkout-form#updateShipping", price: method.price_for(items_subtotal).to_f, is_pickup_point: method.is_pickup_point?, pickup_point_provider: method.pickup_point_provider } %>
                     <span class="body-text font-medium"><%= method.name %></span>
                   </div>
                   <span class="body-secondary shrink-0">
@@ -190,6 +190,7 @@
                 </label>
               <% end %>
             </div>
+            <%= render "checkouts/pickup_point_selector" %>
           </div>
           <!-- Metoda płatności -->
           <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
