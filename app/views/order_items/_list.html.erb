@@ -6,10 +6,9 @@
           <tr>
             <th class="w-20">Zdjęcie</th>
             <th>Produkt</th>
-            <th class="text-right">Cena jedn.</th>
-            <th class="text-center">Ilość</th>
-            <th class="text-right">Suma</th>
-            <th class="text-center w-24">Akcje</th>
+            <th class="text-center w-18">Ilość</th>
+            <th class="text-right w-32">Cena jedn.</th>
+            <th class="text-center w-12">Akcje</th>
           </tr>
         </thead>
         <tbody>
@@ -18,7 +17,7 @@
               <tr id="order_item_<%= item.id %>">
                 <td>
                   <div class="avatar">
-                    <div class="w-16 h-16 rounded">
+                    <div class="w-12 h-12 rounded">
                       <% if item.product.present? && item.product.images.attached? %>
                         <%= image_tag item.product.images.first.variant(:thumb), alt: item.name, class: "object-cover w-full h-full" %>
                       <% else %>
@@ -42,11 +41,10 @@
                     </div>
                   </div>
                 </td>
-                <td class="text-right"><%= number_to_currency(item.unit_price, unit: order.currency) %></td>
                 <td class="text-center">
-                  <span class="badge badge-ghost"><%= item.quantity %></span>
+                  <%= item.quantity %>
                 </td>
-                <td class="text-right font-semibold"><%= number_to_currency(item.total_price, unit: order.currency) %></td>
+                <td class="text-right"><%= number_to_currency(item.unit_price, unit: order.currency) %></td>
                 <td class="text-center">
                   <div class="dropdown dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-sm btn-ghost">

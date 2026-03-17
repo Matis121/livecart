@@ -1,34 +1,28 @@
 <turbo-frame id="shipping_address_section">
-  <div class="flex justify-between items-start mb-3">
-    <h3 class="subsection-title">Adres dostawy</h3>
-    <%= link_to edit_order_shipping_address_path(order),
-        data: { turbo_frame: "shipping_address_modal" },
-        class: "btn btn-ghost btn-sm btn-square" do %>
-      <%= lucide_icon "pencil", class: "w-4 h-4" %>
+  <h3 class="subsection-title mb-3">Adres dostawy</h3>
+  <%= link_to edit_order_shipping_address_path(order), data: { turbo_frame: "shipping_address_section" }, class: "block -mx-2 px-2 py-1 rounded-lg hover:bg-base-200/50 cursor-pointer transition-colors mb-3" do %>
+    <% if shipping_address&.first_name.present? || shipping_address&.address_line1.present? %>
+      <div class="space-y-0.5">
+        <% if shipping_address.first_name.present? || shipping_address.last_name.present? %>
+          <div class="body-text"><%= [shipping_address.first_name, shipping_address.last_name].compact.join(" ") %></div>
+        <% end %>
+        <% if shipping_address.address_line1.present? %>
+          <div class="label-text"><%= shipping_address.address_line1 %></div>
+        <% end %>
+        <% if shipping_address.address_line2.present? %>
+          <div class="label-text"><%= shipping_address.address_line2 %></div>
+        <% end %>
+        <% if shipping_address.postal_code.present? || shipping_address.city.present? %>
+          <div class="label-text"><%= [shipping_address.postal_code, shipping_address.city].compact.join(" ") %></div>
+        <% end %>
+        <% if shipping_address.country.present? %>
+          <div class="label-text"><%= shipping_address.country %></div>
+        <% end %>
+      </div>
+    <% else %>
+      <span class="label-text">Brak adresu</span>
     <% end %>
-  </div>
-  <% if shipping_address&.first_name.present? || shipping_address&.address_line1.present? %>
-    <div class="body-text space-y-1 mb-3">
-      <% if shipping_address.first_name.present? || shipping_address.last_name.present? %>
-        <div class="font-medium"><%= [shipping_address.first_name, shipping_address.last_name].compact.join(" ") %></div>
-      <% end %>
-      <% if shipping_address.address_line1.present? %>
-        <div><%= shipping_address.address_line1 %></div>
-      <% end %>
-      <% if shipping_address.address_line2.present? %>
-        <div><%= shipping_address.address_line2 %></div>
-      <% end %>
-      <% if shipping_address.postal_code.present? || shipping_address.city.present? %>
-        <div><%= [shipping_address.postal_code, shipping_address.city].compact.join(" ") %></div>
-      <% end %>
-      <% if shipping_address.country.present? %>
-        <div><%= shipping_address.country %></div>
-      <% end %>
-    </div>
-  <% else %>
-    <p class="body-secondary mb-3">Brak adresu</p>
   <% end %>
-
   <%= button_to copy_from_billing_order_shipping_address_path(order),
       method: :patch,
       class: "btn btn-ghost btn-xs gap-1",

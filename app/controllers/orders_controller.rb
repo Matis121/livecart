@@ -160,14 +160,13 @@ class OrdersController < ApplicationController
   def update_shipping_payment_methods
     @order = current_account.orders.find_by!(order_number: params[:id])
     if @order.update(shipping_payment_methods_params)
-      flash.now[:notice] = "Metody wysyłki i płatności zostały zaktualizowane"
+      flash.now[:notice] = "Wysyłka została zaktualizowana"
     else
-      flash.now[:error] = "Nie udało się zaktualizować metod wysyłki i płatności"
+      flash.now[:error] = "Nie udało się zaktualizować wysyłki"
     end
 
     render turbo_stream: [
       turbo_stream.replace("shipping_payment_methods_section", partial: "orders/shipping_payment_methods_section", locals: { order: @order }),
-      turbo_stream.replace("payment_section", partial: "orders/payment_section", locals: { order: @order }),
       turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
     ]
   end
@@ -270,10 +269,10 @@ class OrdersController < ApplicationController
   end
 
   def payment_params
-    params.require(:order).permit(:paid_amount, :cash_on_delivery)
+    params.require(:order).permit(:payment_method, :paid_amount, :cash_on_delivery)
   end
 
   def shipping_payment_methods_params
-    params.require(:order).permit(:payment_method, :shipping_method, :shipping_cost)
+    params.require(:order).permit(:shipping_method, :shipping_cost)
   end
 end

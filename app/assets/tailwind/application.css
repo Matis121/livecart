@@ -7,8 +7,8 @@
   prefersdark: true;
   color-scheme: "dark";
   --color-base-100: oklch(100% 0 0);
-  --color-base-200: oklch(95% 0 0);
-  --color-base-300: oklch(90% 0 0);
+  --color-base-200: oklch(97% 0 0);
+  --color-base-300: oklch(92% 0 0);
   --color-base-content: #2e2e2e;
   --color-primary: oklch(51.1% 0.262 276.966);
   --color-primary-content: oklch(100% 0 0);
@@ -102,7 +102,7 @@
 @utility label-text {
   font-size: 0.8125rem; /* 13px */
   line-height: 1.125rem; /* 18px */
-  font-weight: 700;
+  font-weight: 600;
   color: var(--color-text-secondary);
 }
 

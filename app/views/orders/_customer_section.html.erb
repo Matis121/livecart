@@ -1,25 +1,13 @@
 <turbo-frame id="customer_section">
-  <div class="flex justify-between items-start mb-3">
-    <h2 class="subsection-title">Klient</h2>
+  <h3 class="subsection-title mb-3">Klient</h3>
+  <%= link_to edit_customer_order_path(order), data: { turbo_frame: "customer_section" }, class: "block -mx-2 px-2 py-1 rounded-lg hover:bg-base-200/50 cursor-pointer transition-colors" do %>
     <% if order.customer.present? %>
-      <%= link_to "Zmień", edit_customer_order_path(order),
-          data: { turbo_frame: "edit_customer" },
-          class: "text-link" %>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Nazwa</span>
+        <span class="body-text font-medium"><%= order.customer.name %></span>
+      </div>
+    <% else %>
+      <span class="label-text">Brak przypisanego klienta</span>
     <% end %>
-  </div>
-
-  <% if order.customer.present? %>
-    <div>
-      <div class="caption-text mb-1">Nazwa</div>
-      <div class="body-text font-medium"><%= order.customer.name %></div>
-    </div>
-  <% else %>
-    <p class="body-secondary mb-3">Brak przypisanego klienta</p>
-    <%= link_to "Przypisz klienta", edit_customer_order_path(order),
-        data: { turbo_frame: "edit_customer" },
-        class: "btn btn-sm" %>
   <% end %>
-
-  <%= turbo_frame_tag "edit_customer" %>
 </turbo-frame>
-

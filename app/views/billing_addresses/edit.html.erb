@@ -1,94 +1,53 @@
-<%= turbo_frame_tag "billing_address_modal" do %>
-  <dialog class="modal modal-open">
-    <div class="modal-box max-w-2xl max-h-[90vh]">
-      <h3 class="font-bold text-lg mb-4">Dane do faktury</h3>
-      
-      <%= form_with model: @billing_address, url: order_billing_address_path(@order), class: "space-y-4" do |f| %>
-        <!-- Checkbox faktury -->
-        <div class="form-control">
-          <label class="label cursor-pointer justify-start gap-3 bg-base-200 rounded-lg p-4">
-            <%= f.check_box :needs_invoice, class: "checkbox checkbox-primary" %>
-            <div>
-              <span class="label-text font-semibold">Wymagana faktura VAT</span>
-              <p class="text-xs text-base-content/60 mt-1">Zaznacz, jeśli klient potrzebuje faktury</p>
-            </div>
-          </label>
-        </div>
-
-        <div class="divider my-2">Dane firmowe (opcjonalnie)</div>
-
-        <!-- Nazwa firmy - pełna szerokość -->
-        <div class="form-control">
-          <%= f.label :company_name, "Nazwa firmy", class: "label font-semibold" %>
-          <%= f.text_field :company_name, class: "input input-bordered w-full", placeholder: "Nazwa firmy Sp. z o.o." %>
-        </div>
-
-        <!-- NIP - pełna szerokość -->
-        <div class="form-control">
-          <%= f.label :nip, "NIP", class: "label font-semibold" %>
-          <%= f.text_field :nip, class: "input input-bordered w-full", placeholder: "123-456-78-90" %>
-        </div>
-
-        <div class="divider my-2">Dane osobowe</div>
-
-        <!-- Imię i nazwisko w jednej linii -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="form-control">
-            <%= f.label :first_name, "Imię", class: "label font-semibold" %>
-            <%= f.text_field :first_name, class: "input input-bordered w-full", placeholder: "Jan" %>
-          </div>
-
-          <div class="form-control">
-            <%= f.label :last_name, "Nazwisko", class: "label font-semibold" %>
-            <%= f.text_field :last_name, class: "input input-bordered w-full", placeholder: "Kowalski" %>
-          </div>
-        </div>
-
-        <div class="divider my-2">Adres</div>
-
-        <!-- Adres - pełna szerokość -->
-        <div class="form-control">
-          <%= f.label :address_line1, "Ulica i numer", class: "label font-semibold" %>
-          <%= f.text_field :address_line1, class: "input input-bordered w-full", placeholder: "ul. Przykładowa 123" %>
-        </div>
-
-        <div class="form-control">
-          <%= f.label :address_line2, "Dodatkowe info (opcjonalnie)", class: "label" %>
-          <%= f.text_field :address_line2, class: "input input-bordered w-full", placeholder: "Mieszkanie 4, piętro 2" %>
-        </div>
-
-        <!-- Kod pocztowy i miasto w jednej linii -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="form-control">
-            <%= f.label :postal_code, "Kod pocztowy", class: "label font-semibold" %>
-            <%= f.text_field :postal_code, class: "input input-bordered w-full", placeholder: "00-000" %>
-          </div>
-
-          <div class="form-control col-span-2">
-            <%= f.label :city, "Miasto", class: "label font-semibold" %>
-            <%= f.text_field :city, class: "input input-bordered w-full", placeholder: "Warszawa" %>
-          </div>
-        </div>
-
-        <!-- Kraj - pełna szerokość -->
-        <div class="form-control">
-          <%= f.label :country, "Kraj", class: "label font-semibold" %>
-          <%= f.text_field :country, class: "input input-bordered w-full", placeholder: "Polska", value: f.object.country || "Polska" %>
-        </div>
-
-        <div class="divider my-2"></div>
-
-        <div class="modal-action">
-          <%= button_tag type: "button", class: "btn btn-ghost", 
-              onclick: "document.getElementById('billing_address_modal').innerHTML = ''" do %>
-            Anuluj
-          <% end %>
-          <%= f.submit "Zapisz dane", class: "btn btn-primary" %>
-        </div>
-      <% end %>
+<%= turbo_frame_tag "billing_address_section" do %>
+  <div class="flex items-center gap-2 mb-3">
+    <h3 class="subsection-title">Adres faktury</h3>
+  </div>
+  <%= form_with model: @billing_address, url: order_billing_address_path(@order) do |f| %>
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="label-text">Wymagana faktura</span>
+        <%= f.check_box :needs_invoice, class: "checkbox checkbox-sm" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Nazwa firmy</span>
+        <%= f.text_field :company_name, class: "input input-bordered input-sm w-44", placeholder: "Firma Sp. z o.o." %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">NIP</span>
+        <%= f.text_field :nip, class: "input input-bordered input-sm w-44", placeholder: "123-456-78-90" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Imię</span>
+        <%= f.text_field :first_name, class: "input input-bordered input-sm w-44", placeholder: "Jan" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Nazwisko</span>
+        <%= f.text_field :last_name, class: "input input-bordered input-sm w-44", placeholder: "Kowalski" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Ulica i numer</span>
+        <%= f.text_field :address_line1, class: "input input-bordered input-sm w-44", placeholder: "ul. Przykładowa 123" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Dodatkowe info</span>
+        <%= f.text_field :address_line2, class: "input input-bordered input-sm w-44", placeholder: "Mieszkanie 4" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Kod pocztowy</span>
+        <%= f.text_field :postal_code, class: "input input-bordered input-sm w-44", placeholder: "00-000" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Miasto</span>
+        <%= f.text_field :city, class: "input input-bordered input-sm w-44", placeholder: "Warszawa" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Kraj</span>
+        <%= f.text_field :country, class: "input input-bordered input-sm w-44", placeholder: "Polska" %>
+      </div>
     </div>
-    <div class="modal-backdrop" 
-         onclick="document.getElementById('billing_address_modal').innerHTML = ''">
+    <div class="flex justify-end gap-2 mt-4">
+      <%= link_to "Anuluj", order_path(@order), class: "btn btn-ghost btn-sm" %>
+      <%= f.submit "Zapisz", class: "btn btn-primary btn-sm" %>
     </div>
-  </dialog>
+  <% end %>
 <% end %>

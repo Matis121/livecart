@@ -1,55 +1,41 @@
 <%= turbo_frame_tag dom_id(order, :checkout) do %>
-  <div class="card bg-base-100 border border-base-300 shadow-sm">
-    <div class="card-body p-3">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <%# LEWA STRONA: Tytuł i Status %>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-1.5 shrink-0">
-            <%= lucide_icon "shopping-cart", class: "w-4 h-4 text-primary" %>
-            <h3 class="font-semibold text-sm">Koszyk</h3>
-          </div>
-          <% if order.checkout.present? && (order.checkout.active? || order.checkout&.completed?) %>
-            <div class="flex items-center gap-2 border-l border-base-300 pl-3">
-              <%= checkout_status_badge(order.checkout) %>
-              <span class="text-[11px] opacity-70"><%= checkout_expiry_info(order.checkout) %></span>
-            </div>
-          <% end %>
-        </div>
-        <%# PRAWA STRONA: Link i Akcje %>
-        <div class="flex items-center gap-2 flex-1 justify-end min-w-fit">
-          <% if order.checkout.present? && (order.checkout.active? || order.checkout&.completed?) %>
-            <div class="flex items-center gap-1 bg-base-200 rounded-lg p-1 pr-2 max-w-xs group">
-              <button type="button"
-                      onclick="navigator.clipboard.writeText('<%= order.checkout.public_url %>'); this.classList.add('btn-success'); setTimeout(() => this.classList.remove('btn-success'), 2000)"
-                class="btn btn-ghost btn-xs btn-square shrink-0"
-                title="Kopiuj link">
-                <%= lucide_icon "copy", class: "w-3 h-3" %>
-              </button>
-              <a href="<%= order.checkout.public_url %>"
-                 target="_blank"
-                 class="text-[11px] font-mono text-primary hover:underline truncate">
-                Link do koszyka
-              </a>
-            </div>
-            <% unless order.checkout.completed? %>
-              <%= link_to cancel_checkout_order_path(order),
-                          class: "btn btn-ghost btn-xs text-error hover:bg-error/10 shrink-0",
-                          data: { turbo_method: :delete, turbo_confirm: "Czy na pewno chcesz anulować koszyk?" } do %>
-                <%= lucide_icon "x", class: "w-3 h-3" %>
-              <% end %>
-            <% end %>
-          <% else %>
-            <%# Stan pusty - inline %>
-            <span class="text-xs text-base-content/50 mr-1 ">Brak aktywnego linku</span>
-            <%= link_to activate_checkout_order_path(order),
-                        class: "btn btn-primary btn-xs gap-1",
-                        data: { turbo_method: :post } do %>
-              <%= lucide_icon "link", class: "w-3 h-3" %>
-              Wygeneruj
-            <% end %>
-          <% end %>
-        </div>
-      </div>
+  <% if order.checkout.present? && (order.checkout.active? || order.checkout.completed?) %>
+    <div class="flex items-center gap-1 mb-1">
+      <h3 class="subsection-title flex-1">Link do koszyka</h3>
+      <% unless order.checkout.completed? %>
+        <%= link_to cancel_checkout_order_path(order),
+              class: "btn btn-ghost btn-xs text-error",
+              title: "Anuluj koszyk",
+              data: { turbo_method: :delete, turbo_confirm: "Czy na pewno chcesz anulować koszyk?" } do %>
+          <%= lucide_icon "x", class: "w-3 h-3" %>
+        <% end %>
+      <% end %>
     </div>
+    <div class="flex items-center gap-1 bg-base-200 rounded-lg p-1 pl-2">
+      <a href="<%= order.checkout.public_url %>"
+         target="_blank"
+         class="text-xs font-mono text-primary hover:underline truncate flex-1">
+        <%= order.checkout.public_url %>
+      </a>
+      <button type="button"
+              onclick="navigator.clipboard.writeText('<%= order.checkout.public_url %>'); this.innerHTML = '<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'20 6 9 17 4 12\'></polyline></svg>'; setTimeout(() => this.innerHTML = '<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect width=\'14\' height=\'14\' x=\'8\' y=\'8\' rx=\'2\' ry=\'2\'></rect><path d=\'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\'></path></svg>', 2000)"
+      class="btn btn-ghost btn-xs btn-square shrink-0"
+      title="Kopiuj link">
+      <%= lucide_icon "copy", class: "w-3 h-3" %>
+    </button>
   </div>
+  <% if order.checkout.expires_at.present? %>
+    <p class="caption-text mt-1"><%= checkout_expiry_info(order.checkout) %></p>
+  <% end %>
+<% else %>
+  <div class="flex items-center justify-between">
+    <h3 class="subsection-title">Link do koszyka</h3>
+    <%= link_to activate_checkout_order_path(order),
+            class: "btn btn-xs gap-1",
+            data: { turbo_method: :post } do %>
+      <%= lucide_icon "link", class: "w-3 h-3" %>
+      Wygeneruj
+    <% end %>
+  </div>
+<% end %>
 <% end %>

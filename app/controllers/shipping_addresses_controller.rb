@@ -14,7 +14,6 @@ class ShippingAddressesController < ApplicationController
     end
 
     render turbo_stream: [
-      turbo_stream.update("shipping_address_modal", ""),
       turbo_stream.replace("shipping_address_section", partial: "orders/shipping_address_section", locals: { order: @order, shipping_address: @shipping_address }),
       turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
     ]

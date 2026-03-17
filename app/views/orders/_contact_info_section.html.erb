@@ -1,12 +1,6 @@
 <turbo-frame id="contact_info_section">
-  <div class="flex justify-between items-start mb-3">
-    <h3 class="subsection-title">Dane kontaktowe</h3>
-    <%= link_to edit_contact_info_order_path(order),
-        class: "btn btn-ghost btn-sm btn-square" do %>
-      <%= lucide_icon "pencil", class: "w-4 h-4" %>
-    <% end %>
-  </div>
-  <div class="space-y-3">
+  <h3 class="subsection-title mb-3">Dane kontaktowe</h3>
+  <%= link_to edit_contact_info_order_path(order), data: { turbo_frame: "contact_info_section" }, class: "block space-y-3 -mx-2 px-2 py-1 rounded-lg hover:bg-base-200/50 cursor-pointer transition-colors" do %>
     <div class="flex justify-between items-center">
       <span class="label-text">Email</span>
       <span class="body-text font-medium"><%= order.email.presence || "—" %></span>
@@ -15,5 +9,5 @@
       <span class="label-text">Telefon</span>
       <span class="body-text font-medium"><%= order.phone.presence || "—" %></span>
     </div>
-  </div>
+  <% end %>
 </turbo-frame>

@@ -14,7 +14,6 @@ class BillingAddressesController < ApplicationController
     end
 
     render turbo_stream: [
-      turbo_stream.update("billing_address_modal", ""),
       turbo_stream.replace("billing_address_section", partial: "orders/billing_address_section", locals: { order: @order, billing_address: @billing_address }),
       turbo_stream.update("flash_messages", partial: "layouts/flash_messages")
     ]
