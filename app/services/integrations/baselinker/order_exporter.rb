@@ -56,7 +56,7 @@ module Integrations
       private
 
       def prepare_order_data(order)
-        {
+        data = {
           # Order basic info
           order_status_id: baselinker_status_from_order(order),
           custom_source_id: integration.settings.dig("custom_source_id"),
@@ -85,18 +85,26 @@ module Integrations
           products: prepare_products(order),
 
           # Payment and shipping
-          payment_method: order.payment_method,
+          payment_method: order.payment_method.to_s,
           payment_method_cod: order.cash_on_delivery? ? 1 : 0,
-          delivery_method: order.shipping_method,
+          delivery_method: order.shipping_method.to_s,
           delivery_price: order.shipping_cost.to_f,
 
           # Currency
           currency: order.currency,
 
-          # Custom fields
-          user_comments: "Zamówienie z LiveCart ##{order.order_number}",
-          admin_comments: "Zaimportowane z LiveCart"
+          # Comments
+          user_comments: order.comment.to_s
         }.compact
+
+        if order.pickup_point.present?
+          pp = order.pickup_point
+          data[:delivery_point_id] = pp.point_id.to_s
+          data[:delivery_point_name] = pp.name.to_s
+          data[:delivery_point_address] = [ pp.address_line1, pp.postal_code, pp.city ].compact.join(", ")
+        end
+
+        data
       end
 
       def prepare_products(order)
