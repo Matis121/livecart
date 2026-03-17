@@ -7,6 +7,7 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
   has_one :shipping_address, dependent: :destroy
   has_one :billing_address, dependent: :destroy
+  has_one :pickup_point, dependent: :destroy
   has_many :order_status_histories, dependent: :destroy
   has_one :checkout, dependent: :destroy
   has_many :integration_exports, dependent: :destroy

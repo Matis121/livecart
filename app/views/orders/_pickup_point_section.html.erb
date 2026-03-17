@@ -1,0 +1,23 @@
+<turbo-frame id="pickup_point_section">
+  <h3 class="subsection-title mb-3">Punkt odbioru</h3>
+  <%= link_to edit_order_pickup_point_path(order), data: { turbo_frame: "pickup_point_section" }, class: "block -mx-2 px-2 py-1 rounded-lg hover:bg-base-200/50 cursor-pointer transition-colors mb-3" do %>
+    <% if pickup_point&.name.present? || pickup_point&.point_id.present? %>
+      <div class="space-y-0.5">
+        <% if pickup_point.point_id.present? %>
+          <div class="label-text"><%= pickup_point.point_id %></div>
+        <% end %>
+        <% if pickup_point.name.present? %>
+          <div class="label-text"><%= pickup_point.name %></div>
+        <% end %>
+        <% if pickup_point.address_line1.present? %>
+          <div class="label-text"><%= pickup_point.address_line1 %></div>
+        <% end %>
+        <% if pickup_point.postal_code.present? || pickup_point.city.present? %>
+          <div class="label-text"><%= [pickup_point.postal_code, pickup_point.city].compact.join(" ") %></div>
+        <% end %>
+      </div>
+    <% else %>
+      <span class="label-text">Brak punktu odbioru</span>
+    <% end %>
+  <% end %>
+</turbo-frame>

@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     resource :billing_address, only: [ :edit, :update ] do
       patch :copy_from_shipping
     end
+    resource :pickup_point, only: [ :edit, :update ]
     member do
       get :edit_customer
       get :edit_discount_code

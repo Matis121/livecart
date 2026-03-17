@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_16_223217) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_17_163348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -229,6 +229,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_16_223217) do
     t.index ["integration_id"], name: "index_payment_methods_on_integration_id"
   end
 
+  create_table "pickup_points", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "point_id"
+    t.string "name"
+    t.string "address_line1"
+    t.string "postal_code"
+    t.string "city"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_pickup_points_on_order_id"
+  end
+
   create_table "product_imports", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "import_name", null: false
@@ -372,6 +384,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_16_223217) do
   add_foreign_key "orders", "transmissions"
   add_foreign_key "payment_methods", "accounts"
   add_foreign_key "payment_methods", "integrations"
+  add_foreign_key "pickup_points", "orders"
   add_foreign_key "product_imports", "accounts"
   add_foreign_key "product_stock_movements", "order_items"
   add_foreign_key "product_stock_movements", "products"

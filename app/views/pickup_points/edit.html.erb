@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "pickup_point_section" do %>
+  <h3 class="subsection-title mb-3">Punkt odbioru</h3>
+  <%= form_with model: @pickup_point, url: order_pickup_point_path(@order), method: :patch do |f| %>
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="label-text">ID punktu</span>
+        <%= f.text_field :point_id, class: "input input-bordered input-sm w-44", placeholder: "WAR010" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Nazwa</span>
+        <%= f.text_field :name, class: "input input-bordered input-sm w-44", placeholder: "Paczkomat przy centrum" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Ulica i numer</span>
+        <%= f.text_field :address_line1, class: "input input-bordered input-sm w-44", placeholder: "ul. Przykładowa 1" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Kod pocztowy</span>
+        <%= f.text_field :postal_code, class: "input input-bordered input-sm w-44", placeholder: "00-000" %>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="label-text">Miasto</span>
+        <%= f.text_field :city, class: "input input-bordered input-sm w-44", placeholder: "Warszawa" %>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <%= link_to "Anuluj", order_path(@order), class: "btn btn-ghost btn-sm" %>
+      <%= f.submit "Zapisz", class: "btn btn-primary btn-sm" %>
+    </div>
+  <% end %>
+<% end %>

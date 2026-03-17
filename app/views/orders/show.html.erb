@@ -37,93 +37,98 @@
     </ul>
   </div>
 </div>
-<!-- Główna powierzchnia -->
-<div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
-  <div class="grid grid-cols-1 xl:grid-cols-3 divide-y xl:divide-y-0 xl:divide-x divide-base-200">
-    <!-- ═══ LEWA — treść zamówienia ═══ -->
-    <div class="xl:col-span-2 divide-y divide-base-200">
-      <!-- Produkty -->
-      <div class="p-5 sm:p-6">
-        <div class="flex justify-between items-center mb-5">
-          <h2 class="section-title">Produkty</h2>
-          <%= link_to new_order_order_item_path(@order),
-                data: { turbo_frame: "new_order_item" },
-                class: "btn btn-sm" do %>
-            Dodaj produkt
-          <% end %>
-        </div>
-        <%= turbo_frame_tag "new_order_item" %>
-        <%= render "order_items/list", order: @order %>
-      </div>
-      <!-- Adresy -->
-      <div class="p-5 sm:p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
-          <div class="pb-6 md:pb-0 md:pr-6 border-b md:border-b-0 md:border-r border-base-200">
-            <%= render "orders/shipping_address_section",
-                  order: @order,
-                  shipping_address: @order.shipping_address %>
-          </div>
-          <div class="pt-6 md:pt-0 md:pl-6">
-            <%= render "orders/billing_address_section",
-                  order: @order,
-                  billing_address: @order.billing_address %>
-          </div>
-        </div>
-      </div>
-      <!-- Komentarz -->
-      <% if @order.comment.present? %>
-        <div class="p-5 sm:p-6">
-          <h2 class="section-title mb-3">Komentarz</h2>
-          <p class="body-text whitespace-pre-wrap"><%= @order.comment %></p>
-        </div>
+
+<!-- 1. Produkty -->
+<div class="bg-base-100 rounded-lg shadow-sm overflow-hidden mb-4">
+  <div class="p-5 sm:p-6 border-b border-base-200">
+    <div class="flex justify-between items-center">
+      <h2 class="section-title">Produkty</h2>
+      <%= link_to new_order_order_item_path(@order),
+            data: { turbo_frame: "new_order_item" },
+            class: "btn btn-sm" do %>
+        Dodaj produkt
       <% end %>
     </div>
-    <!-- ═══ PRAWA — panel boczny ═══ -->
-    <div class="xl:col-span-1 divide-y divide-base-200">
-      <!-- Koszyk -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/order_checkout", order: @order %>
+  </div>
+  <div class="p-5 sm:p-6">
+    <%= turbo_frame_tag "new_order_item" %>
+    <%= render "order_items/list", order: @order %>
+  </div>
+  <% if @order.comment.present? %>
+    <div class="p-5 sm:p-6 border-t border-base-200">
+      <h2 class="section-title mb-3">Komentarz</h2>
+      <p class="body-text whitespace-pre-wrap"><%= @order.comment %></p>
+    </div>
+  <% end %>
+</div>
+
+<!-- 2. Szczegóły zamówienia -->
+<div class="bg-base-100 rounded-lg shadow-sm overflow-hidden mb-4">
+  <div class="p-5 sm:p-6 border-b border-base-200">
+    <h2 class="section-title">Szczegóły zamówienia</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-base-200">
+    <!-- Klient + dane kontaktowe + koszyk -->
+    <div class="divide-y divide-base-200">
+      <div class="p-5 sm:p-6"><%= render "orders/order_checkout", order: @order %></div>
+      <div class="p-5 sm:p-6"><%= render "orders/customer_section", order: @order %></div>
+      <div class="p-5 sm:p-6"><%= render "orders/contact_info_section", order: @order %></div>
+    </div>
+    <!-- Płatność + wysyłka + kod rabatowy -->
+    <div class="divide-y divide-base-200">
+      <div class="p-5 sm:p-6"><%= render "orders/payment_section", order: @order %></div>
+      <div class="p-5 sm:p-6"><%= render "orders/shipping_payment_methods_section", order: @order %></div>
+      <div class="p-5 sm:p-6"><%= render "orders/discount_code_section", order: @order %></div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Etykiety i dokumenty -->
+<div class="bg-base-100 rounded-lg shadow-sm overflow-hidden mb-4">
+  <div class="p-5 sm:p-6 border-b border-base-200">
+    <h2 class="section-title">Etykiety i dokumenty</h2>
+  </div>
+  <div class="p-5 sm:p-6">
+    <div class="flex flex-wrap gap-3">
+      <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-base-200/60 text-base-content/40 cursor-not-allowed select-none">
+        <%= lucide_icon("package", class: "w-4 h-4 shrink-0") %>
+        <span class="text-sm font-medium">Etykieta wysyłkowa</span>
+        <span class="badge badge-ghost badge-sm">Wkrótce</span>
       </div>
-      <!-- Klient -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/customer_section", order: @order %>
-      </div>
-      <!-- Dane kontakowe -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/contact_info_section", order: @order %>
-      </div>
-      <!-- Płatność -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/payment_section", order: @order %>
-      </div>
-      <!-- Wysyłka -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/shipping_payment_methods_section", order: @order %>
-      </div>
-      <!-- Kod rabatowy -->
-      <div class="p-5 sm:p-6">
-        <%= render "orders/discount_code_section", order: @order %>
-      </div>
-      <!-- Akcje -->
-      <div class="p-5 sm:p-6">
-        <h2 class="section-title mb-4">Akcje</h2>
-        <div class="space-y-2">
-          <!-- Etykieta (placeholder) -->
-          <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-base-200/60 text-base-content/40 cursor-not-allowed select-none">
-            <%= lucide_icon("package", class: "w-4 h-4 shrink-0") %>
-            <span class="text-sm font-medium flex-1">Etykieta wysyłkowa</span>
-            <span class="text-xs">Wkrótce</span>
-          </div>
-          <!-- Faktura (placeholder) -->
-          <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-base-200/60 text-base-content/40 cursor-not-allowed select-none">
-            <%= lucide_icon("file-text", class: "w-4 h-4 shrink-0") %>
-            <span class="text-sm font-medium flex-1">Faktura</span>
-            <span class="text-xs">Wkrótce</span>
-          </div>
-        </div>
+      <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-base-200/60 text-base-content/40 cursor-not-allowed select-none">
+        <%= lucide_icon("file-text", class: "w-4 h-4 shrink-0") %>
+        <span class="text-sm font-medium">Faktura</span>
+        <span class="badge badge-ghost badge-sm">Wkrótce</span>
       </div>
     </div>
   </div>
 </div>
+
+<!-- 4. Adresy dostawy / faktury / punkty -->
+<div class="bg-base-100 rounded-lg shadow-sm overflow-hidden mb-4">
+  <div class="p-5 sm:p-6 border-b border-base-200">
+    <h2 class="section-title">Adresy</h2>
+  </div>
+  <div class="p-5 sm:p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-base-200">
+      <div class="pb-6 md:pb-0 md:pr-6">
+        <%= render "orders/shipping_address_section",
+              order: @order,
+              shipping_address: @order.shipping_address %>
+      </div>
+      <div class="pt-6 md:pt-0 md:px-6">
+        <%= render "orders/billing_address_section",
+              order: @order,
+              billing_address: @order.billing_address %>
+      </div>
+      <div class="pt-6 md:pt-0 md:pl-6">
+        <%= render "orders/pickup_point_section",
+              order: @order,
+              pickup_point: @order.pickup_point %>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modals -->
 <%= turbo_frame_tag "status_history_modal", target: "_top" %>
