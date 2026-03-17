@@ -28,7 +28,9 @@
       </div>
       <div class="flex justify-between items-center">
         <span class="label-text">Kraj</span>
-        <%= f.text_field :country, class: "input input-bordered input-sm w-44", placeholder: "Polska" %>
+        <%= f.select :country, options_for_select(ShippingAddress::COUNTRIES, @shipping_address.country.presence || "PL"),
+            {},
+            class: "select select-bordered select-sm w-44" %>
       </div>
     </div>
     <div class="flex justify-end gap-2 mt-4">

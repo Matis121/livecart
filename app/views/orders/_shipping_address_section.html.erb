@@ -16,7 +16,7 @@
           <div class="label-text"><%= [shipping_address.postal_code, shipping_address.city].compact.join(" ") %></div>
         <% end %>
         <% if shipping_address.country.present? %>
-          <div class="label-text"><%= shipping_address.country %></div>
+          <div class="label-text"><%= shipping_address.country_name %></div>
         <% end %>
       </div>
     <% else %>

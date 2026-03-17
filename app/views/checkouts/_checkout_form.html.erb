@@ -79,7 +79,9 @@
                 </div>
                 <div class="form-control md:col-span-2">
                   <%= sa.label :country, "Kraj *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :country, class: "input input-bordered w-full rounded-xl", required: true, value: order.shipping_address.country.presence || "Polska" %>
+                  <%= sa.select :country, options_for_select(ShippingAddress::COUNTRIES, order.shipping_address.country.presence || "PL"),
+                      { required: true },
+                      class: "select select-bordered w-full rounded-xl" %>
                 </div>
               </div>
             <% end %>
@@ -132,7 +134,9 @@
                   </div>
                   <div class="form-control md:col-span-2">
                     <%= ba.label :country, "Kraj", class: "label label-text font-medium" %>
-                    <%= ba.text_field :country, class: "input input-bordered w-full rounded-xl", value: "Polska" %>
+                    <%= ba.select :country, options_for_select(BillingAddress::COUNTRIES, order.billing_address.country.presence || "PL"),
+                        {},
+                        class: "select select-bordered w-full rounded-xl" %>
                   </div>
                 </div>
               </div>

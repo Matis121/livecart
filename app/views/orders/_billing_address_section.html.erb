@@ -27,7 +27,7 @@
           <div class="label-text"><%= [billing_address.postal_code, billing_address.city].compact.join(" ") %></div>
         <% end %>
         <% if billing_address.country.present? %>
-          <div class="label-text"><%= billing_address.country %></div>
+          <div class="label-text"><%= billing_address.country_name %></div>
         <% end %>
       </div>
     <% else %>
