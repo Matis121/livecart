@@ -45,6 +45,8 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 
 group :development, :test do
+  gem "dotenv-rails"
+
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
@@ -82,3 +84,6 @@ gem "image_processing", "~> 1.2"
 gem "faraday", "~> 2.9"
 gem "faraday-retry", "~> 2.2"
 gem "faraday-multipart", "~> 1.0"
+
+# OAuth 2.0 with PKCE for social media integrations (TikTok, Instagram, Facebook)
+gem "oauth2", "~> 2.0"

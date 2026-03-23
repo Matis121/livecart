@@ -1,12 +1,23 @@
 <%= render "transmissions/header", transmission: @transmission %>
 <%= render "transmissions/status_card", transmission: @transmission %>
-<% if @transmission.active? %>
+
+<div class="<%= @transmission.live_linked? ? 'grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6' : '' %>">
   <div>
-    <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+    <% if @transmission.active? %>
+      <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+    <% end %>
+    <%= turbo_frame_tag "product_items_list" do %>
+      <%= render "transmissions/product_items_list", transmission: @transmission %>
+    <% end %>
+
+    <% if @transmission.completed? && @transmission.live_linked? %>
+      <%= render "transmissions/live_dm_summary", transmission: @transmission %>
+    <% end %>
   </div>
-<% end %>
-<%= turbo_frame_tag "product_items_list" do %>
-  <%= render "transmissions/product_items_list", transmission: @transmission %>
-<% end %>
+
+  <%= render "transmissions/live_chat_feed", transmission: @transmission %>
+</div>
+
 <%= turbo_frame_tag "transmission_modal" %>
 <%= turbo_frame_tag "transmission_item_modal" %>
+<%= turbo_frame_tag "live_assignment_modal" %>

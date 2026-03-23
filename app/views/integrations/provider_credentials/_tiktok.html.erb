@@ -1,0 +1,31 @@
+<div class="card bg-base-100 border border-base-300 shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title text-lg mb-4">Połączenie z TikTok</h2>
+
+    <% if integration.persisted? && integration.access_token.present? %>
+      <div class="alert alert-success mb-4">
+        <%= lucide_icon("check-circle", class: "w-5 h-5 shrink-0") %>
+        <div>
+          <p class="font-semibold">Konto połączone jako @<%= integration.provider_account_name %></p>
+          <p class="text-sm">Token wygasa: <%= integration.token_expires_at&.strftime("%d.%m.%Y %H:%M") || "nieznany" %></p>
+        </div>
+      </div>
+      <%= link_to integrations_tiktok_oauth_authorize_path, class: "btn btn-ghost btn-sm" do %>
+        <%= lucide_icon("refresh-cw", class: "w-4 h-4") %>
+        Ponów autoryzację
+      <% end %>
+    <% else %>
+      <div class="alert alert-info mb-4">
+        <%= lucide_icon("info", class: "w-5 h-5 shrink-0") %>
+        <div class="text-sm">
+          <strong>TikTok wymaga autoryzacji OAuth.</strong><br>
+          Kliknij przycisk poniżej, aby przekierować do TikTok i zatwierdzić dostęp.
+        </div>
+      </div>
+      <%= link_to integrations_tiktok_oauth_authorize_path, class: "btn btn-primary w-full gap-2" do %>
+        <%= lucide_icon("external-link", class: "w-4 h-4") %>
+        Połącz konto TikTok
+      <% end %>
+    <% end %>
+  </div>
+</div>

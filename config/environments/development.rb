@@ -72,4 +72,7 @@ Rails.application.configure do
 
   # Sidekiq adapter for Active Job
   config.active_job.queue_adapter = :sidekiq
+
+  # Allow ngrok tunnels
+  config.hosts << /.*\.ngrok-free\.app/
 end

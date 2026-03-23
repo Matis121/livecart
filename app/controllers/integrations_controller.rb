@@ -12,6 +12,12 @@ class IntegrationsController < ApplicationController
   end
 
   def new
+    # OAuth-based providers skip the form and go directly to OAuth flow
+    if params[:provider].present? && oauth_provider?(params[:provider])
+      redirect_to oauth_authorize_path_for(params[:provider])
+      return
+    end
+
     @integration = current_account.integrations.new
 
     # Pre-populate provider if coming from tile selection
@@ -76,6 +82,21 @@ class IntegrationsController < ApplicationController
 
   def set_integration
     @integration = current_account.integrations.find(params[:id])
+  end
+
+  OAUTH_PROVIDERS = %w[tiktok instagram facebook].freeze
+
+  def oauth_provider?(provider)
+    OAUTH_PROVIDERS.include?(provider.to_s.downcase)
+  end
+
+  def oauth_authorize_path_for(provider)
+    case provider.to_s.downcase
+    when "tiktok"
+      integrations_tiktok_oauth_authorize_path
+    else
+      new_integration_path
+    end
   end
 
   def integration_params

@@ -1,5 +1,5 @@
 class TransmissionsController < ApplicationController
-  before_action :set_transmission, only: [ :show, :edit, :update, :destroy, :convert_to_orders ]
+  before_action :set_transmission, only: [ :show, :edit, :update, :destroy, :convert_to_orders, :link_live ]
 
   PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
   DEFAULT_PER_PAGE = 10
@@ -83,14 +83,54 @@ class TransmissionsController < ApplicationController
     # Uruchom job w tle
     TransmissionConverterJob.perform_later(@transmission.id)
 
+    # Wyślij DM jeśli transmisja ma podłączoną integrację social media
+    if @transmission.integration&.social_media_live?
+      Integrations::LiveDmSenderJob.perform_later(@transmission.id)
+    end
+
     redirect_to @transmission,
                 notice: "Przetwarzanie rozpoczęte!"
+  end
+
+  def link_live
+    integration = current_account.integrations.find_by(id: params[:integration_id])
+
+    unless integration&.social_media_live?
+      redirect_to @transmission, alert: "Wybrana integracja jest nieprawidłowa lub nieaktywna."
+      return
+    end
+
+    live_external_id = params[:live_external_id].to_s.strip
+
+    if live_external_id.blank?
+      redirect_to @transmission, alert: "Podaj ID transmisji live."
+      return
+    end
+
+    begin
+      poller_class = "Integrations::#{integration.provider.capitalize}::LiveChatPoller".constantize
+      poller = poller_class.new(integration)
+      live_room_id = poller.get_room_id(live_external_id)
+
+      @transmission.update!(
+        integration:      integration,
+        live_external_id: live_external_id,
+        live_room_id:     live_room_id
+      )
+
+      Integrations::LiveChatPollJob.perform_later(@transmission.id, integration.id)
+
+      redirect_to @transmission, notice: "Podłączono live #{integration.provider.capitalize}. Czat jest aktywny."
+    rescue => e
+      Rails.logger.error("[link_live] #{e.class}: #{e.message}")
+      redirect_to @transmission, alert: "Nie udało się podłączyć live: #{e.message}"
+    end
   end
 
   private
 
   def transmission_params
-    params.require(:transmission).permit(:name, :status)
+    params.require(:transmission).permit(:name, :status, :integration_id, :live_external_id)
   end
 
   def set_transmission

@@ -1,0 +1,103 @@
+<div class="p-5 w-full max-w-md">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="font-bold text-lg">Przypisz do produktu</h3>
+    <button class="btn btn-ghost btn-sm btn-circle"
+            data-action="click->modal#close"
+            onclick="document.getElementById('live_assignment_modal').innerHTML = ''">
+      ✕
+    </button>
+  </div>
+
+  <%# Platform user info %>
+  <div class="flex items-center gap-3 mb-4 p-3 bg-base-200 rounded-lg">
+    <% if @avatar_url.present? %>
+      <img src="<%= @avatar_url %>" class="w-10 h-10 rounded-full object-cover" alt="@<%= @username %>">
+    <% else %>
+      <div class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center font-bold text-sm">
+        <%= @username[0]&.upcase %>
+      </div>
+    <% end %>
+    <div>
+      <div class="font-semibold text-sm">@<%= @username %></div>
+      <div class="text-xs text-base-content/50 capitalize"><%= @platform %></div>
+    </div>
+  </div>
+
+  <%= form_with url: transmission_live_assignments_path(@transmission),
+                method: :post,
+                data: { controller: "transmission-items-form",
+                        "transmission-items-form-transmission-id-value": @transmission.id },
+                class: "space-y-4" do |f| %>
+
+    <input type="hidden" name="platform"   value="<%= @platform %>">
+    <input type="hidden" name="user_id"    value="<%= @user_id %>">
+    <input type="hidden" name="username"   value="<%= @username %>">
+    <input type="hidden" name="avatar_url" value="<%= @avatar_url %>">
+
+    <%# Customer name override %>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="form-control">
+        <label class="label py-1"><span class="label-text text-xs">Imię</span></label>
+        <input type="text" name="first_name" class="input input-sm input-bordered"
+               value="<%= @customer.first_name %>">
+      </div>
+      <div class="form-control">
+        <label class="label py-1"><span class="label-text text-xs">Nazwisko</span></label>
+        <input type="text" name="last_name" class="input input-sm input-bordered"
+               value="<%= @customer.last_name == "-" ? "" : @customer.last_name %>"
+               placeholder="Opcjonalnie">
+      </div>
+    </div>
+
+    <%# Product search %>
+    <div class="form-control">
+      <label class="label py-1"><span class="label-text text-xs font-medium">Produkt *</span></label>
+      <div class="relative">
+        <input type="text"
+               placeholder="Wyszukaj produkt..."
+               class="input input-sm input-bordered w-full"
+               data-action="input->transmission-items-form#filterProducts focus->transmission-items-form#handleFocus"
+               data-transmission-items-form-target="searchInput"
+               autocomplete="off">
+      </div>
+      <div class="hidden border border-base-300 rounded-lg bg-base-100 max-h-48 overflow-y-auto mt-1"
+           data-transmission-items-form-target="resultsDropdown">
+        <div data-transmission-items-form-target="productsList" class="p-1"></div>
+        <div data-transmission-items-form-target="minChars" class="p-4 text-center text-xs text-base-content/50">
+          Wpisz min. 2 znaki
+        </div>
+        <div data-transmission-items-form-target="noResults" class="hidden p-4 text-center text-xs text-base-content/50">
+          Brak wyników
+        </div>
+      </div>
+      <div data-transmission-items-form-target="selectedProduct" class="hidden mt-2 p-2 bg-base-200 rounded-lg text-sm">
+        <div class="flex items-center gap-2">
+          <img data-transmission-items-form-target="selectedImage" class="w-8 h-8 rounded object-cover hidden">
+          <span data-transmission-items-form-target="selectedName" class="font-medium flex-1"></span>
+          <button type="button" class="btn btn-ghost btn-xs btn-circle"
+                  data-action="click->transmission-items-form#clearProduct">✕</button>
+        </div>
+      </div>
+      <input type="hidden" name="product_id" data-transmission-items-form-target="productIdInput">
+    </div>
+
+    <%# Quantity and price %>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="form-control">
+        <label class="label py-1"><span class="label-text text-xs">Ilość</span></label>
+        <input type="number" name="quantity" value="1" min="1"
+               class="input input-sm input-bordered">
+      </div>
+      <div class="form-control">
+        <label class="label py-1"><span class="label-text text-xs">Cena (opcjonalnie)</span></label>
+        <input type="text" name="unit_price" placeholder="auto"
+               class="input input-sm input-bordered">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm w-full">
+      <%= lucide_icon("check", class: "w-4 h-4") %>
+      Przypisz
+    </button>
+  <% end %>
+</div>

@@ -1,0 +1,61 @@
+<% integration = transmission.integration %>
+<% dm_result = integration&.dm_result_for(transmission.id) %>
+<% is_fallback = dm_result.nil? || dm_result["status"] != "sent" %>
+
+<% if is_fallback %>
+  <div class="card bg-base-100 shadow-sm mt-6">
+    <div class="card-body">
+      <h3 class="card-title text-base flex items-center gap-2">
+        <%= lucide_icon("message-square", class: "w-4 h-4") %>
+        Podsumowania do wysłania
+        <span class="badge badge-warning badge-sm">Skopiuj ręcznie</span>
+      </h3>
+      <p class="text-sm text-base-content/60 mb-4">
+        Wyślij te wiadomości ręcznie przez DM na <%= transmission.live_platform&.capitalize %>.
+      </p>
+
+      <%
+        platform_items = transmission.transmission_items
+          .includes(:customer, :product)
+          .select { |ti| ti.customer&.platform == integration&.provider && ti.customer.platform_user_id.present? }
+          .group_by(&:customer)
+      %>
+
+      <% if platform_items.any? %>
+        <div class="space-y-3">
+          <% platform_items.each do |customer, items| %>
+            <%
+              total = items.sum { |ti| ti.unit_price * ti.quantity }
+              lines = items.map do |ti|
+                name = ti.product&.name || ti.name
+                "• #{name} x#{ti.quantity} — #{"%.2f" % (ti.unit_price * ti.quantity)} zł"
+              end.join("\n")
+              message = "Dzień dobry @#{customer.platform_username}!\nTwoje zamówienie z transmisji live:\n#{lines}\nSuma: #{"%.2f" % total} zł\nDziękujemy za zakup!"
+            %>
+            <div class="border border-base-300 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <% if customer.profile_data&.dig("avatar_url").present? %>
+                    <img src="<%= customer.profile_data["avatar_url"] %>"
+                         class="w-7 h-7 rounded-full object-cover" alt="@<%= customer.platform_username %>">
+                  <% end %>
+                  <span class="font-semibold text-sm">@<%= customer.platform_username %></span>
+                </div>
+                <button
+                  class="btn btn-ghost btn-xs gap-1"
+                  onclick="navigator.clipboard.writeText(this.dataset.text).then(() => { this.textContent = 'Skopiowano!' }); setTimeout(() => { this.innerHTML = '<%= lucide_icon("copy", class: "w-3 h-3") %> Kopiuj' }, 2000)"
+                  data-text="<%= message.gsub('"', '&quot;') %>">
+                  <%= lucide_icon("copy", class: "w-3 h-3") %>
+                  Kopiuj
+                </button>
+              </div>
+              <pre class="text-xs bg-base-200 rounded p-2 whitespace-pre-wrap break-words"><%= message %></pre>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50">Brak klientów z platformy <%= transmission.live_platform&.capitalize %>.</p>
+      <% end %>
+    </div>
+  </div>
+<% end %>

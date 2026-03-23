@@ -1,0 +1,79 @@
+<div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card-body p-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="card-title text-base flex items-center gap-2">
+        <%= lucide_icon("message-circle", class: "w-4 h-4") %>
+        Live Chat
+        <% if transmission.live_linked? %>
+          <span class="badge badge-success badge-sm">
+            <%= transmission.live_platform&.capitalize %>
+          </span>
+        <% end %>
+      </h3>
+    </div>
+
+    <% if transmission.live_linked? %>
+      <%# Chat feed %>
+      <div
+        data-controller="live-chat"
+        data-live-chat-transmission-id-value="<%= transmission.id %>"
+      >
+        <div
+          data-live-chat-target="feed"
+          class="h-80 overflow-y-auto flex flex-col gap-1 border border-base-300 rounded-lg p-2 bg-base-50"
+          id="live-chat-feed-<%= transmission.id %>"
+        >
+          <p class="text-xs text-base-content/50 text-center py-4">
+            Czekam na wiadomości z <%= transmission.live_platform&.capitalize %>...
+          </p>
+        </div>
+        <p class="text-xs text-base-content/50 mt-1">
+          Najedź na wiadomość i kliknij <strong>+</strong> aby przypisać klienta do produktu.
+        </p>
+      </div>
+
+    <% elsif transmission.active? %>
+      <%# Link live form %>
+      <% social_integrations = current_account.integrations.select(&:social_media_live?) %>
+      <% if social_integrations.any? %>
+        <%= form_with url: link_live_transmission_path(transmission), method: :patch, class: "flex flex-col gap-3" do |f| %>
+          <div class="form-control">
+            <label class="label label-text text-xs">Platforma</label>
+            <select name="integration_id" class="select select-sm select-bordered" required>
+              <option value="">Wybierz platformę</option>
+              <% social_integrations.each do |integration| %>
+                <option value="<%= integration.id %>">
+                  <%= integration.provider.capitalize %> (@<%= integration.provider_account_name %>)
+                </option>
+              <% end %>
+            </select>
+          </div>
+          <div class="form-control">
+            <label class="label label-text text-xs">ID transmisji live</label>
+            <input type="text" name="live_external_id" class="input input-sm input-bordered"
+                   placeholder="np. 7412345678901234567" required>
+            <span class="label-text-alt text-xs text-base-content/50 mt-1">
+              Znajdź w URL swojego live'a na TikToku
+            </span>
+          </div>
+          <button type="submit" class="btn btn-sm btn-primary">
+            <%= lucide_icon("link", class: "w-3 h-3") %>
+            Podłącz live
+          </button>
+        <% end %>
+      <% else %>
+        <div class="text-center py-4">
+          <p class="text-sm text-base-content/60 mb-2">Brak podłączonego konta social media.</p>
+          <%= link_to new_integration_path(provider: "tiktok"), class: "btn btn-sm btn-ghost" do %>
+            <%= lucide_icon("plus", class: "w-3 h-3") %>
+            Połącz TikTok
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-base-content/50 text-center py-4">
+        Czat live dostępny tylko podczas aktywnej transmisji.
+      </p>
+    <% end %>
+  </div>
+</div>

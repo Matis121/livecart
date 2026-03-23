@@ -71,6 +71,7 @@ Rails.application.routes.draw do
   resources :transmissions, controller: "transmissions" do
     member do
       post :convert_to_orders
+      patch :link_live
     end
     resources :transmission_items, only: [ :new, :create, :show, :edit, :update, :destroy ] do
       collection do
@@ -80,6 +81,11 @@ Rails.application.routes.draw do
         get :search_products
       end
     end
+    resources :live_assignments, only: [ :create ] do
+      collection do
+        get :new_assignment
+      end
+    end
   end
 
   # Integrations
@@ -87,6 +93,12 @@ Rails.application.routes.draw do
     member do
       post :sync_now
     end
+  end
+
+  # Social media OAuth callbacks
+  namespace :integrations do
+    get "tiktok/oauth/authorize", to: "tiktok_oauth#authorize", as: :tiktok_oauth_authorize
+    get "tiktok/oauth/callback",  to: "tiktok_oauth#callback",  as: :tiktok_oauth_callback
   end
 
   # PayU IPN webhook (public, no auth required)

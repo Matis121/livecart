@@ -2,6 +2,7 @@ class Integration < ApplicationRecord
   belongs_to :account
   belongs_to :user
   has_many :integration_exports, dependent: :destroy
+  has_many :transmissions, dependent: :nullify
 
   enum :integration_type, {
     marketplace: 0,      # Baselinker, Sellasist
@@ -168,6 +169,38 @@ class Integration < ApplicationRecord
 
   def integration_type_name
     INTEGRATION_TYPE_NAMES[integration_type.to_sym] || integration_type.humanize
+  end
+
+  def tiktok?
+    provider == "tiktok"
+  end
+
+  def social_media_live?
+    type_social_media? && status_active? && access_token.present?
+  end
+
+  def token_expiring_soon?
+    token_expires_at.present? && token_expires_at < 5.minutes.from_now
+  end
+
+  def live_cursor_for(transmission_id)
+    settings&.dig("live_cursors", transmission_id.to_s)
+  end
+
+  def update_live_cursor!(transmission_id, cursor)
+    current = settings || {}
+    cursors = current["live_cursors"] || {}
+    update_columns(settings: current.merge("live_cursors" => cursors.merge(transmission_id.to_s => cursor)))
+  end
+
+  def dm_result_for(transmission_id)
+    settings&.dig("dm_results", transmission_id.to_s)
+  end
+
+  def update_dm_result!(transmission_id, result)
+    current = settings || {}
+    results = current["dm_results"] || {}
+    update_columns(settings: current.merge("dm_results" => results.merge(transmission_id.to_s => result)))
   end
 
   def payu?

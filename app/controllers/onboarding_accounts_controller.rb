@@ -22,7 +22,7 @@ class OnboardingAccountsController < ApplicationController
   private
 
   def account_params
-    params.require(:account).permit(:company_name, :nip, :name)
+    params.require(:account).permit(:company_name, :nip)
   end
 
   def ensure_account_absent!
