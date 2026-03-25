@@ -4,7 +4,15 @@ class CustomersController < ApplicationController
   PER_PAGE_OPTIONS = [ 10, 20, 35, 50, 100, 250 ].freeze
   DEFAULT_PER_PAGE = 10
   def index
-    @customers = current_account.customers.order(created_at: :asc)
+    @all_customers = current_account.customers
+
+    case params[:platform]
+    when "tiktok"  then @all_customers = @all_customers.where(platform: "tiktok")
+    when "manual"  then @all_customers = @all_customers.where(platform: nil)
+    end
+
+    @q = @all_customers.ransack(params[:q])
+    @customers = @q.result.order(created_at: :asc)
 
     per_page = if params[:per_page].present?
       params[:per_page].to_i
@@ -60,6 +68,12 @@ class CustomersController < ApplicationController
   end
 
   def customer_params
-    params.require(:customer).permit(:first_name, :last_name, :platform_user_id, :platform, :platform_username, :profile_data)
+    permitted = params.require(:customer).permit(:first_name, :last_name, :email, :phone_prefix, :phone_number, :platform, :platform_username)
+    prefix = permitted.delete(:phone_prefix).to_s.strip
+    number = permitted.delete(:phone_number).to_s.gsub(/\D/, "")
+    permitted[:phone] = number.present? ? "#{prefix}#{number}" : nil
+    permitted[:platform] = permitted[:platform].presence
+    permitted[:platform_username] = nil if permitted[:platform].blank?
+    permitted
   end
 end

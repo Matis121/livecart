@@ -32,6 +32,7 @@ export default class extends Controller {
   connect() {
     this.toggleSource();
     this.searchTimeout = null;
+    this.customerSearchTimeout = null;
     this.boundCloseDropdown = this.closeDropdownOnClickOutside.bind(this);
     document.addEventListener("mousedown", this.boundCloseDropdown);
   }
@@ -145,9 +146,124 @@ export default class extends Controller {
   }
 
   closeDropdownOnClickOutside(event) {
-    if (this.hasResultsDropdownTarget && !this.element.contains(event.target)) {
-      this.resultsDropdownTarget.classList.add("hidden");
+    if (!this.element.contains(event.target)) {
+      if (this.hasResultsDropdownTarget) {
+        this.resultsDropdownTarget.classList.add("hidden");
+      }
+      this.element
+        .querySelectorAll(".customer-dropdown")
+        .forEach((d) => d.classList.add("hidden"));
     }
+  }
+
+  // --- Customer search ---
+
+  filterCustomers(event) {
+    const input = event.target;
+    const container = input.closest(".relative");
+    const dropdown = container.querySelector(".customer-dropdown");
+    const rawValue = input.value;
+    const query = rawValue.replace(/^@/, "").trim();
+
+    clearTimeout(this.customerSearchTimeout);
+
+    if (query.length === 0) {
+      dropdown.classList.add("hidden");
+      dropdown.innerHTML = "";
+      container.querySelector("input[name='items[][customer_id]']").value = "";
+      container.querySelector("input[name='items[][customer_name]']").value = "";
+      return;
+    }
+
+    dropdown.classList.remove("hidden");
+    dropdown.innerHTML =
+      '<div class="p-3 text-sm text-base-content/40">Szukam...</div>';
+
+    this.customerSearchTimeout = setTimeout(() => {
+      fetch(
+        `/transmissions/${this.transmissionIdValue}/transmission_items/search_customers?q=${encodeURIComponent(rawValue)}`,
+        { headers: { Accept: "application/json" } },
+      )
+        .then((r) => r.json())
+        .then((customers) =>
+          this.renderCustomerResults(container, dropdown, customers, query),
+        )
+        .catch(() => dropdown.classList.add("hidden"));
+    }, 250);
+  }
+
+  openCustomerDropdown(event) {
+    const input = event.target;
+    if (input.value.trim().length > 0) {
+      const dropdown = input.closest(".relative").querySelector(".customer-dropdown");
+      if (dropdown.innerHTML.trim()) dropdown.classList.remove("hidden");
+    }
+  }
+
+  renderCustomerResults(container, dropdown, customers, query) {
+    let html = customers
+      .map((c) => {
+        const display = c.username
+          ? `@${this.escapeHtml(c.username)}`
+          : this.escapeHtml(c.name);
+        const sub = c.email
+          ? `<div class="text-xs text-base-content/50">${this.escapeHtml(c.email)}</div>`
+          : "";
+        return `<button type="button"
+            class="w-full text-left px-4 py-2.5 hover:bg-base-200 transition-colors"
+            data-action="click->transmission-items-form#selectExistingCustomer"
+            data-customer-id="${c.id}"
+            data-display="${this.escapeHtml(display)}">
+          <div class="font-medium text-sm">${display}</div>${sub}
+        </button>`;
+      })
+      .join('<div class="border-t border-base-200"></div>');
+
+    if (customers.length > 0) {
+      html += '<div class="border-t border-base-200"></div>';
+    }
+
+    html += `<button type="button"
+        class="w-full text-left px-4 py-2.5 hover:bg-base-200 transition-colors text-base-content/60"
+        data-action="click->transmission-items-form#selectNewCustomer"
+        data-name="${this.escapeHtml(query)}">
+      <div class="text-sm">Dodaj jako nowego: <strong>${this.escapeHtml(query)}</strong></div>
+    </button>`;
+
+    dropdown.innerHTML = html;
+    dropdown.classList.remove("hidden");
+  }
+
+  selectExistingCustomer(event) {
+    const btn = event.currentTarget;
+    const container = btn.closest(".relative");
+    this._applyCustomerSelection(
+      container,
+      btn.dataset.customerId,
+      "",
+      btn.dataset.display,
+    );
+  }
+
+  selectNewCustomer(event) {
+    const btn = event.currentTarget;
+    const container = btn.closest(".relative");
+    this._applyCustomerSelection(container, "", btn.dataset.name, btn.dataset.name);
+  }
+
+  _applyCustomerSelection(container, customerId, customerName, displayText) {
+    container.querySelector(".customer-search-input").value = displayText;
+    container.querySelector("input[name='items[][customer_id]']").value = customerId;
+    container.querySelector("input[name='items[][customer_name]']").value = customerName;
+    container.querySelector(".customer-dropdown").classList.add("hidden");
+  }
+
+  escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   addRow() {

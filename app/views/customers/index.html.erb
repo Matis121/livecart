@@ -5,8 +5,42 @@
     Dodaj klienta
   <% end %>
 </div>
-<% if @customers.any? %>
-  <%= render "customers/table" %>
+
+<%# Link rejestracyjny dla kupujących %>
+<% registration_url = new_buyer_registration_url(shop_slug: current_account.slug) %>
+<div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-6 p-4 bg-base-100 border border-base-300/60 rounded-xl shadow-sm">
+  <div class="flex items-center gap-2 shrink-0">
+    <%= lucide_icon("link", class: "w-4 h-4 text-base-content/50") %>
+    <span class="label-text font-medium">Link rejestracyjny</span>
+  </div>
+  <div class="flex-1 min-w-0 font-mono text-sm text-base-content/60 truncate bg-base-200/60 rounded-lg px-3 py-1.5">
+    <%= registration_url %>
+  </div>
+  <button type="button"
+          class="btn btn-sm btn-ghost gap-1.5 shrink-0"
+          data-copy-url="<%= registration_url %>"
+          onclick="navigator.clipboard.writeText(this.dataset.copyUrl).then(() => { const label = this.querySelector('[data-label]'); label.textContent = 'Skopiowano!'; setTimeout(() => label.textContent = 'Kopiuj', 1500) })">
+    <%= lucide_icon("copy", class: "w-4 h-4") %>
+    <span data-label>Kopiuj</span>
+  </button>
+</div>
+<% if current_account.customers.any? %>
+  <div class="flex gap-4">
+    <div class="flex-1 min-w-0">
+      <%= render "customers/customers_toolbar" %>
+      <% if @customers.any? %>
+        <div class="bg-base-100 rounded-b-lg shadow-sm">
+          <%= render "customers/table" %>
+        </div>
+      <% else %>
+        <div class="bg-base-100 rounded-b-lg shadow-sm p-12 text-center text-base-content/50">
+          <%= lucide_icon("search-x", class: "w-8 h-8 mx-auto mb-3 opacity-40") %>
+          <p>Brak klientów pasujących do filtrów.</p>
+          <%= link_to "Wyczyść filtry", customers_path, class: "btn btn-sm btn-ghost mt-3" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 <% else %>
   <%= render "customers/empty_state" %>
 <% end %>

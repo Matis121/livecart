@@ -78,6 +78,7 @@ Rails.application.routes.draw do
         delete :destroy_by_product
         delete :destroy_by_manual
         get :search_products
+        get :search_customers
       end
     end
   end
@@ -106,5 +107,7 @@ Rails.application.routes.draw do
         patch :apply_discount
       end
     end
+    get "register", to: "buyer_registrations#new", as: :new_buyer_registration
+    post "register", to: "buyer_registrations#create", as: :buyer_registration
   end
 end
