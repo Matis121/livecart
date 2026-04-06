@@ -1,11 +1,8 @@
 <%= turbo_frame_tag "customer_modal" do %>
   <dialog class="modal modal-open">
-    <div class="modal-box max-w-md max-h-[90vh]">
-      <h3 class="font-bold text-lg mb-4">Edytuj klienta</h3>
+    <div class="modal-box max-w-2xl max-h-[92vh] overflow-y-auto">
       <%= render "form" %>
     </div>
-    <div class="modal-backdrop"
-         onclick="document.getElementById('customer_modal').innerHTML = ''">
-    </div>
+    <div class="modal-backdrop" onclick="document.getElementById('customer_modal').innerHTML = ''"></div>
   </dialog>
 <% end %>

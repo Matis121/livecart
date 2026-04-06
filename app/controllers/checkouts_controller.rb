@@ -1,5 +1,5 @@
 class CheckoutsController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :apply_discount, :not_found ]
+  skip_before_action :authenticate_user!, only: [ :show, :update, :close_package, :apply_discount, :check_email, :not_found ]
 
   before_action :find_shop, except: [ :not_found ]
   before_action :find_checkout, except: [ :not_found ]
@@ -19,21 +19,11 @@ class CheckoutsController < ApplicationController
         # IPN jeszcze nie dotarł — pokaż stronę oczekiwania
         return render :payu_pending
       end
-      # IPN już zadziałał (order nie jest payment_processing) — pokaż sukces
+      # IPN już zadziałał — pokaż podsumowanie zamówienia
       return
     end
-
-    # Jeśli checkout jest zakończony, sprawdź czy to pierwsza wizyta po zakończeniu
-    if @checkout.completed?
-      if session[:show_success_for_checkout] == @checkout.id
-        # Pokaż stronę sukcesu i wyczyść flagę
-        session.delete(:show_success_for_checkout)
-      else
-        # Nie ma flagi - to ponowna wizyta, przekieruj
-        redirect_to not_found_checkouts_path
-      end
-    end
     # Jeśli open_package_pending? — widok sam renderuje stronę zamknięcia paczki
+    # Jeśli completed? — widok renderuje podsumowanie zamówienia
   end
 
   def update
@@ -77,7 +67,6 @@ class CheckoutsController < ApplicationController
     if payu_payment?(payment_method_record)
       redirect_to_payu(payment_method_record.integration)
     else
-      session[:show_success_for_checkout] = @checkout.id
       redirect_to checkout_path(@shop.slug, @checkout.token)
     end
   rescue => e
@@ -107,6 +96,12 @@ class CheckoutsController < ApplicationController
         end
       end
     end
+  end
+
+  def check_email
+    email = params[:email].to_s.strip.downcase
+    taken = @order.account.customers.exists?(email: email)
+    render json: { taken: taken }
   end
 
   def not_found
@@ -165,10 +160,12 @@ class CheckoutsController < ApplicationController
       else
         @order.update!(status: :in_fulfillment)
         @checkout.complete!
-        session[:show_success_for_checkout] = @checkout.id
         redirect_to checkout_path(@shop.slug, @checkout.token)
       end
     else
+      set_checkout_view_data
+      @open_package_enabled = @account.open_package_enabled?
+      @from_phase2 = true
       render :show, status: :unprocessable_entity
     end
   end
@@ -178,9 +175,11 @@ class CheckoutsController < ApplicationController
     if update_order_data(include_payment: false)
       @checkout.open_package!
       @order.update!(status: :open_package)
-      session[:show_success_for_checkout] = @checkout.id
       redirect_to checkout_path(@shop.slug, @checkout.token)
     else
+      set_checkout_view_data
+      @open_package_enabled = @account.open_package_enabled?
+      @from_phase2 = true
       render :show, status: :unprocessable_entity
     end
   end
@@ -223,6 +222,28 @@ class CheckoutsController < ApplicationController
           payment_method: payment_method_name,
           cash_on_delivery: payment_method_record&.cash_on_delivery? || false
         )
+      end
+
+      # Powiąż zamówienie z klientem: znajdź istniejącego po emailu lub utwórz nowego
+      pre_assigned_customer = @order.customer
+      linked_customer = nil
+
+      if @order.customer.nil? && @order.email.present?
+        existing = @order.account.customers.find_by(email: @order.email)
+        linked_customer = existing || @order.account.customers.create!(
+          email: @order.email,
+          phone: @order.phone.presence,
+          first_name: @order.shipping_address.first_name,
+          last_name: @order.shipping_address.last_name
+        )
+        @order.update_column(:customer_id, linked_customer.id)
+      end
+
+      # Zapisz adresy: tylko dla pre-przypisanego lub właśnie powiązanego klienta
+      customer_to_update = pre_assigned_customer || linked_customer
+      if customer_to_update.present?
+        customer_to_update.save_shipping_from_order!(@order)
+        customer_to_update.save_billing_from_order!(@order)
       end
 
       true

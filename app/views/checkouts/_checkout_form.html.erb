@@ -1,3 +1,9 @@
+<%
+  show_phase2 = (order.customer.present? && order.customer.has_saved_shipping_address?) ||
+                local_assigns[:from_phase2].present?
+  initial_phase = show_phase2 ? 2 : 1
+%>
+
 <!-- Shop header bar -->
 <div class="flex items-center gap-3 mb-8 pb-5 border-b border-base-300/60">
   <% if account_logo.present? %>
@@ -14,13 +20,37 @@
     <span class="caption-text hidden sm:inline">Bezpieczna płatność</span>
   </div>
 </div>
+
 <!-- Main grid -->
 <div class="flex flex-col xl:flex-row gap-6 items-start">
   <!-- Left column: Form -->
   <div class="flex-1 min-w-0">
     <% items_subtotal = order.order_items.sum(:total_price) %>
-    <%= form_with model: order, url: checkout_path(order.account.slug, checkout.token), method: :patch, local: true, data: { controller: "checkout-form", checkout_form_items_subtotal_value: items_subtotal.to_f, checkout_form_discount_amount_value: (order.discount_amount || 0).to_f, checkout_form_inpost_widget_token_value: @inpost_widget_token, checkout_form_orlen_widget_token_value: @orlen_widget_token } do |f| %>
-      <div class="space-y-4">
+    <%= form_with model: order, url: checkout_path(order.account.slug, checkout.token), method: :patch, local: true,
+        data: {
+          controller: "checkout-form checkout-phases",
+          checkout_form_items_subtotal_value: items_subtotal.to_f,
+          checkout_form_discount_amount_value: (order.discount_amount || 0).to_f,
+          checkout_form_inpost_widget_token_value: @inpost_widget_token,
+          checkout_form_orlen_widget_token_value: @orlen_widget_token,
+          checkout_phases_initial_phase_value: initial_phase
+        } do |f| %>
+
+      <% base_errors = order.errors[:base] %>
+      <% if base_errors.any? %>
+        <div class="alert alert-error rounded-xl mb-4">
+          <ul class="list-disc list-inside text-sm space-y-0.5">
+            <% base_errors.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- ===================== FAZA 1: Zbieranie danych ===================== -->
+      <div data-checkout-phases-target="phase1"
+           class="<%= 'hidden' if show_phase2 %> space-y-4">
+
         <!-- 1. Dane kontaktowe -->
         <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
           <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -28,12 +58,21 @@
           </div>
           <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="form-control">
+              <div class="form-control"
+                   <% if order.customer.nil? %>
+                     data-controller="email-check"
+                     data-email-check-url-value="<%= check_email_checkout_path(order.account.slug, checkout.token) %>"
+                   <% end %>>
                 <%= f.label :email, "Email *", class: "label label-text font-medium" %>
                 <%= f.email_field :email,
-                  class: "input input-bordered w-full rounded-xl",
+                  class: "input input-bordered w-full rounded-xl #{"input-error" if order.errors[:email].any?}",
                   required: true,
-                  placeholder: "twoj@email.pl" %>
+                  placeholder: "twoj@email.pl",
+                  data: order.customer.nil? ? { email_check_target: "input", action: "blur->email-check#check" } : {} %>
+                <p data-email-check-target="error"
+                   class="label label-text-alt text-error mt-1 <%= "hidden" unless order.errors[:email].any? %>">
+                  <%= order.errors[:email].first %>
+                </p>
               </div>
               <div class="form-control">
                 <%= f.label :phone, "Telefon *", class: "label label-text font-medium" %>
@@ -45,6 +84,7 @@
             </div>
           </div>
         </div>
+
         <!-- 2. Adres dostawy -->
         <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
           <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -55,38 +95,60 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-control">
                   <%= sa.label :first_name, "Imię *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :first_name, class: "input input-bordered w-full rounded-xl", required: true %>
+                  <%= sa.text_field :first_name,
+                    class: "input input-bordered w-full rounded-xl",
+                    required: true,
+                    data: { checkout_phases_target: "shippingFirstName" } %>
                 </div>
                 <div class="form-control">
                   <%= sa.label :last_name, "Nazwisko *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :last_name, class: "input input-bordered w-full rounded-xl", required: true %>
+                  <%= sa.text_field :last_name,
+                    class: "input input-bordered w-full rounded-xl",
+                    required: true,
+                    data: { checkout_phases_target: "shippingLastName" } %>
                 </div>
                 <div class="form-control md:col-span-2">
                   <%= sa.label :address_line1, "Ulica i numer *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :address_line1, class: "input input-bordered w-full rounded-xl", required: true, placeholder: "np. ul. Główna 123" %>
+                  <%= sa.text_field :address_line1,
+                    class: "input input-bordered w-full rounded-xl",
+                    required: true,
+                    placeholder: "np. ul. Główna 123",
+                    data: { checkout_phases_target: "shippingAddress1" } %>
                 </div>
                 <div class="form-control md:col-span-2">
                   <%= sa.label :address_line2, "Dodatkowe informacje", class: "label label-text font-medium" %>
-                  <%= sa.text_field :address_line2, class: "input input-bordered w-full rounded-xl", placeholder: "np. mieszkanie 4, kod domofonu" %>
+                  <%= sa.text_field :address_line2,
+                    class: "input input-bordered w-full rounded-xl",
+                    placeholder: "np. mieszkanie 4, kod domofonu",
+                    data: { checkout_phases_target: "shippingAddress2" } %>
                 </div>
                 <div class="form-control">
                   <%= sa.label :postal_code, "Kod pocztowy *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :postal_code, class: "input input-bordered w-full rounded-xl", required: true, placeholder: "00-000" %>
+                  <%= sa.text_field :postal_code,
+                    class: "input input-bordered w-full rounded-xl",
+                    required: true,
+                    placeholder: "00-000",
+                    data: { checkout_phases_target: "shippingPostalCode" } %>
                 </div>
                 <div class="form-control">
                   <%= sa.label :city, "Miasto *", class: "label label-text font-medium" %>
-                  <%= sa.text_field :city, class: "input input-bordered w-full rounded-xl", required: true %>
+                  <%= sa.text_field :city,
+                    class: "input input-bordered w-full rounded-xl",
+                    required: true,
+                    data: { checkout_phases_target: "shippingCity" } %>
                 </div>
                 <div class="form-control md:col-span-2">
                   <%= sa.label :country, "Kraj *", class: "label label-text font-medium" %>
-                  <%= sa.select :country, options_for_select(ShippingAddress::COUNTRIES, order.shipping_address.country.presence || "PL"),
-                      { required: true },
-                      class: "select select-bordered w-full rounded-xl" %>
+                  <%= sa.select :country,
+                    options_for_select(ShippingAddress::COUNTRIES, order.shipping_address.country.presence || "PL"),
+                    { required: true },
+                    class: "select select-bordered w-full rounded-xl" %>
                 </div>
               </div>
             <% end %>
           </div>
         </div>
+
         <!-- 3. Dane do faktury -->
         <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
           <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -98,52 +160,155 @@
                 <label class="label cursor-pointer justify-start gap-3 p-0">
                   <%= ba.check_box :needs_invoice,
                     class: "checkbox checkbox-primary",
-                    onchange: "document.getElementById('invoice-fields').classList.toggle('hidden')" %>
+                    data: {
+                      checkout_phases_target: "needsInvoice",
+                      action: "change->checkout-phases#toggleInvoice"
+                    } %>
                   <span class="label-text font-medium">Chcę otrzymać fakturę VAT</span>
                 </label>
               </div>
-              <div id="invoice-fields" class="<%= 'hidden' unless order.billing_address.needs_invoice %> space-y-4">
+              <div data-checkout-phases-target="invoiceFields"
+                   class="<%= 'hidden' unless order.billing_address.needs_invoice %> space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="form-control md:col-span-2">
                     <%= ba.label :company_name, "Nazwa firmy", class: "label label-text font-medium" %>
-                    <%= ba.text_field :company_name, class: "input input-bordered w-full rounded-xl" %>
+                    <%= ba.text_field :company_name,
+                      class: "input input-bordered w-full rounded-xl",
+                      data: { checkout_phases_target: "billingCompany" } %>
                   </div>
                   <div class="form-control">
                     <%= ba.label :nip, "NIP", class: "label label-text font-medium" %>
-                    <%= ba.text_field :nip, class: "input input-bordered w-full rounded-xl", placeholder: "0000000000" %>
+                    <%= ba.text_field :nip,
+                      class: "input input-bordered w-full rounded-xl",
+                      placeholder: "0000000000",
+                      data: { checkout_phases_target: "billingNip" } %>
                   </div>
                   <div class="form-control">
                     <%= ba.label :first_name, "Imię", class: "label label-text font-medium" %>
-                    <%= ba.text_field :first_name, class: "input input-bordered w-full rounded-xl" %>
+                    <%= ba.text_field :first_name,
+                      class: "input input-bordered w-full rounded-xl",
+                      data: { checkout_phases_target: "billingFirstName" } %>
                   </div>
                   <div class="form-control">
                     <%= ba.label :last_name, "Nazwisko", class: "label label-text font-medium" %>
-                    <%= ba.text_field :last_name, class: "input input-bordered w-full rounded-xl" %>
+                    <%= ba.text_field :last_name,
+                      class: "input input-bordered w-full rounded-xl",
+                      data: { checkout_phases_target: "billingLastName" } %>
                   </div>
                   <div class="form-control md:col-span-2">
                     <%= ba.label :address_line1, "Ulica i numer", class: "label label-text font-medium" %>
-                    <%= ba.text_field :address_line1, class: "input input-bordered w-full rounded-xl" %>
+                    <%= ba.text_field :address_line1,
+                      class: "input input-bordered w-full rounded-xl",
+                      data: { checkout_phases_target: "billingAddress1" } %>
                   </div>
                   <div class="form-control">
                     <%= ba.label :postal_code, "Kod pocztowy", class: "label label-text font-medium" %>
-                    <%= ba.text_field :postal_code, class: "input input-bordered w-full rounded-xl", placeholder: "00-000" %>
+                    <%= ba.text_field :postal_code,
+                      class: "input input-bordered w-full rounded-xl",
+                      placeholder: "00-000",
+                      data: { checkout_phases_target: "billingPostalCode" } %>
                   </div>
                   <div class="form-control">
                     <%= ba.label :city, "Miasto", class: "label label-text font-medium" %>
-                    <%= ba.text_field :city, class: "input input-bordered w-full rounded-xl" %>
+                    <%= ba.text_field :city,
+                      class: "input input-bordered w-full rounded-xl",
+                      data: { checkout_phases_target: "billingCity" } %>
                   </div>
                   <div class="form-control md:col-span-2">
                     <%= ba.label :country, "Kraj", class: "label label-text font-medium" %>
-                    <%= ba.select :country, options_for_select(BillingAddress::COUNTRIES, order.billing_address.country.presence || "PL"),
-                        {},
-                        class: "select select-bordered w-full rounded-xl" %>
+                    <%= ba.select :country,
+                      options_for_select(BillingAddress::COUNTRIES, order.billing_address.country.presence || "PL"),
+                      {},
+                      class: "select select-bordered w-full rounded-xl" %>
                   </div>
                 </div>
               </div>
             <% end %>
           </div>
         </div>
-        <!-- 4. Sposób realizacji (tylko przy open_package) -->
+
+        <!-- Kontynuuj -->
+        <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm p-6">
+          <button type="button"
+                  class="btn btn-primary btn-lg w-full rounded-xl font-semibold"
+                  data-action="click->checkout-phases#continue">
+            Kontynuuj
+          </button>
+        </div>
+
+      </div>
+      <!-- ===================== END FAZA 1 ===================== -->
+
+      <!-- ===================== FAZA 2: Podsumowanie + wysyłka/płatność ===================== -->
+      <div data-checkout-phases-target="phase2"
+           class="<%= 'hidden' unless show_phase2 %> space-y-4">
+
+        <!-- Box: Adres dostawy -->
+        <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
+          <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
+            <h2 class="subsection-title tracking-tight">Adres dostawy</h2>
+            <button type="button"
+                    class="ml-auto btn btn-ghost btn-xs"
+                    data-action="click->checkout-phases#editShipping">
+              Zmień
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="bg-base-200/40 rounded-xl p-4 space-y-0.5">
+              <p class="body-text font-semibold" data-checkout-phases-target="summaryShippingName">
+                <%= order.shipping_address.first_name %> <%= order.shipping_address.last_name %>
+              </p>
+              <p class="body-secondary" data-checkout-phases-target="summaryShippingAddress1">
+                <%= order.shipping_address.address_line1 %>
+              </p>
+              <p class="body-secondary <%= 'hidden' unless order.shipping_address.address_line2.present? %>"
+                 data-checkout-phases-target="summaryShippingAddress2">
+                <%= order.shipping_address.address_line2 %>
+              </p>
+              <p class="body-secondary" data-checkout-phases-target="summaryShippingPostalCity">
+                <%= order.shipping_address.postal_code %> <%= order.shipping_address.city %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Box: Dane do faktury (hidden jeśli brak) -->
+        <% billing_summary_visible = order.billing_address.needs_invoice? && order.billing_address.address_line1.present? %>
+        <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden
+                    <%= 'hidden' unless billing_summary_visible %>"
+             data-checkout-phases-target="phase2BillingBox">
+          <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
+            <h2 class="subsection-title tracking-tight">Dane do faktury</h2>
+            <button type="button"
+                    class="ml-auto btn btn-ghost btn-xs"
+                    data-action="click->checkout-phases#editBilling">
+              Zmień
+            </button>
+          </div>
+          <div class="p-6">
+            <div class="bg-base-200/40 rounded-xl p-4 space-y-0.5">
+              <p class="body-text font-semibold <%= 'hidden' unless order.billing_address.company_name.present? %>"
+                 data-checkout-phases-target="summaryBillingCompany">
+                <%= order.billing_address.company_name %>
+              </p>
+              <p class="body-secondary <%= 'hidden' unless order.billing_address.nip.present? %>"
+                 data-checkout-phases-target="summaryBillingNip">
+                NIP: <%= order.billing_address.nip %>
+              </p>
+              <p class="body-secondary" data-checkout-phases-target="summaryBillingName">
+                <%= order.billing_address.first_name %> <%= order.billing_address.last_name %>
+              </p>
+              <p class="body-secondary" data-checkout-phases-target="summaryBillingAddress1">
+                <%= order.billing_address.address_line1 %>
+              </p>
+              <p class="body-secondary" data-checkout-phases-target="summaryBillingPostalCity">
+                <%= order.billing_address.postal_code %> <%= order.billing_address.city %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sposób realizacji (open_package vs ship_now) -->
         <% if open_package_enabled %>
           <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
             <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -151,16 +316,22 @@
             </div>
             <div class="p-6">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-warning/50 transition-all has-checked:border-warning has-checked:bg-warning/5" data-action="change->checkout-form#toggleMode">
-                  <input type="radio" name="commit_type" value="open_package" class="radio radio-warning absolute top-4 right-4" data-checkout-form-target="modeRadio" />
+                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-warning/50 transition-all has-checked:border-warning has-checked:bg-warning/5"
+                       data-action="change->checkout-form#toggleMode">
+                  <input type="radio" name="commit_type" value="open_package"
+                         class="radio radio-warning absolute top-4 right-4"
+                         data-checkout-form-target="modeRadio" />
                   <div class="flex items-center gap-3 mb-2 pr-8">
                     <%= lucide_icon "package-open", class: "w-5 h-5 text-warning shrink-0" %>
                     <span class="subsection-title">Otwarta paczka</span>
                   </div>
                   <p class="body-secondary">Zapisz dane i wróć później, aby zamknąć paczkę i zapłacić.</p>
                 </label>
-                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-primary/50 transition-all has-checked:border-primary has-checked:bg-primary/5" data-action="change->checkout-form#toggleMode">
-                  <input type="radio" name="commit_type" value="ship_now" class="radio radio-primary absolute top-4 right-4" data-checkout-form-target="modeRadio" />
+                <label class="relative flex flex-col p-5 border-2 border-base-300 rounded-xl cursor-pointer hover:border-primary/50 transition-all has-checked:border-primary has-checked:bg-primary/5"
+                       data-action="change->checkout-form#toggleMode">
+                  <input type="radio" name="commit_type" value="ship_now"
+                         class="radio radio-primary absolute top-4 right-4"
+                         data-checkout-form-target="modeRadio" />
                   <div class="flex items-center gap-3 mb-2 pr-8">
                     <%= lucide_icon "send", class: "w-5 h-5 text-primary shrink-0" %>
                     <span class="subsection-title">Wyślij teraz</span>
@@ -173,8 +344,12 @@
         <% else %>
           <input type="hidden" name="commit_type" value="ship_now" />
         <% end %>
-        <!-- Dostawa i płatność (widoczne przy "Wyślij teraz") -->
-        <div id="shipping-payment-section" class="<%= 'hidden' if open_package_enabled %> space-y-4" data-checkout-form-target="paymentSection">
+
+        <!-- Dostawa i płatność -->
+        <div id="shipping-payment-section"
+             class="<%= 'hidden' if open_package_enabled %> space-y-4"
+             data-checkout-form-target="paymentSection">
+
           <!-- Metoda dostawy -->
           <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
             <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -182,10 +357,18 @@
               <h2 class="subsection-title tracking-tight">Metoda dostawy</h2>
             </div>
             <div class="px-6 py-4 space-y-2">
-              <% shipping_methods.each_with_index do |method, index| %>
+              <% shipping_methods.each do |method| %>
                 <label class="flex items-center justify-between gap-4 p-4 border border-base-200 rounded-xl cursor-pointer hover:bg-base-200/30 hover:border-primary/30 transition-colors has-checked:border-primary has-checked:bg-primary/5">
                   <div class="flex items-center gap-3">
-                    <%= f.radio_button :shipping_method_id, method.id, class: "radio radio-primary shrink-0", data: { checkout_form_target: "shippingRadio", action: "change->checkout-form#updateShipping", price: method.price_for(items_subtotal).to_f, is_pickup_point: method.is_pickup_point?, pickup_point_provider: method.pickup_point_provider } %>
+                    <%= f.radio_button :shipping_method_id, method.id,
+                      class: "radio radio-primary shrink-0",
+                      data: {
+                        checkout_form_target: "shippingRadio",
+                        action: "change->checkout-form#updateShipping",
+                        price: method.price_for(items_subtotal).to_f,
+                        is_pickup_point: method.is_pickup_point?,
+                        pickup_point_provider: method.pickup_point_provider
+                      } %>
                     <span class="body-text font-medium"><%= method.name %></span>
                   </div>
                   <span class="body-secondary shrink-0">
@@ -196,6 +379,7 @@
             </div>
             <%= render "checkouts/pickup_point_selector" %>
           </div>
+
           <!-- Metoda płatności -->
           <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm overflow-hidden">
             <div class="flex items-center gap-3 px-6 py-4 bg-base-200/40 border-b border-base-300/40">
@@ -205,7 +389,9 @@
             <div class="px-6 py-4 space-y-2">
               <% payment_methods.each do |method| %>
                 <label class="flex items-center gap-3 p-4 border border-base-200 rounded-xl cursor-pointer hover:bg-base-200/30 hover:border-primary/30 transition-colors has-checked:border-primary has-checked:bg-primary/5">
-                  <%= f.radio_button :payment_method, method.name, class: "radio radio-primary shrink-0", data: { checkout_form_target: "paymentRadio" } %>
+                  <%= f.radio_button :payment_method, method.name,
+                    class: "radio radio-primary shrink-0",
+                    data: { checkout_form_target: "paymentRadio" } %>
                   <div>
                     <span class="body-text font-medium"><%= method.name %></span>
                     <% if method.description.present? %>
@@ -217,6 +403,7 @@
             </div>
           </div>
         </div>
+
         <!-- Regulamin + Submit -->
         <div class="bg-base-100 rounded-lg border border-base-300/60 shadow-sm p-6">
           <div class="form-control mb-5">
@@ -226,14 +413,21 @@
             </label>
           </div>
           <div data-checkout-form-target="submitArea">
-            <button type="submit" class="btn btn-primary btn-lg w-full rounded-xl font-semibold btn-disabled" disabled data-checkout-form-target="submitButton">
+            <button type="submit"
+                    class="btn btn-primary btn-lg w-full rounded-xl font-semibold btn-disabled"
+                    disabled
+                    data-checkout-form-target="submitButton">
               Wybierz sposób realizacji
             </button>
           </div>
         </div>
+
       </div>
+      <!-- ===================== END FAZA 2 ===================== -->
+
     <% end %>
   </div>
+
   <!-- Right column: Summary (sticky on desktop, top on mobile) -->
   <div class="w-full xl:w-105 shrink-0 order-first xl:order-last">
     <div class="xl:sticky xl:top-6">

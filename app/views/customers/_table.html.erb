@@ -6,6 +6,7 @@
         <th class="label-text">Klient</th>
         <th class="label-text">Email</th>
         <th class="label-text">Telefon</th>
+        <th class="label-text">Adres / Faktura</th>
         <th class="label-text text-end">Akcje</th>
       </tr>
     </thead>
@@ -34,6 +35,24 @@
           </td>
           <td><%= customer.email.presence || '<span class="text-base-content/30">—</span>'.html_safe %></td>
           <td><%= customer.phone.presence || '<span class="text-base-content/30">—</span>'.html_safe %></td>
+          <td>
+            <div class="flex items-center gap-2 flex-wrap">
+              <% if customer.has_saved_shipping_address? %>
+                <span class="badge badge-sm badge-success gap-1">
+                  <%= lucide_icon "map-pin", class: "w-3 h-3" %>
+                  <%= customer.shipping_city %>
+                </span>
+              <% else %>
+                <span class="text-base-content/30 text-sm">—</span>
+              <% end %>
+              <% if customer.has_saved_billing_data? %>
+                <span class="badge badge-sm badge-info gap-1">
+                  <%= lucide_icon "receipt", class: "w-3 h-3" %>
+                  FV
+                </span>
+              <% end %>
+            </div>
+          </td>
           <td class="text-end">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-sm btn-ghost">

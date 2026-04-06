@@ -13,18 +13,42 @@ class BuyerRegistrationsController < ApplicationController
     phone_prefix = params[:phone_prefix].to_s.strip
     phone_number = params[:phone_number].to_s.gsub(/\D/, "")
     phone = phone_number.present? ? "#{phone_prefix}#{phone_number}" : nil
-    @customer = @shop.customers.new(
-      platform: "tiktok",
-      platform_username: username,
-      email: params[:email].to_s.strip,
-      phone: phone
-    )
+    email = params[:email].to_s.strip
 
-    if @customer.save
+    # Already registered with this username — redirect as success
+    existing_pa = CustomerPlatformAccount.find_by(
+      account_id: @shop.id, platform: "tiktok", platform_username: username
+    )
+    if existing_pa
       redirect_to new_buyer_registration_path(shop_slug: @shop.slug, registered: username)
-    else
-      render :new, status: :unprocessable_entity
+      return
     end
+
+    ActiveRecord::Base.transaction do
+      customer = @shop.customers.find_by(email: email.presence) ||
+                 @shop.customers.build(email: email.presence, phone: phone)
+
+      if customer.new_record? && !customer.save
+        @customer = customer
+        raise ActiveRecord::Rollback
+      end
+
+      pa = customer.platform_accounts.build(
+        account_id: @shop.id,
+        platform: "tiktok",
+        platform_username: username
+      )
+
+      if pa.save
+        redirect_to new_buyer_registration_path(shop_slug: @shop.slug, registered: username)
+      else
+        @customer = customer
+        pa.errors.each { |e| @customer.errors.add(e.attribute, e.message) }
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    render :new, status: :unprocessable_entity if @customer.present? && @customer.errors.any?
   end
 
   private

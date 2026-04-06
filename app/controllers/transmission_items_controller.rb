@@ -29,17 +29,18 @@ class TransmissionItemsController < ApplicationController
     tiktok_mode = raw.start_with?("@")
     query = raw.delete_prefix("@").strip
     customers = if query.length >= 1
-      scope = current_account.customers
+      scope = current_account.customers.includes(:platform_accounts)
       if tiktok_mode
-        scope.where("platform_username ILIKE :q", q: "%#{query}%")
+        scope.joins(:platform_accounts)
+             .where("customer_platform_accounts.platform_username ILIKE :q", q: "%#{query}%")
       else
         scope.where(
-          "platform_username ILIKE :q OR first_name ILIKE :q OR last_name ILIKE :q",
+          "customers.first_name ILIKE :q OR customers.last_name ILIKE :q OR customers.id IN (SELECT customer_id FROM customer_platform_accounts WHERE platform_username ILIKE :q)",
           q: "%#{query}%"
         )
       end
         .limit(8)
-        .order(:first_name, :platform_username)
+        .order(:first_name)
     else
       []
     end

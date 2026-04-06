@@ -89,6 +89,9 @@ class Order < ApplicationRecord
   after_update :log_status_change, if: :saved_change_to_status?
   after_update :export_to_marketplace_integrations, if: :saved_change_to_status?
 
+  # Prefill adresów z klienta gdy klient jest przypisany/zmieniany
+  after_commit :prefill_addresses_from_customer, if: -> { saved_change_to_customer_id? && customer.present? }
+
 
   def status_name
     STATUS_NAMES[status.to_sym] || status
@@ -158,6 +161,54 @@ class Order < ApplicationRecord
   end
 
   private
+
+  def prefill_addresses_from_customer
+    update_columns(
+      email: customer.email.presence || email,
+      phone: customer.phone.presence || phone
+    )
+
+    sa = shipping_address.reload
+    ba = billing_address.reload
+
+    if customer.has_saved_shipping_address?
+      sa.update_columns(
+        first_name:    customer.shipping_first_name,
+        last_name:     customer.shipping_last_name,
+        address_line1: customer.shipping_address_line1,
+        address_line2: customer.shipping_address_line2,
+        city:          customer.shipping_city,
+        postal_code:   customer.shipping_postal_code,
+        country:       customer.shipping_country
+      )
+    else
+      sa.update_columns(
+        first_name: nil, last_name: nil, address_line1: nil,
+        address_line2: nil, city: nil, postal_code: nil, country: nil
+      )
+    end
+
+    if customer.has_saved_billing_data?
+      ba.update_columns(
+        needs_invoice:  true,
+        company_name:   customer.billing_company_name,
+        nip:            customer.billing_nip,
+        first_name:     customer.billing_first_name,
+        last_name:      customer.billing_last_name,
+        address_line1:  customer.billing_address_line1,
+        address_line2:  customer.billing_address_line2,
+        city:           customer.billing_city,
+        postal_code:    customer.billing_postal_code,
+        country:        customer.billing_country
+      )
+    else
+      ba.update_columns(
+        needs_invoice: false, company_name: nil, nip: nil,
+        first_name: nil, last_name: nil, address_line1: nil,
+        address_line2: nil, city: nil, postal_code: nil, country: nil
+      )
+    end
+  end
 
   def build_blank_addresses
     return unless new_record?

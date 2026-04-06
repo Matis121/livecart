@@ -7,12 +7,18 @@ class CustomersController < ApplicationController
     @all_customers = current_account.customers
 
     case params[:platform]
-    when "tiktok"  then @all_customers = @all_customers.where(platform: "tiktok")
-    when "manual"  then @all_customers = @all_customers.where(platform: nil)
+    when "tiktok"
+      @all_customers = @all_customers.joins(:platform_accounts)
+                                     .where(customer_platform_accounts: { platform: "tiktok" })
+    when "manual"
+      @all_customers = @all_customers.left_joins(:platform_accounts)
+                                     .where(customer_platform_accounts: { id: nil })
     end
 
     @q = @all_customers.ransack(params[:q])
-    @customers = @q.result.order(created_at: :asc)
+    # Deduplicate via subquery on id to avoid DISTINCT on json columns (profile_data)
+    distinct_ids = @q.result.select("customers.id")
+    @customers = Customer.where(id: distinct_ids).order(created_at: :desc).includes(:platform_accounts)
 
     per_page = if params[:per_page].present?
       params[:per_page].to_i
@@ -68,12 +74,18 @@ class CustomersController < ApplicationController
   end
 
   def customer_params
-    permitted = params.require(:customer).permit(:first_name, :last_name, :email, :phone_prefix, :phone_number, :platform, :platform_username)
+    permitted = params.require(:customer).permit(
+      :first_name, :last_name, :email, :phone_prefix, :phone_number, :platform, :platform_username,
+      :shipping_first_name, :shipping_last_name, :shipping_address_line1, :shipping_address_line2,
+      :shipping_city, :shipping_postal_code, :shipping_country,
+      :billing_needs_invoice, :billing_company_name, :billing_nip,
+      :billing_first_name, :billing_last_name, :billing_address_line1, :billing_address_line2,
+      :billing_city, :billing_postal_code, :billing_country
+    )
     prefix = permitted.delete(:phone_prefix).to_s.strip
     number = permitted.delete(:phone_number).to_s.gsub(/\D/, "")
     permitted[:phone] = number.present? ? "#{prefix}#{number}" : nil
     permitted[:platform] = permitted[:platform].presence
-    permitted[:platform_username] = nil if permitted[:platform].blank?
     permitted
   end
 end
