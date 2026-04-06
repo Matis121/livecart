@@ -1,18 +1,6 @@
 <% if @checkout.completed? %>
-  <div class="min-h-[80vh] flex items-center justify-center px-4 py-16">
-    <div class="text-center max-w-sm">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
-        <%= lucide_icon "check", class: "w-10 h-10 text-success stroke-[2]" %>
-      </div>
-      <% if @checkout.open_package? %>
-        <h1 class="page-title mb-3 tracking-tight">Paczka zamknięta</h1>
-        <p class="body-secondary">Twoja paczka została zamknięta. Zamówienie przeszło do realizacji.</p>
-      <% else %>
-        <h1 class="page-title mb-3 tracking-tight">Zamówienie złożone!</h1>
-        <p class="body-secondary mb-4">Dziękujemy za zakup. Potwierdzenie wysłano na</p>
-        <p class="font-medium text-base-content/70 bg-base-100 rounded-xl px-4 py-2 inline-block border border-base-300"><%= @order.email %></p>
-      <% end %>
-    </div>
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <%= render partial: "checkouts/order_confirmation", locals: { order: @order, account_logo: @account_logo, account_name: @account_name } %>
   </div>
 <% elsif @checkout.open_package_pending? %>
   <div class="container mx-auto px-4 py-8 max-w-6xl">
@@ -20,6 +8,6 @@
   </div>
 <% else %>
   <div class="container mx-auto px-4 py-8 max-w-6xl">
-    <%= render partial: "checkouts/checkout_form", locals: { checkout: @checkout, order: @order, account_logo: @account_logo, account_name: @account_name, shipping_methods: @shipping_methods, payment_methods: @payment_methods, open_package_enabled: @open_package_enabled } %>
+    <%= render partial: "checkouts/checkout_form", locals: { checkout: @checkout, order: @order, account_logo: @account_logo, account_name: @account_name, shipping_methods: @shipping_methods, payment_methods: @payment_methods, open_package_enabled: @open_package_enabled, from_phase2: @from_phase2 } %>
   </div>
 <% end %>

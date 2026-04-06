@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   end
 
   def public_checkout_page?
-    controller_name == "checkouts"
+    controller_name.in?(%w[checkouts buyer_registrations])
   end
 
   def require_account

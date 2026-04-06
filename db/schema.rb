@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_23_142807) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -89,16 +89,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_142807) do
     t.index ["token"], name: "index_checkouts_on_token", unique: true
   end
 
+  create_table "customer_platform_accounts", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.bigint "account_id", null: false
+    t.string "platform", null: false
+    t.string "platform_username"
+    t.string "platform_user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "platform", "platform_username"], name: "index_cpa_on_account_platform_username", unique: true, where: "(platform_username IS NOT NULL)"
+    t.index ["customer_id", "platform"], name: "index_customer_platform_accounts_on_customer_id_and_platform", unique: true
+    t.index ["customer_id"], name: "index_customer_platform_accounts_on_customer_id"
+  end
+
   create_table "customers", force: :cascade do |t|
     t.bigint "account_id", null: false
-    t.string "platform_user_id"
-    t.string "platform"
-    t.string "platform_username"
-    t.string "first_name", null: false
-    t.string "last_name", null: false
+    t.string "first_name"
+    t.string "last_name"
     t.json "profile_data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "phone"
+    t.jsonb "default_shipping_address"
+    t.jsonb "default_billing_data"
+    t.index ["account_id", "email"], name: "index_customers_on_account_id_and_email_unique", unique: true, where: "((email IS NOT NULL) AND ((email)::text <> ''::text))"
     t.index ["account_id"], name: "index_customers_on_account_id"
   end
 
@@ -348,7 +363,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_142807) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name", null: false
+    t.bigint "integration_id"
+    t.string "live_external_id"
+    t.string "live_room_id"
     t.index ["account_id"], name: "index_transmissions_on_account_id"
+    t.index ["integration_id"], name: "index_transmissions_on_integration_id"
+    t.index ["live_external_id"], name: "index_transmissions_on_live_external_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -370,6 +390,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_142807) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "billing_addresses", "orders"
   add_foreign_key "checkouts", "orders"
+  add_foreign_key "customer_platform_accounts", "customers"
   add_foreign_key "customers", "accounts"
   add_foreign_key "discount_codes", "accounts"
   add_foreign_key "integration_exports", "integrations"
@@ -397,5 +418,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_142807) do
   add_foreign_key "transmission_items", "products"
   add_foreign_key "transmission_items", "transmissions"
   add_foreign_key "transmissions", "accounts"
+  add_foreign_key "transmissions", "integrations"
   add_foreign_key "users", "accounts"
 end

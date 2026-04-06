@@ -1,10 +1,10 @@
-<div class="card bg-base-100 shadow-md border border-base-200/60 mb-6 overflow-hidden" 
+<div class="card bg-base-100 shadow-md border border-base-200/60 mb-6" 
      data-controller="transmission-items-form"
      data-transmission-items-form-transmission-id-value="<%= transmission.id %>">
   <div class="card-body p-6 sm:p-8">
     <div class="flex items-center gap-3 mb-6">
       <div>
-        <h2 class="section-title">Dodaj produkt do transmisji</h2>
+        <h2 class="section-title">Nowy produkt</h2>
         <p class="body-secondary mt-0.5">Wybierz produkt z magazynu lub utwórz nowy, a następnie przypisz klientów</p>
       </div>
     </div>
@@ -140,13 +140,15 @@
         <div data-transmission-items-form-target="rows" class="space-y-3">
           <template data-transmission-items-form-target="template">
             <div class="flex flex-wrap items-end gap-3" data-transmission-items-form-target="row">
-              <div class="flex-1 min-w-45">
-                <select name="items[][customer_id]" class="input input-bordered w-full">
-                  <option value="">— Wybierz klienta —</option>
-                  <% customers.each do |c| %>
-                    <option value="<%= c.id %>"><%= c.name %></option>
-                  <% end %>
-                </select>
+              <div class="flex-1 min-w-45 relative">
+                <input type="text"
+                       class="input input-bordered w-full customer-search-input"
+                       placeholder="Wpisz imię lub @nick..."
+                       autocomplete="off"
+                       data-action="input->transmission-items-form#filterCustomers focus->transmission-items-form#openCustomerDropdown">
+                <input type="hidden" name="items[][customer_id]">
+                <input type="hidden" name="items[][customer_name]">
+                <div class="customer-dropdown hidden absolute z-10 top-full left-0 right-0 mt-1 border border-base-300 rounded-lg bg-base-100 shadow-lg max-h-48 overflow-y-auto"></div>
               </div>
               <div class="w-20">
                 <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered w-full" placeholder="Ilość">
@@ -156,14 +158,16 @@
               </button>
             </div>
           </template>
-          <div class="flex flex-wrap items-center gap-3" data-transmission-items-form-target="row">
-            <div class="flex-1 min-w-45">
-              <select name="items[][customer_id]" class="input input-bordered w-full">
-                <option value="">— Wybierz klienta —</option>
-                <% customers.each do |c| %>
-                  <option value="<%= c.id %>"><%= c.name %></option>
-                <% end %>
-              </select>
+          <div class="flex flex-wrap items-end gap-3" data-transmission-items-form-target="row">
+            <div class="flex-1 min-w-45 relative">
+              <input type="text"
+                     class="input input-bordered w-full customer-search-input"
+                     placeholder="Wpisz imię lub @nick..."
+                     autocomplete="off"
+                     data-action="input->transmission-items-form#filterCustomers focus->transmission-items-form#openCustomerDropdown">
+              <input type="hidden" name="items[][customer_id]">
+              <input type="hidden" name="items[][customer_name]">
+              <div class="customer-dropdown hidden absolute z-10 top-full left-0 right-0 mt-1 border border-base-300 rounded-lg bg-base-100 shadow-lg max-h-48 overflow-y-auto"></div>
             </div>
             <div class="w-20">
               <input type="number" name="items[][quantity]" value="1" min="1" class="input input-bordered w-full" placeholder="Ilość">

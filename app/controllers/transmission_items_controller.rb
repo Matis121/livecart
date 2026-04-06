@@ -24,6 +24,31 @@ class TransmissionItemsController < ApplicationController
     render partial: "transmission_items/product_list", locals: { products: @products }
   end
 
+  def search_customers
+    raw = params[:q].to_s.strip
+    tiktok_mode = raw.start_with?("@")
+    query = raw.delete_prefix("@").strip
+    customers = if query.length >= 1
+      scope = current_account.customers.includes(:platform_accounts)
+      if tiktok_mode
+        scope.joins(:platform_accounts)
+             .where("customer_platform_accounts.platform_username ILIKE :q", q: "%#{query}%")
+      else
+        scope.where(
+          "customers.first_name ILIKE :q OR customers.last_name ILIKE :q OR customers.id IN (SELECT customer_id FROM customer_platform_accounts WHERE platform_username ILIKE :q)",
+          q: "%#{query}%"
+        )
+      end
+        .limit(8)
+        .order(:first_name)
+    else
+      []
+    end
+    render json: customers.map { |c|
+      { id: c.id, username: c.platform_username, name: c.name, email: c.email }
+    }
+  end
+
   def create
     @transmission_item = @transmission.transmission_items.build(transmission_item_params)
     if @transmission_item.save
@@ -38,7 +63,9 @@ class TransmissionItemsController < ApplicationController
   end
 
   def bulk_create
-    items = params[:items].to_a.reject { |h| h["customer_id"].blank? || h["quantity"].to_i < 1 }
+    items = params[:items].to_a.reject { |h|
+      (h["customer_id"].blank? && h["customer_name"].blank?) || h["quantity"].to_i < 1
+    }
     if items.empty?
       redirect_to transmission_path(@transmission), alert: "Dodaj co najmniej jednego klienta z ilością."
       return
@@ -56,7 +83,15 @@ class TransmissionItemsController < ApplicationController
     errors = []
     @transmission.transaction do
       items.each do |item|
-        customer = current_account.customers.find_by(id: item["customer_id"])
+        customer = if item["customer_id"].present?
+          current_account.customers.find_by(id: item["customer_id"])
+        elsif item["customer_name"].present?
+          parts = item["customer_name"].to_s.strip.split
+          current_account.customers.find_or_create_by!(
+            first_name: parts.first,
+            last_name: parts.drop(1).join(" ").presence
+          )
+        end
         next unless customer
 
         ti = @transmission.transmission_items.build(

@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   resources :orders, controller: "orders" do
     collection do
       patch :bulk_action
+      get :search_customers
     end
     resources :order_items, only: [ :new, :create, :edit, :update, :destroy ] do
        collection do
@@ -78,6 +79,7 @@ Rails.application.routes.draw do
         delete :destroy_by_product
         delete :destroy_by_manual
         get :search_products
+        get :search_customers
       end
     end
   end
@@ -104,7 +106,10 @@ Rails.application.routes.draw do
       member do
         patch :close_package
         patch :apply_discount
+        get :check_email
       end
     end
+    get "register", to: "buyer_registrations#new", as: :new_buyer_registration
+    post "register", to: "buyer_registrations#create", as: :buyer_registration
   end
 end

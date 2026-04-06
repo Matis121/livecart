@@ -45,7 +45,6 @@ class OrdersController < ApplicationController
 
   def show
     @order = current_account.orders.find_by(order_number: params[:id])
-    @customers = current_account.customers.order(:first_name, :last_name)
     if @order.nil?
       redirect_to orders_path, alert: "Zamówienie nie znalezione"
     end
@@ -86,9 +85,33 @@ class OrdersController < ApplicationController
 
   def edit_customer
     @order = current_account.orders.find_by!(order_number: params[:id])
-    @customers = current_account.customers.order(:first_name, :last_name)
 
     redirect_to @order unless turbo_frame_request?
+  end
+
+  def search_customers
+    raw = params[:q].to_s.strip
+    tiktok_mode = raw.start_with?("@")
+    query = raw.delete_prefix("@").strip
+    customers = if query.length >= 2
+      scope = current_account.customers.includes(:platform_accounts)
+      if tiktok_mode
+        scope.joins(:platform_accounts)
+             .where("customer_platform_accounts.platform_username ILIKE :q", q: "%#{query}%")
+      else
+        scope.where(
+          "customers.first_name ILIKE :q OR customers.last_name ILIKE :q OR customers.id IN (SELECT customer_id FROM customer_platform_accounts WHERE platform_username ILIKE :q)",
+          q: "%#{query}%"
+        )
+      end
+        .limit(8)
+        .order(:first_name)
+    else
+      []
+    end
+    render json: customers.map { |c|
+      { id: c.id, username: c.platform_username, name: c.name, email: c.email }
+    }
   end
 
   def edit_contact_info
