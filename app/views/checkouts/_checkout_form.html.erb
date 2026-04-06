@@ -76,10 +76,31 @@
               </div>
               <div class="form-control">
                 <%= f.label :phone, "Telefon *", class: "label label-text font-medium" %>
-                <%= f.telephone_field :phone,
-                  class: "input input-bordered w-full rounded-xl",
-                  required: true,
-                  placeholder: "+48 123 456 789" %>
+                <%
+                  checkout_phone = order.phone.to_s
+                  checkout_prefixes = [
+                    "+48", "+49", "+43", "+32", "+45", "+33", "+30", "+31", "+353",
+                    "+39", "+1", "+47", "+351", "+40", "+421", "+386", "+34", "+46",
+                    "+41", "+380", "+44", "+420", "+36"
+                  ]
+                  checkout_prefix = checkout_prefixes.sort_by { |p| -p.length }.find { |p| checkout_phone.start_with?(p) } || "+48"
+                  checkout_number = checkout_phone.delete_prefix(checkout_prefix)
+                %>
+                <div class="flex gap-2">
+                  <select name="order[phone_prefix]" class="select select-bordered w-28 shrink-0 rounded-xl">
+                    <% checkout_prefixes.each do |prefix| %>
+                      <option value="<%= prefix %>" <%= "selected" if checkout_prefix == prefix %>><%= prefix %></option>
+                    <% end %>
+                  </select>
+                  <input type="tel"
+                         name="order[phone_number]"
+                         class="input input-bordered flex-1 rounded-xl"
+                         placeholder="123456789"
+                         value="<%= checkout_number %>"
+                         required
+                         maxlength="9"
+                         oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)">
+                </div>
               </div>
             </div>
           </div>

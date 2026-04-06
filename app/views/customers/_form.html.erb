@@ -1,4 +1,4 @@
-<%= form_with model: @customer, data: { turbo_frame: "_top" } do |f| %>
+<%= form_with model: @customer, id: "customer_form" do |f| %>
   <%
     phone_prefixes = [
       ["+48",  "PL +48"],  ["+49",  "DE +49"],  ["+43",  "AT +43"],
@@ -14,14 +14,32 @@
     detected_prefix = phone_prefixes.map(&:first).sort_by { |p| -p.length }.find { |p| stored_phone.start_with?(p) } || "+48"
     detected_number = stored_phone.delete_prefix(detected_prefix)
   %>
-  <div class="space-y-5">
 
-    <!-- Sekcja: Dane podstawowe -->
-    <div class="rounded-xl border border-base-300/70 overflow-hidden">
-      <div class="flex items-center gap-2.5 px-4 py-3 bg-base-200/50 border-b border-base-300/50">
-        <span class="text-sm font-semibold">Dane podstawowe</span>
+  <%# Baner błędów %>
+  <% if @customer.errors.any? %>
+    <div class="flex items-start gap-3 px-4 py-3 mb-4 rounded-lg bg-error/10 border border-error/30 text-error">
+      <%= lucide_icon("circle-alert", class: "w-4 h-4 mt-0.5 shrink-0") %>
+      <div>
+        <p class="font-medium text-sm">Popraw błędy przed zapisaniem:</p>
+        <ul class="mt-1 space-y-0.5 text-sm list-disc list-inside">
+          <% @customer.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
       </div>
-      <div class="p-4 grid grid-cols-2 gap-3">
+    </div>
+  <% end %>
+
+  <%# Górny rząd: Dane kontaktowe + Platformy %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+
+    <!-- Dane kontaktowe -->
+    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-base-200 flex items-center gap-2">
+        <%= lucide_icon("at-sign", class: "w-4 h-4 text-base-content/40") %>
+        <h2 class="section-title">Dane kontaktowe</h2>
+      </div>
+      <div class="p-5 space-y-3">
         <div class="form-control">
           <%= f.label :email, "Email", class: "label label-text font-medium" %>
           <%= f.email_field :email,
@@ -51,12 +69,22 @@
             <p class="text-error text-xs mt-1"><%= msg %></p>
           <% end %>
         </div>
+      </div>
+    </div>
+
+    <!-- Platformy -->
+    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-base-200 flex items-center gap-2">
+        <%= lucide_icon("tv-2", class: "w-4 h-4 text-base-content/40") %>
+        <h2 class="section-title">Platformy</h2>
+      </div>
+      <div class="p-5 space-y-3">
         <div class="form-control">
-          <label class="label label-text font-medium">Źródło zamówienia</label>
+          <label class="label label-text font-medium">Platforma</label>
           <select name="customer[platform]"
                   class="select select-bordered w-full"
                   onchange="document.getElementById('customer_nick_section').classList.toggle('hidden', this.value !== 'tiktok')">
-            <option value="" <%= "selected" if @customer.platform.blank? %>>Osobiste</option>
+            <option value="" <%= "selected" if @customer.platform.blank? %>>Brak</option>
             <option value="tiktok" <%= "selected" if @customer.platform == "tiktok" %>>TikTok</option>
           </select>
         </div>
@@ -75,16 +103,21 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Sekcja: Adres dostawy -->
-    <div class="rounded-xl border border-base-300/70 overflow-hidden">
-      <div class="flex items-center gap-2.5 px-4 py-3 bg-base-200/50 border-b border-base-300/50">
-        <span class="text-sm font-semibold">Adres dostawy</span>
+  <%# Dolny rząd: Adres dostawy + Dane do faktury %>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+    <!-- Adres dostawy -->
+    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-base-200 flex items-center gap-2">
+        <%= lucide_icon("map-pin", class: "w-4 h-4 text-base-content/40") %>
+        <h2 class="section-title">Adres dostawy</h2>
         <% if @customer.has_saved_shipping_address? %>
           <span class="ml-auto badge badge-sm badge-success">Zapisany</span>
         <% end %>
       </div>
-      <div class="p-4 grid grid-cols-2 gap-3">
+      <div class="p-5 grid grid-cols-2 gap-3">
         <div class="form-control">
           <%= f.label :shipping_first_name, "Imię", class: "label label-text font-medium" %>
           <%= f.text_field :shipping_first_name, class: "input input-bordered w-full" %>
@@ -118,16 +151,17 @@
       </div>
     </div>
 
-    <!-- Sekcja: Dane do faktury -->
-    <div class="rounded-xl border border-base-300/70 overflow-hidden">
-      <div class="flex items-center gap-2.5 px-4 py-3 bg-base-200/50 border-b border-base-300/50">
-        <span class="text-sm font-semibold">Dane do faktury</span>
+    <!-- Dane do faktury -->
+    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-5 py-4 border-b border-base-200 flex items-center gap-2">
+        <%= lucide_icon("receipt", class: "w-4 h-4 text-base-content/40") %>
+        <h2 class="section-title">Dane do faktury</h2>
         <% if @customer.has_saved_billing_data? %>
           <span class="ml-auto badge badge-sm badge-info">Zapisane</span>
         <% end %>
       </div>
-      <div class="p-4">
-        <div class="form-control mb-3">
+      <div class="p-5">
+        <div class="form-control mb-4">
           <label class="label cursor-pointer justify-start gap-3 p-0">
             <%= f.check_box :billing_needs_invoice,
                   class: "checkbox checkbox-primary",
@@ -173,15 +207,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Akcje -->
-    <div class="flex justify-end gap-2 pt-1">
-      <%= button_tag type: "button", class: "btn btn-ghost",
-          onclick: "document.getElementById('customer_modal').innerHTML = ''" do %>
-        Anuluj
-      <% end %>
-      <%= f.submit "Zapisz zmiany", class: "btn btn-primary" %>
-    </div>
-
   </div>
+
 <% end %>

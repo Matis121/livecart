@@ -1,6 +1,6 @@
 <div class="<%= header_class %>">
   <%= render "shared/page_header", title: "Klienci", subtitle: "Zarządzaj klientami swojego sklepu" %>
-  <%= link_to new_customer_path, class: "btn btn-primary w-full sm:w-auto", data: { turbo_frame: "customer_modal" } do %>
+  <%= link_to new_customer_path, class: "btn btn-primary w-full sm:w-auto" do %>
     <%= lucide_icon('plus', class: 'w-4 h-4') %>
     Dodaj klienta
   <% end %>
@@ -44,4 +44,3 @@
 <% else %>
   <%= render "customers/empty_state" %>
 <% end %>
-<%= turbo_frame_tag "customer_modal" %>

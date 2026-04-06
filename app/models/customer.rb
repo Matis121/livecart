@@ -50,7 +50,7 @@ class Customer < ApplicationRecord
   # Sync virtual platform attrs to platform_accounts after save
   after_save :sync_platform_account, if: -> { instance_variable_defined?(:@assigned_platform) }
 
-  validates :first_name, presence: true, length: { maximum: 50 }, unless: :platform_customer?
+  validates :first_name, length: { maximum: 50 }
   validates :last_name, length: { maximum: 50 }
 
   before_validation { self.email = email.presence }

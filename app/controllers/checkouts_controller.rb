@@ -288,7 +288,11 @@ class CheckoutsController < ApplicationController
   end
 
   def contact_params
-    params.require(:order).permit(:email, :phone)
+    permitted = params.require(:order).permit(:email, :phone, :phone_prefix, :phone_number)
+    prefix = permitted.delete(:phone_prefix).to_s.strip
+    number = permitted.delete(:phone_number).to_s.gsub(/\D/, "")
+    permitted[:phone] = number.present? ? "#{prefix}#{number}" : permitted[:phone]
+    permitted
   end
 
   def shipping_address_params

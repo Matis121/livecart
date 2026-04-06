@@ -28,24 +28,27 @@ class BuyerRegistrationsController < ApplicationController
       customer = @shop.customers.find_by(email: email.presence) ||
                  @shop.customers.build(email: email.presence, phone: phone)
 
-      if customer.new_record? && !customer.save
-        @customer = customer
-        raise ActiveRecord::Rollback
-      end
-
-      pa = customer.platform_accounts.build(
-        account_id: @shop.id,
-        platform: "tiktok",
-        platform_username: username
-      )
-
-      if pa.save
-        redirect_to new_buyer_registration_path(shop_slug: @shop.slug, registered: username)
+      if customer.new_record?
+        customer.platform = "tiktok"
+        customer.platform_username = username
+        unless customer.save
+          @customer = customer
+          raise ActiveRecord::Rollback
+        end
       else
-        @customer = customer
-        pa.errors.each { |e| @customer.errors.add(e.attribute, e.message) }
-        raise ActiveRecord::Rollback
+        pa = customer.platform_accounts.build(
+          account_id: @shop.id,
+          platform: "tiktok",
+          platform_username: username
+        )
+        unless pa.save
+          @customer = customer
+          pa.errors.each { |e| @customer.errors.add(e.attribute, e.message) }
+          raise ActiveRecord::Rollback
+        end
       end
+
+      redirect_to new_buyer_registration_path(shop_slug: @shop.slug, registered: username)
     end
 
     render :new, status: :unprocessable_entity if @customer.present? && @customer.errors.any?
