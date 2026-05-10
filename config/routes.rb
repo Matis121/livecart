@@ -53,6 +53,7 @@ Rails.application.routes.draw do
     end
     resource :pickup_point, only: [ :edit, :update ]
     member do
+      get :transmissions_list
       get :edit_customer
       get :edit_discount_code
       patch :update_discount_code

@@ -116,7 +116,9 @@ class Integration < ApplicationRecord
     case provider.to_s.downcase
     when "baselinker", "sellasist"
       api_key.present?
-    when "tiktok", "facebook", "instagram"
+    when "tiktok"
+      settings&.dig("tiktok_username").present?
+    when "facebook", "instagram"
       access_token.present?
     when "stripe", "payu", "przelewy24"
       api_key.present? && api_secret.present?
@@ -168,6 +170,10 @@ class Integration < ApplicationRecord
 
   def integration_type_name
     INTEGRATION_TYPE_NAMES[integration_type.to_sym] || integration_type.humanize
+  end
+
+  def tiktok_username
+    settings&.dig("tiktok_username")
   end
 
   def payu?

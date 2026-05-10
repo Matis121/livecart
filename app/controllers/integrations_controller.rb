@@ -91,7 +91,8 @@ class IntegrationsController < ApplicationController
                   :stock_match_by, :price_match_by, :export_order_status,
                   :baselinker_status_id, :order_status_sync_enabled,
                   :custom_source_id, { status_mapping: {} },
-                  :md5key, :sandbox ]
+                  :md5key, :sandbox,
+                  :tiktok_username ]
     )
   end
 end

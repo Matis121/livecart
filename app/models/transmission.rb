@@ -1,7 +1,9 @@
 class Transmission < ApplicationRecord
   belongs_to :account
   has_many :transmission_items, dependent: :destroy
-  has_many :orders, dependent: :nullify
+  has_many :order_transmissions, dependent: :destroy
+  has_many :orders, through: :order_transmissions
+  has_many :live_chat_messages, dependent: :destroy
 
   validates :name, presence: true
 

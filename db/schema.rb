@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_10_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -177,6 +177,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
     t.index ["user_id"], name: "index_integrations_on_user_id"
   end
 
+  create_table "live_chat_messages", force: :cascade do |t|
+    t.bigint "transmission_id", null: false
+    t.integer "platform", null: false
+    t.string "sender_id", null: false
+    t.string "sender_name", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transmission_id", "created_at"], name: "index_live_chat_messages_on_transmission_id_and_created_at"
+    t.index ["transmission_id"], name: "index_live_chat_messages_on_transmission_id"
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.bigint "order_id", null: false
     t.bigint "product_id"
@@ -201,6 +213,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
     t.index ["order_id"], name: "index_order_status_histories_on_order_id"
   end
 
+  create_table "order_transmissions", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "transmission_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id", "transmission_id"], name: "index_order_transmissions_on_order_id_and_transmission_id", unique: true
+    t.index ["order_id"], name: "index_order_transmissions_on_order_id"
+    t.index ["transmission_id"], name: "index_order_transmissions_on_transmission_id"
+  end
+
   create_table "orders", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "customer_id"
@@ -220,14 +242,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
     t.bigint "discount_code_id"
     t.decimal "discount_amount", precision: 8, scale: 2, default: "0.0", null: false
     t.string "discount_name"
-    t.bigint "transmission_id"
     t.boolean "cash_on_delivery", default: false, null: false
     t.string "payu_order_id"
     t.index ["account_id"], name: "index_orders_on_account_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discount_code_id"], name: "index_orders_on_discount_code_id"
     t.index ["payu_order_id"], name: "index_orders_on_payu_order_id"
-    t.index ["transmission_id"], name: "index_orders_on_transmission_id"
   end
 
   create_table "payment_methods", force: :cascade do |t|
@@ -397,13 +417,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_06_100001) do
   add_foreign_key "integration_exports", "orders"
   add_foreign_key "integrations", "accounts"
   add_foreign_key "integrations", "users"
+  add_foreign_key "live_chat_messages", "transmissions"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_status_histories", "orders"
+  add_foreign_key "order_transmissions", "orders"
+  add_foreign_key "order_transmissions", "transmissions"
   add_foreign_key "orders", "accounts"
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "discount_codes"
-  add_foreign_key "orders", "transmissions"
   add_foreign_key "payment_methods", "accounts"
   add_foreign_key "payment_methods", "integrations"
   add_foreign_key "pickup_points", "orders"

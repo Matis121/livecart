@@ -1,12 +1,28 @@
 <%= render "transmissions/header", transmission: @transmission %>
 <%= render "transmissions/status_card", transmission: @transmission %>
-<% if @transmission.active? %>
-  <div>
-    <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+
+<% if @transmission.active? && @has_live_chat %>
+  <div class="grid grid-cols-1 xl:grid-cols-[1fr_450px] gap-6 items-start">
+    <div>
+      <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+      <%= turbo_frame_tag "product_items_list" do %>
+        <%= render "transmissions/product_items_list", transmission: @transmission %>
+      <% end %>
+    </div>
+    <div class="xl:sticky xl:top-4" style="height: calc(100vh - 8rem); max-height: 700px;">
+      <%= render "transmissions/live_chat_panel", transmission: @transmission, chat_messages: @chat_messages || [], registered_sender_map: @registered_sender_map || {} %>
+    </div>
   </div>
+<% else %>
+  <% if @transmission.active? %>
+    <div>
+      <%= render "transmissions/add_product_form", transmission: @transmission, products: @products, customers: @customers %>
+    </div>
+  <% end %>
+  <%= turbo_frame_tag "product_items_list" do %>
+    <%= render "transmissions/product_items_list", transmission: @transmission %>
+  <% end %>
 <% end %>
-<%= turbo_frame_tag "product_items_list" do %>
-  <%= render "transmissions/product_items_list", transmission: @transmission %>
-<% end %>
+
 <%= turbo_frame_tag "transmission_modal" %>
 <%= turbo_frame_tag "transmission_item_modal" %>

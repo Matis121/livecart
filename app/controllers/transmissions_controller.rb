@@ -28,6 +28,19 @@ class TransmissionsController < ApplicationController
   def show
     @customers = current_account.customers
     @products = []
+    @tiktok_integration = current_account.integrations.find_by(provider: "tiktok", status: "active")
+    @has_live_chat = @tiktok_integration.present?
+
+    if @transmission.active? && @has_live_chat
+      @chat_messages = @transmission.live_chat_messages.chronological
+      sender_ids = @chat_messages.map(&:sender_id).uniq
+      @registered_sender_map = sender_ids.any? ?
+        current_account.customer_platform_accounts
+          .where(platform: "tiktok", platform_username: sender_ids)
+          .pluck(:platform_username, :customer_id)
+          .to_h
+        : {}
+    end
   end
 
   def new
@@ -60,6 +73,7 @@ class TransmissionsController < ApplicationController
 
   def destroy
     @transmission.destroy!
+    LiveChatChannel.stop_relay(current_account.id)
     redirect_to transmissions_path, notice: "Usunięto transmisję"
   end
 
@@ -82,6 +96,9 @@ class TransmissionsController < ApplicationController
 
     # Uruchom job w tle
     TransmissionConverterJob.perform_later(@transmission.id)
+
+    # Zamknij relay chatu (transmisja zakończona)
+    LiveChatChannel.stop_relay(current_account.id)
 
     redirect_to @transmission,
                 notice: "Przetwarzanie rozpoczęte!"

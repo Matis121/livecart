@@ -26,13 +26,11 @@
             <td class="align-top">
               <div class="flex flex-col gap-4">
                 <%= link_to order.order_number, order_path(order), class: "text-primary font-semibold hover:underline" %>
-                <% if order&.transmission.present? %>
-                  <%= link_to transmission_path(order.transmission) do %>
-                    <span class="caption-text flex items-center gap-1.5">
-                      <span class="badge badge-sm badge-primary/10 border border-primary/20">
-                        <%= lucide_icon('radio', class: 'w-3 h-3') %>
-                        Live
-                      </span>
+                <% if order.transmissions.any? %>
+                  <%= link_to transmissions_list_order_path(order), class: "inline-flex", data: { turbo_frame: "transmissions_list_modal" } do %>
+                    <span class="badge badge-sm badge-primary/10 border border-primary/20">
+                      <%= lucide_icon('radio', class: 'w-3 h-3') %>
+                      Live
                     </span>
                   <% end %>
                 <% end %>
@@ -110,25 +108,25 @@
           <option value="<%= orders_path(request.params.merge(per_page: option, page: 1)) %>" <%= 'selected' if @pagy.limit == option %>>
             <%= option %>
           </option>
+          <% end %>
+        </select>
+      </div>
+      <div class="flex items-center gap-1">
+        <% if @pagy.page > 1 %>
+          <%= link_to orders_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+            <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+          <% end %>
+        <% else %>
+          <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
         <% end %>
-      </select>
-    </div>
-    <div class="flex items-center gap-1">
-      <% if @pagy.page > 1 %>
-        <%= link_to orders_path(request.params.merge(page: @pagy.page - 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
-          <%= lucide_icon('chevron-left', class: 'w-4 h-4') %>
+        <span class="px-2 tabular-nums caption-text"><%= @pagy.page %> / <%= @pagy.pages %></span>
+        <% if @pagy.page < @pagy.pages %>
+          <%= link_to orders_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
+            <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
+          <% end %>
+        <% else %>
+          <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
         <% end %>
-      <% else %>
-        <span class="p-1 opacity-30"><%= lucide_icon('chevron-left', class: 'w-4 h-4') %></span>
-      <% end %>
-      <span class="px-2 tabular-nums caption-text"><%= @pagy.page %> / <%= @pagy.pages %></span>
-      <% if @pagy.page < @pagy.pages %>
-        <%= link_to orders_path(request.params.merge(page: @pagy.page + 1)), class: "p-1 rounded hover:bg-base-200 transition-colors" do %>
-          <%= lucide_icon('chevron-right', class: 'w-4 h-4') %>
-        <% end %>
-      <% else %>
-        <span class="p-1 opacity-30"><%= lucide_icon('chevron-right', class: 'w-4 h-4') %></span>
-      <% end %>
+      </div>
     </div>
   </div>
-</div>

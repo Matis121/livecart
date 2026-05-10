@@ -7,9 +7,11 @@
           <%= transmission.active? ? 'Aktywna' : (transmission.processing? ? 'Przetwarzanie' : (transmission.completed? ? 'Zakończona' : 'Anulowana')) %>
         </span>
       </div>
-      <%= button_to convert_to_orders_transmission_path(transmission), method: :post, class: "btn btn-primary" do %>
-        <%= lucide_icon("check-circle", class: "w-4 h-4") %>
-        Zakończ transmisję
+      <% unless transmission.completed? %>
+        <%= button_to convert_to_orders_transmission_path(transmission), method: :post, class: "btn btn-primary" do %>
+          <%= lucide_icon("check-circle", class: "w-4 h-4") %>
+          Zakończ transmisję
+        <% end %>
       <% end %>
     </div>
   </div>

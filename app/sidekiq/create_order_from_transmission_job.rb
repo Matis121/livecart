@@ -45,10 +45,11 @@ class CreateOrderFromTransmissionJob < ApplicationJob
         total_amount: 0,
         shipping_cost: 0,
         currency: "PLN",
-        transmission: transmission,
         email: customer.email.presence,
         phone: customer.phone.presence,
       )
+
+      order.transmissions << transmission
 
       items.each do |item|
         order.order_items.create!(

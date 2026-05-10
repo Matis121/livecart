@@ -19,7 +19,7 @@ class OrdersController < ApplicationController
   def index
     @all_orders = current_account.orders
     @q = @all_orders.ransack(params[:q])
-    orders = @q.result.includes(:customer, :order_items).order(created_at: :desc).distinct
+    orders = @q.result.includes(:customer, :order_items, :transmissions).order(created_at: :desc).distinct
     orders = orders.where(status: params[:status]) if params[:status].present?
 
 
@@ -211,6 +211,13 @@ class OrdersController < ApplicationController
   def status_history
     @order = current_account.orders.find_by!(order_number: params[:id])
     @status_history = @order.order_status_histories.chronological
+
+    redirect_to @order unless turbo_frame_request?
+  end
+
+  def transmissions_list
+    @order = current_account.orders.find_by!(order_number: params[:id])
+    @transmissions = @order.transmissions
 
     redirect_to @order unless turbo_frame_request?
   end

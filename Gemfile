@@ -78,6 +78,9 @@ gem "sidekiq", "~> 8.1"
 gem "sidekiq-cron", "~> 2.0"
 gem "image_processing", "~> 1.2"
 
+# WebSocket client for server-side relay (EulerStream → ActionCable)
+gem "websocket-client-simple", "~> 0.6"
+
 # HTTP client for external API integrations
 gem "faraday", "~> 2.9"
 gem "faraday-retry", "~> 2.2"

@@ -2,7 +2,8 @@ class Order < ApplicationRecord
   belongs_to :account
   belongs_to :customer, optional: true
   belongs_to :discount_code, optional: true
-  belongs_to :transmission, optional: true
+  has_many :order_transmissions, dependent: :destroy
+  has_many :transmissions, through: :order_transmissions
 
   has_many :order_items, dependent: :destroy
   has_one :shipping_address, dependent: :destroy
@@ -58,8 +59,10 @@ class Order < ApplicationRecord
   # Dodaje produkty z transmisji do istniejącego zamówienia (otwarta paczka)
   def add_transmission_items!(items, transmission = nil)
     transaction do
-      # Ustaw transmission_id jeśli to pierwsza transmisja
-      update!(transmission: transmission) if transmission && transmission_id.nil?
+      # Powiąż transmisję z zamówieniem (unika duplikatów)
+      if transmission && !transmissions.include?(transmission)
+        transmissions << transmission
+      end
 
       items.each do |item|
         order_items.create!(

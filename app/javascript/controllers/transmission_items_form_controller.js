@@ -34,11 +34,14 @@ export default class extends Controller {
     this.searchTimeout = null;
     this.customerSearchTimeout = null;
     this.boundCloseDropdown = this.closeDropdownOnClickOutside.bind(this);
+    this.boundHandleChatUser = this.handleChatUser.bind(this);
     document.addEventListener("mousedown", this.boundCloseDropdown);
+    document.addEventListener("live-chat:select-user", this.boundHandleChatUser);
   }
 
   disconnect() {
     document.removeEventListener("mousedown", this.boundCloseDropdown);
+    document.removeEventListener("live-chat:select-user", this.boundHandleChatUser);
   }
 
   toggleSource() {
@@ -171,7 +174,6 @@ export default class extends Controller {
       dropdown.classList.add("hidden");
       dropdown.innerHTML = "";
       container.querySelector("input[name='items[][customer_id]']").value = "";
-      container.querySelector("input[name='items[][customer_name]']").value = "";
       return;
     }
 
@@ -186,7 +188,7 @@ export default class extends Controller {
       )
         .then((r) => r.json())
         .then((customers) =>
-          this.renderCustomerResults(container, dropdown, customers, query),
+          this.renderCustomerResults(container, dropdown, customers),
         )
         .catch(() => dropdown.classList.add("hidden"));
     }, 250);
@@ -200,7 +202,7 @@ export default class extends Controller {
     }
   }
 
-  renderCustomerResults(container, dropdown, customers, query) {
+  renderCustomerResults(container, dropdown, customers) {
     let html = customers
       .map((c) => {
         const display = c.username
@@ -219,16 +221,9 @@ export default class extends Controller {
       })
       .join('<div class="border-t border-base-200"></div>');
 
-    if (customers.length > 0) {
-      html += '<div class="border-t border-base-200"></div>';
+    if (customers.length === 0) {
+      html += `<div class="px-4 py-2.5 text-sm text-base-content/50">Brak wyników</div>`;
     }
-
-    html += `<button type="button"
-        class="w-full text-left px-4 py-2.5 hover:bg-base-200 transition-colors text-base-content/60"
-        data-action="click->transmission-items-form#selectNewCustomer"
-        data-name="${this.escapeHtml(query)}">
-      <div class="text-sm">Dodaj jako nowego: <strong>${this.escapeHtml(query)}</strong></div>
-    </button>`;
 
     dropdown.innerHTML = html;
     dropdown.classList.remove("hidden");
@@ -237,25 +232,45 @@ export default class extends Controller {
   selectExistingCustomer(event) {
     const btn = event.currentTarget;
     const container = btn.closest(".relative");
-    this._applyCustomerSelection(
-      container,
-      btn.dataset.customerId,
-      "",
-      btn.dataset.display,
-    );
+    this._applyCustomerSelection(container, btn.dataset.customerId, btn.dataset.display);
   }
 
-  selectNewCustomer(event) {
-    const btn = event.currentTarget;
-    const container = btn.closest(".relative");
-    this._applyCustomerSelection(container, "", btn.dataset.name, btn.dataset.name);
-  }
-
-  _applyCustomerSelection(container, customerId, customerName, displayText) {
+  _applyCustomerSelection(container, customerId, displayText) {
     container.querySelector(".customer-search-input").value = displayText;
     container.querySelector("input[name='items[][customer_id]']").value = customerId;
-    container.querySelector("input[name='items[][customer_name]']").value = customerName;
     container.querySelector(".customer-dropdown").classList.add("hidden");
+  }
+
+  handleChatUser(event) {
+    const { customerId, username } = event.detail;
+    if (!customerId) return;
+
+    this._addCustomerDirectly(customerId, username);
+  }
+
+  _addCustomerDirectly(customerId, displayText) {
+    const alreadyAdded = this.rowTargets.some(
+      (row) => row.querySelector("input[name='items[][customer_id]']")?.value === String(customerId)
+    );
+    if (alreadyAdded) return;
+
+    let container = null;
+
+    for (const row of this.rowTargets) {
+      const cidInput = row.querySelector("input[name='items[][customer_id]']");
+      if (cidInput && !cidInput.value) {
+        container = row.querySelector(".relative");
+        break;
+      }
+    }
+
+    if (!container) {
+      this.addRow();
+      container = this.rowsTarget.lastElementChild?.querySelector(".relative");
+    }
+
+    if (!container) return;
+    this._applyCustomerSelection(container, customerId, displayText);
   }
 
   escapeHtml(str) {

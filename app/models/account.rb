@@ -10,6 +10,7 @@ class Account < ApplicationRecord
   has_many :transmissions
   has_many :product_imports
   has_many :integrations
+  has_many :customer_platform_accounts
 
   has_one_attached :logo
 

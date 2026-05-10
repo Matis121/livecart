@@ -1,0 +1,33 @@
+<div class="card bg-base-100 border border-base-300 shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title text-lg mb-4">Konfiguracja TikTok Live Chat</h2>
+
+    <div class="alert alert-info mb-4">
+      <%= lucide_icon("info", class: "w-5 h-5 shrink-0") %>
+      <span class="text-sm">
+        Podaj swoją nazwę użytkownika TikTok. Chat z live transmisji będzie automatycznie
+        wyświetlany podczas aktywnych transmisji w aplikacji.
+      </span>
+    </div>
+
+    <!-- TikTok username -->
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text font-semibold">Nazwa użytkownika TikTok *</span>
+      </label>
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 font-medium">@</span>
+        <input type="text"
+               name="integration[settings][tiktok_username]"
+               value="<%= integration.settings&.dig('tiktok_username') %>"
+               class="input input-bordered w-full pl-8"
+               placeholder="twoja_nazwa"
+               autocomplete="off"
+               required>
+      </div>
+      <label class="label">
+        <span class="label-text-alt text-base-content/50">Np. jeśli Twój profil to @jan_kowalski, wpisz: jan_kowalski</span>
+      </label>
+    </div>
+  </div>
+</div>

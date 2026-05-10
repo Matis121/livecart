@@ -64,7 +64,7 @@ class TransmissionItemsController < ApplicationController
 
   def bulk_create
     items = params[:items].to_a.reject { |h|
-      (h["customer_id"].blank? && h["customer_name"].blank?) || h["quantity"].to_i < 1
+      h["customer_id"].blank? || h["quantity"].to_i < 1
     }
     if items.empty?
       redirect_to transmission_path(@transmission), alert: "Dodaj co najmniej jednego klienta z ilością."
@@ -83,15 +83,7 @@ class TransmissionItemsController < ApplicationController
     errors = []
     @transmission.transaction do
       items.each do |item|
-        customer = if item["customer_id"].present?
-          current_account.customers.find_by(id: item["customer_id"])
-        elsif item["customer_name"].present?
-          parts = item["customer_name"].to_s.strip.split
-          current_account.customers.find_or_create_by!(
-            first_name: parts.first,
-            last_name: parts.drop(1).join(" ").presence
-          )
-        end
+        customer = current_account.customers.find_by(id: item["customer_id"]) if item["customer_id"].present?
         next unless customer
 
         ti = @transmission.transmission_items.build(
